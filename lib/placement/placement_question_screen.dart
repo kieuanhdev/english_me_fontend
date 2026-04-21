@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:englishme/vocab/vocab_learning_screen.dart';
 
 class PlacementQuestionScreen extends StatefulWidget {
   const PlacementQuestionScreen({super.key});
@@ -112,11 +113,11 @@ class _PlacementQuestionScreenState extends State<PlacementQuestionScreen> {
 
   void _nextQuestion() {
     if (_questionIndex >= _questions.length - 1) {
-      setState(() {
-        _questionIndex = 0;
-        _selectedId = null;
-        _submitted = false;
-      });
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const VocabLearningScreen(),
+        ),
+      );
       return;
     }
 

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:englishme/welcome/styles/welcome_tokens.dart';
+import 'package:englishme/theme/app_theme.dart';
 
 enum AppButtonVariant { primary, secondary }
 
@@ -27,14 +27,14 @@ class AppButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isPrimary = variant == AppButtonVariant.primary;
     final Color shadowColor =
-        isPrimary ? WelcomeColors.primaryDark : const Color(0xFFCBD5DD);
+        isPrimary ? AppColors.primaryDark : AppColors.neutralShadow;
     final BorderSide borderSide = isPrimary
         ? BorderSide.none
-        : const BorderSide(color: WelcomeColors.border, width: 2);
+        : const BorderSide(color: AppColors.border, width: 2);
 
     final TextStyle resolvedTextStyle =
-        (textStyle ?? WelcomeTypography.buttonLabel).copyWith(
-      color: isPrimary ? Colors.white : WelcomeColors.primary,
+        (textStyle ?? AppTypography.button).copyWith(
+      color: isPrimary ? Colors.white : AppColors.primary,
     );
 
     final Widget buttonChild = Row(
@@ -52,10 +52,10 @@ class AppButton extends StatelessWidget {
     final ButtonStyle style = ButtonStyle(
       minimumSize: WidgetStatePropertyAll(Size(0, height)),
       backgroundColor: WidgetStatePropertyAll(
-        isPrimary ? WelcomeColors.primary : WelcomeColors.surface,
+        isPrimary ? AppColors.primary : AppColors.surface,
       ),
       foregroundColor: WidgetStatePropertyAll(
-        isPrimary ? Colors.white : WelcomeColors.primary,
+        isPrimary ? Colors.white : AppColors.primary,
       ),
       side: WidgetStatePropertyAll(borderSide),
       elevation: const WidgetStatePropertyAll(0),
@@ -69,7 +69,7 @@ class AppButton extends StatelessWidget {
       overlayColor: WidgetStatePropertyAll(
         isPrimary
             ? Colors.white.withValues(alpha: 0.08)
-            : WelcomeColors.primary.withValues(alpha: 0.06),
+            : AppColors.primary.withValues(alpha: 0.06),
       ),
       textStyle: WidgetStatePropertyAll(resolvedTextStyle),
     );

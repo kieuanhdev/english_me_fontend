@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/placement/placement_question_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class PlacementIntroScreen extends StatelessWidget {
@@ -64,7 +65,7 @@ class PlacementIntroScreen extends StatelessWidget {
                     child: _SkillCard(
                       label: 'Ngữ pháp',
                       icon: Icons.menu_book_rounded,
-                      color: Color(0xFF16A7A4),
+                      color: AppColors.skillGrammar,
                     ),
                   ),
                   AppGap.w10,
@@ -72,7 +73,7 @@ class PlacementIntroScreen extends StatelessWidget {
                     child: _SkillCard(
                       label: 'Từ vựng',
                       icon: Icons.library_books_rounded,
-                      color: Color(0xFFF4B12D),
+                      color: AppColors.skillVocabulary,
                     ),
                   ),
                   AppGap.w10,
@@ -80,7 +81,7 @@ class PlacementIntroScreen extends StatelessWidget {
                     child: _SkillCard(
                       label: 'Nghe hiểu',
                       icon: Icons.headphones_rounded,
-                      color: Color(0xFFF06191),
+                      color: AppColors.skillListening,
                     ),
                   ),
                 ],
@@ -88,7 +89,13 @@ class PlacementIntroScreen extends StatelessWidget {
               AppGap.h24,
               AppButton(
                 label: 'BẮT ĐẦU KIỂM TRA',
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const PlacementQuestionScreen(),
+                    ),
+                  );
+                },
                 variant: AppButtonVariant.primary,
               ),
               AppGap.h18,

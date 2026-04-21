@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:englishme/auth/login_screen.dart';
 import 'package:englishme/auth/register_screen.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
@@ -141,9 +142,15 @@ class _ActionButtons extends StatelessWidget {
           variant: AppButtonVariant.primary,
         ),
         AppGap.h14,
-        const AppButton(
+        AppButton(
           label: 'TÔI ĐÃ CÓ TÀI KHOẢN',
-          onPressed: _noop,
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const LoginScreen(),
+              ),
+            );
+          },
           variant: AppButtonVariant.secondary,
         ),
       ],
@@ -174,4 +181,3 @@ class _LanguageSwitcher extends StatelessWidget {
   }
 }
 
-void _noop() {}

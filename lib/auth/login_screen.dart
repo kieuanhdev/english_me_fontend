@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:englishme/auth/login_screen.dart';
+import 'package:englishme/auth/register_screen.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
-import 'package:englishme/placement/placement_intro_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class RegisterScreen extends StatelessWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +22,14 @@ class RegisterScreen extends StatelessWidget {
               _TopHeader(onBack: () => Navigator.of(context).pop()),
               AppGap.h26,
               Text(
-                'Tạo tài khoản',
+                'Chào mừng trở lại!',
                 style: AppTypography.displayLarge.copyWith(fontSize: 26),
               ),
               Text(
-                'Chỉ cần vài bước để bắt đầu học.',
+                'Đăng nhập để tiếp tục lộ trình học của bạn.',
                 style: AppTypography.body.copyWith(fontSize: 14),
               ),
               AppGap.h20,
-              const _FieldLabel('TÊN HIỂN THỊ'),
-              AppGap.h6,
-              const AppTextField(initialValue: 'Minh Anh'),
-              AppGap.h14,
               const _FieldLabel('EMAIL'),
               AppGap.h6,
               const AppTextField(
@@ -48,23 +43,25 @@ class RegisterScreen extends StatelessWidget {
                 initialValue: '••••••••••',
                 obscureText: true,
               ),
-              AppGap.h14,
-              const _FieldLabel('XÁC NHẬN MẬT KHẨU'),
-              AppGap.h6,
-              const AppTextField(
-                initialValue: '••••••••••',
-                obscureText: true,
-              ),
-              AppGap.h18,
-              AppButton(
-                label: 'ĐĂNG KÝ',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const PlacementIntroScreen(),
+              AppGap.h8,
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Quên mật khẩu?',
+                    style: AppTypography.body.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 14,
                     ),
-                  );
-                },
+                  ),
+                ),
+              ),
+              AppGap.h10,
+              AppButton(
+                label: 'ĐĂNG NHẬP',
+                onPressed: () {},
                 variant: AppButtonVariant.primary,
               ),
               AppGap.h24,
@@ -94,7 +91,7 @@ class RegisterScreen extends StatelessWidget {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      'Đã có tài khoản? ',
+                      'Chưa có tài khoản? ',
                       style: AppTypography.body.copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
@@ -104,13 +101,11 @@ class RegisterScreen extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const RegisterScreen()),
                         );
                       },
                       child: Text(
-                        'Đăng nhập',
+                        'Đăng ký',
                         style: AppTypography.body.copyWith(
                           fontSize: 13,
                           color: AppColors.primary,

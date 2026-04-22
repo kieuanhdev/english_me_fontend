@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const Color bg = Color(0xFFF7FAFC); // --ink-50
@@ -33,41 +32,47 @@ class AppColors {
 }
 
 class AppTypography {
-  static TextStyle get displayLarge => GoogleFonts.baloo2(
+  static TextStyle get displayLarge => const TextStyle(
+        fontFamily: 'Baloo2',
         fontSize: 30,
         fontWeight: FontWeight.w800,
         height: 1.15,
         color: AppColors.text,
       );
 
-  static TextStyle get displayAccent => GoogleFonts.baloo2(
+  static TextStyle get displayAccent => const TextStyle(
+        fontFamily: 'Baloo2',
         fontSize: 30,
         fontWeight: FontWeight.w800,
         height: 1.15,
         color: AppColors.primary,
       );
 
-  static TextStyle get brand => GoogleFonts.baloo2(
+  static TextStyle get brand => const TextStyle(
+        fontFamily: 'Baloo2',
         fontSize: 30,
         fontWeight: FontWeight.w800,
         color: AppColors.primary,
         letterSpacing: -0.2,
       );
 
-  static TextStyle get body => GoogleFonts.nunito(
+  static TextStyle get body => const TextStyle(
+        fontFamily: 'Nunito',
         fontSize: 15,
         fontWeight: FontWeight.w600,
         height: 1.35,
         color: AppColors.textMuted,
       );
 
-  static TextStyle get button => GoogleFonts.baloo2(
+  static TextStyle get button => const TextStyle(
+        fontFamily: 'Baloo2',
         fontSize: 17,
         fontWeight: FontWeight.w800,
         letterSpacing: 0.3,
       );
 
-  static TextStyle get caption => GoogleFonts.nunito(
+  static TextStyle get caption => const TextStyle(
+        fontFamily: 'Nunito',
         fontSize: 12,
         fontWeight: FontWeight.w700,
         color: AppColors.textMuted,
@@ -87,7 +92,8 @@ class AppTheme {
     );
 
     return base.copyWith(
-      textTheme: GoogleFonts.nunitoTextTheme(base.textTheme).apply(
+      textTheme: base.textTheme.apply(
+        fontFamily: 'Nunito',
         bodyColor: AppColors.text,
         displayColor: AppColors.text,
       ),

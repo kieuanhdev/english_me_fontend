@@ -9,14 +9,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.2.3
+  get: ^4.7.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  build_runner:        # Cần thêm cái này để chạy lệnh generate
+  flutter_gen_runner:  # Thư viện generator
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/locales/
   fonts:
     - family: Nunito
       fonts:
@@ -24,3 +31,10 @@ flutter:
     - family: Baloo2
       fonts:
         - asset: assets/fonts/Baloo2-Variable.ttf
+
+# Đặt ở cuối file pubspec.yaml, không thụt đầu dòng
+flutter_gen:
+  output: lib/gen/
+  line_length: 80
+  integrations:
+    flutter_svg: true

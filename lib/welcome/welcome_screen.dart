@@ -1,9 +1,13 @@
+import 'package:englishme/core/widgets/app_text.dart';
+import 'package:englishme/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/auth/login_screen.dart';
 import 'package:englishme/auth/register_screen.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/welcome/styles/welcome_tokens.dart';
+import 'package:get/get.dart';
+import '../core/values/app_strings.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -25,12 +29,11 @@ class WelcomeScreen extends StatelessWidget {
                   _MascotIllustration(),
                   AppGap.h32,
                   _WelcomeTitle(),
-                  AppGap.h14,
-                  _WelcomeDescription(),
+
                   AppGap.h40,
                   _ActionButtons(),
                   AppGap.h28,
-                  _LanguageSwitcher(),
+                  // _LanguageSwitcher(),
                 ],
               ),
             ),
@@ -46,9 +49,15 @@ class _AppBrand extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'EnglishMe',
-      style: WelcomeTypography.brand,
+    return Row(
+      children: [
+        Assets.images.iconAppEnglishMe.svg(
+          width: 48,
+          height: 48,
+          semanticsLabel: 'Logo English Me',
+        ),
+        AppText(T.appName, style: WelcomeTypography.brand),
+      ],
     );
   }
 }
@@ -58,32 +67,7 @@ class _MascotIllustration extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 190,
-      height: 190,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: WelcomeColors.primary,
-        border: Border.all(
-          color: WelcomeColors.primaryDark,
-          width: 6,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22003640),
-            blurRadius: 12,
-            offset: Offset(0, 8),
-          ),
-        ],
-      ),
-      child: const Center(
-        child: Icon(
-          Icons.flutter_dash,
-          size: 96,
-          color: WelcomeColors.primarySoft,
-        ),
-      ),
-    );
+    return Assets.images.wellcome.image();
   }
 }
 
@@ -94,31 +78,18 @@ class _WelcomeTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(
-          'Học tiếng Anh miễn phí',
+        AppText(
+          T.welcomeTitle,
           textAlign: TextAlign.center,
           style: WelcomeTypography.titleMain,
         ),
         AppGap.h6,
-        Text(
-          'vui hơn mỗi ngày',
+        AppText(
+          T.welcomeSubtitle,
           textAlign: TextAlign.center,
-          style: WelcomeTypography.titleAccent,
+          style: WelcomeTypography.body,
         ),
       ],
-    );
-  }
-}
-
-class _WelcomeDescription extends StatelessWidget {
-  const _WelcomeDescription();
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      'Cá nhân hóa theo trình độ. Học từ vựng theo phương pháp\nSM-2, luyện phát âm cùng AI.',
-      textAlign: TextAlign.center,
-      style: WelcomeTypography.body,
     );
   }
 }
@@ -131,26 +102,14 @@ class _ActionButtons extends StatelessWidget {
     return Column(
       children: [
         AppButton(
-          label: 'BẮT ĐẦU',
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const RegisterScreen(),
-              ),
-            );
-          },
+          label: T.register,
+          onPressed: () => Get.to(() => const RegisterScreen()),
           variant: AppButtonVariant.primary,
         ),
         AppGap.h14,
         AppButton(
-          label: 'TÔI ĐÃ CÓ TÀI KHOẢN',
-          onPressed: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const LoginScreen(),
-              ),
-            );
-          },
+          label: T.login,
+          onPressed: () => Get.to(() => const LoginScreen()),
           variant: AppButtonVariant.secondary,
         ),
       ],
@@ -166,18 +125,10 @@ class _LanguageSwitcher extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(
-          Icons.language,
-          size: 16,
-          color: WelcomeColors.textMuted,
-        ),
+        const Icon(Icons.language, size: 16, color: WelcomeColors.textMuted),
         AppGap.w8,
-        Text(
-          'Tiếng Việt',
-          style: WelcomeTypography.language,
-        ),
+        Text('Tiếng Việt', style: WelcomeTypography.language),
       ],
     );
   }
 }
-

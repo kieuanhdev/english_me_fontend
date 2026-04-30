@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Thêm GetX để dùng .tr
 import 'package:englishme/theme/app_theme.dart';
 
 enum AppButtonVariant { primary, secondary }
@@ -8,10 +9,12 @@ class AppButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.variant = AppButtonVariant.primary,
-    this.height = 60,
+    this.height = 56, // Giảm nhẹ chiều cao cho cân đối
     this.expand = true,
     this.leading,
     this.textStyle,
+    this.isLoading = false, // Thêm trạng thái loading
+    this.isTranslate = true, // Tích hợp dịch tự động
     super.key,
   });
 
@@ -22,74 +25,90 @@ class AppButton extends StatelessWidget {
   final bool expand;
   final Widget? leading;
   final TextStyle? textStyle;
+  final bool isLoading;
+  final bool isTranslate;
 
   @override
   Widget build(BuildContext context) {
     final bool isPrimary = variant == AppButtonVariant.primary;
-    final Color shadowColor =
-        isPrimary ? AppColors.primaryDark : AppColors.neutralShadow;
-    final BorderSide borderSide = isPrimary
-        ? BorderSide.none
-        : const BorderSide(color: AppColors.border, width: 2);
 
-    final TextStyle resolvedTextStyle =
-        (textStyle ?? AppTypography.button).copyWith(
-      color: isPrimary ? Colors.white : AppColors.primary,
-    );
+    // Xử lý label: Dịch nếu cần
+    final String displayLabel = isTranslate ? label.tr : label;
 
-    final Widget buttonChild = Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (leading != null) ...[
-          leading!,
-          const SizedBox(width: 8),
-        ],
-        Text(label, style: resolvedTextStyle),
-      ],
-    );
+    final Color shadowColor = isPrimary
+        ? AppColors.primaryDark
+        : AppColors.neutralShadow;
 
-    final ButtonStyle style = ButtonStyle(
-      minimumSize: WidgetStatePropertyAll(Size(0, height)),
-      backgroundColor: WidgetStatePropertyAll(
-        isPrimary ? AppColors.primary : AppColors.surface,
-      ),
-      foregroundColor: WidgetStatePropertyAll(
-        isPrimary ? Colors.white : AppColors.primary,
-      ),
-      side: WidgetStatePropertyAll(borderSide),
-      elevation: const WidgetStatePropertyAll(0),
-      shadowColor: const WidgetStatePropertyAll(Colors.transparent),
-      surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-        ),
-      ),
-      overlayColor: WidgetStatePropertyAll(
-        isPrimary
-            ? Colors.white.withValues(alpha: 0.08)
-            : AppColors.primary.withValues(alpha: 0.06),
-      ),
-      textStyle: WidgetStatePropertyAll(resolvedTextStyle),
-    );
+    final TextStyle resolvedTextStyle = (textStyle ?? AppTypography.button)
+        .copyWith(color: isPrimary ? Colors.white : AppColors.primary);
 
-    final Widget button = isPrimary
-        ? ElevatedButton(onPressed: onPressed, style: style, child: buttonChild)
-        : OutlinedButton(onPressed: onPressed, style: style, child: buttonChild);
+    final Widget buttonChild = isLoading
+        ? SizedBox(
+            height: 24,
+            width: 24,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isPrimary ? Colors.white : AppColors.primary,
+              ),
+            ),
+          )
+        : Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (leading != null) ...[leading!, const SizedBox(width: 8)],
+              Text(displayLabel, style: resolvedTextStyle),
+            ],
+          );
+
+    final ButtonStyle style =
+        ElevatedButton.styleFrom(
+          minimumSize: Size(expand ? double.infinity : 0, height),
+          backgroundColor: isPrimary ? AppColors.primary : AppColors.surface,
+          foregroundColor: isPrimary ? Colors.white : AppColors.primary,
+          side: isPrimary
+              ? BorderSide.none
+              : const BorderSide(color: AppColors.border, width: 2),
+          elevation: 0,
+          shadowColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ), // Bo góc tròn hơn chút
+        ).copyWith(
+          overlayColor: WidgetStatePropertyAll(
+            isPrimary
+                ? Colors.white.withValues(alpha: 0.1)
+                : AppColors.primary.withValues(alpha: 0.05),
+          ),
+        );
 
     return Container(
       width: expand ? double.infinity : null,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: [
-          BoxShadow(
-            color: shadowColor,
-            offset: const Offset(0, 4),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: onPressed == null || isLoading
+            ? null
+            : [
+                // Tắt bóng khi disable hoặc loading
+                BoxShadow(
+                  color: shadowColor,
+                  offset: const Offset(0, 4),
+                  blurRadius: 0,
+                ),
+              ],
       ),
-      child: button,
+      child: isPrimary
+          ? ElevatedButton(
+              onPressed: isLoading ? null : onPressed,
+              style: style,
+              child: buttonChild,
+            )
+          : OutlinedButton(
+              onPressed: isLoading ? null : onPressed,
+              style: style,
+              child: buttonChild,
+            ),
     );
   }
 }

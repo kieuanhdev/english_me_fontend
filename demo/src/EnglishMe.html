@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EnglishMe — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  /* ---------- TWEAKABLE DEFAULTS ---------- */
+  /* (read by the host so edits survive reload) */
+
+  :root {
+    --teal-50:  #E6FAF9;
+    --teal-100: #C6F2EF;
+    --teal-200: #8EE6E1;
+    --teal-400: #2FC7C1;
+    --teal-500: #0EA5A4;
+    --teal-600: #0B8A89;
+    --teal-700: #086B6B;
+    --teal-900: #033A3A;
+
+    --yellow-300: #FFD166;
+    --yellow-400: #FDBA38;
+    --yellow-500: #F59E0B;
+
+    --pink-300: #FFB1C6;
+    --pink-500: #FF6D94;
+
+    --purple-500: #8B5CF6;
+
+    --red-500: #EF4444;
+    --green-500: #22C55E;
+
+    --ink-900: #0D1B2A;
+    --ink-700: #2A3B4D;
+    --ink-500: #5B6B7C;
+    --ink-400: #8896A4;
+    --ink-300: #C7D1DB;
+    --ink-200: #E4EAF0;
+    --ink-100: #F1F5F8;
+    --ink-50:  #F7FAFC;
+    --white: #FFFFFF;
+
+    --bg: var(--ink-50);
+    --surface: var(--white);
+    --surface-2: var(--ink-100);
+    --text: var(--ink-900);
+    --text-muted: var(--ink-500);
+    --border: var(--ink-200);
+    --primary: var(--teal-500);
+    --primary-dark: var(--teal-700);
+    --primary-soft: var(--teal-50);
+    --accent: var(--yellow-400);
+
+    --radius-s: 10px;
+    --radius-m: 14px;
+    --radius-l: 20px;
+    --radius-xl: 28px;
+
+    --shadow-btn: 0 4px 0 0 var(--primary-dark);
+    --shadow-btn-yellow: 0 4px 0 0 #C98416;
+    --shadow-btn-white: 0 4px 0 0 #CBD5DD;
+    --shadow-card: 0 2px 0 0 var(--ink-200);
+    --shadow-float: 0 12px 28px -8px rgba(13,27,42,.18), 0 4px 10px -4px rgba(13,27,42,.10);
+
+    --font-display: "Baloo 2", "Nunito", system-ui, sans-serif;
+    --font-body: "Nunito", system-ui, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg: #0B1620;
+    --surface: #14222F;
+    --surface-2: #1C2E3E;
+    --text: #F1F5F8;
+    --text-muted: #9BADBF;
+    --border: #25384A;
+    --primary-soft: #083836;
+    --shadow-btn-white: 0 4px 0 0 #0A1720;
+    --shadow-card: 0 2px 0 0 #0A1720;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: var(--font-body);
+    background: #0D1B2A;
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* ---------- STAGE (phone frameless) ---------- */
+  .stage {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px 120px;
+    background:
+      radial-gradient(1200px 600px at 20% 0%, rgba(14,165,164,.18), transparent 60%),
+      radial-gradient(900px 500px at 100% 100%, rgba(253,186,56,.10), transparent 60%),
+      #0D1B2A;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 0 10px #0A1420,
+      0 0 0 12px #1C2E3E,
+      0 40px 80px -20px rgba(0,0,0,.6);
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* status bar */
+  .statusbar {
+    height: 44px;
+    padding: 14px 26px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+  .statusbar .icons { display: flex; gap: 6px; align-items: center; }
+
+  .screen {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { width: 0; }
+
+  /* ---------- BUTTONS (chunky, bottom-shadow) ---------- */
+  .btn {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 22px;
+    cursor: pointer;
+    transition: transform .08s ease, box-shadow .08s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .btn:active { transform: translateY(2px); }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow-btn);
+  }
+  .btn-primary:active { box-shadow: 0 2px 0 0 var(--primary-dark); }
+  .btn-yellow {
+    background: var(--yellow-400);
+    color: var(--ink-900);
+    box-shadow: var(--shadow-btn-yellow);
+  }
+  .btn-white {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--shadow-btn-white);
+    border: 2px solid var(--border);
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--primary);
+    text-transform: none;
+    font-weight: 700;
+  }
+  .btn-block { width: 100%; }
+  .btn-lg { padding: 18px 22px; font-size: 17px; }
+
+  .input {
+    width: 100%;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 16px;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s;
+  }
+  .input:focus { border-color: var(--primary); }
+
+  h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; color: var(--text); }
+  p { margin: 0; }
+
+  /* pill */
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 10px; border-radius: 999px;
+    font-family: var(--font-display); font-weight: 700; font-size: 12px;
+    background: var(--primary-soft); color: var(--primary-dark);
+  }
+
+  .card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 18px;
+    box-shadow: var(--shadow-card);
+  }
+
+  /* ---------- BOTTOM NAV ---------- */
+  .bottomnav {
+    height: 76px;
+    padding: 8px 12px 18px;
+    background: var(--surface);
+    border-top: 2px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    flex-shrink: 0;
+  }
+  .bottomnav button {
+    border: none; background: none; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 6px 10px; border-radius: 10px;
+    font-family: var(--font-display); font-weight: 700; font-size: 11px;
+    color: var(--ink-400); flex: 1;
+  }
+  .bottomnav button.active { color: var(--primary); }
+  .bottomnav button svg { width: 26px; height: 26px; }
+
+  /* ---------- SCREEN-SWITCHER SIDEBAR ---------- */
+  .switcher {
+    position: fixed;
+    top: 24px; left: 24px;
+    background: #14222F;
+    color: #F1F5F8;
+    border-radius: 18px;
+    padding: 14px;
+    width: 210px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,.5);
+    z-index: 100;
+    font-family: var(--font-display);
+  }
+  .switcher h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #7B8FA3; margin-bottom: 10px; font-weight: 700; }
+  .switcher-btn {
+    display: block; width: 100%;
+    background: none; border: none;
+    text-align: left; padding: 8px 10px;
+    border-radius: 10px;
+    color: #C7D1DB; font-weight: 700; font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 2px;
+  }
+  .switcher-btn:hover { background: #1C2E3E; color: #fff; }
+  .switcher-btn.active { background: var(--teal-500); color: #fff; }
+  .switcher-btn .num { opacity: .6; margin-right: 6px; }
+
+  /* ---------- TWEAKS PANEL ---------- */
+  .tweaks {
+    position: fixed;
+    right: 24px; bottom: 24px;
+    background: #14222F;
+    color: #F1F5F8;
+    border-radius: 18px;
+    padding: 16px;
+    width: 240px;
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,.5);
+    z-index: 100;
+    font-family: var(--font-display);
+  }
+  .tweaks h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #7B8FA3; margin-bottom: 10px; font-weight: 700; }
+  .tweak-row { margin-bottom: 10px; }
+  .tweak-row label { display: block; font-size: 11px; color: #9BADBF; margin-bottom: 6px; font-weight: 700; }
+  .swatches { display: flex; gap: 8px; }
+  .swatch {
+    width: 30px; height: 30px; border-radius: 999px;
+    border: 2px solid transparent; cursor: pointer;
+  }
+  .swatch.active { border-color: #fff; transform: scale(1.1); }
+  .toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #1C2E3E; padding: 8px 12px; border-radius: 10px;
+    cursor: pointer;
+  }
+  .toggle span { font-size: 13px; font-weight: 700; }
+  .toggle .track {
+    width: 34px; height: 20px; border-radius: 999px;
+    background: #3A4E62; position: relative; transition: background .15s;
+  }
+  .toggle .track::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 16px; height: 16px; border-radius: 999px;
+    background: #fff; transition: transform .15s;
+  }
+  .toggle.on .track { background: var(--teal-500); }
+  .toggle.on .track::after { transform: translateX(14px); }
+
+  /* utility */
+  .row { display: flex; align-items: center; }
+  .col { display: flex; flex-direction: column; }
+  .gap-8 { gap: 8px; } .gap-12 { gap: 12px; } .gap-16 { gap: 16px; } .gap-24 { gap: 24px; }
+  .grow { flex: 1; }
+  .center { justify-content: center; align-items: center; }
+
+  /* progress bar */
+  .progress {
+    height: 14px; background: var(--ink-200); border-radius: 999px; overflow: hidden;
+    border: 2px solid var(--ink-200);
+  }
+  .progress-fill {
+    height: 100%; background: var(--primary); border-radius: 999px;
+    transition: width .4s ease;
+    position: relative;
+  }
+  .progress-fill::after {
+    content: ''; position: absolute; top: 2px; left: 8px; right: 8px; height: 3px;
+    background: rgba(255,255,255,.5); border-radius: 999px;
+  }
+
+  /* hide scrollbar */
+  .noscroll { overflow: hidden; }
+
+  @keyframes pop {
+    0% { transform: scale(.8); opacity: 0; }
+    60% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .pop-in { animation: pop .35s ease-out; }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .slide-up { animation: slideUp .35s ease-out both; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script>
+  /* Tweakable defaults — host rewrites this JSON on disk when user changes values */
+  window.__TWEAKS__ = /*EDITMODE-BEGIN*/{
+    "primary": "teal",
+    "dark": false
+  }/*EDITMODE-END*/;
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="src/Icons.jsx"></script>
+<script type="text/babel" src="src/Mascot.jsx"></script>
+<script type="text/babel" src="src/Chrome.jsx"></script>
+<script type="text/babel" src="src/Welcome.jsx"></script>
+<script type="text/babel" src="src/Placement.jsx"></script>
+<script type="text/babel" src="src/Dashboard.jsx"></script>
+<script type="text/babel" src="src/Flashcard.jsx"></script>
+<script type="text/babel" src="src/App.jsx"></script>
+
+</body>
+</html>

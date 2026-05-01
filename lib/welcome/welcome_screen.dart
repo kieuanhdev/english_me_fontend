@@ -1,13 +1,11 @@
+import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text.dart';
 import 'package:englishme/gen/assets.gen.dart';
-import 'package:flutter/material.dart';
-import 'package:englishme/auth/login_screen.dart';
-import 'package:englishme/auth/register_screen.dart';
-import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/welcome/styles/welcome_tokens.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../core/values/app_strings.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -33,7 +31,6 @@ class WelcomeScreen extends StatelessWidget {
                   AppGap.h40,
                   _ActionButtons(),
                   AppGap.h28,
-                  // _LanguageSwitcher(),
                 ],
               ),
             ),
@@ -103,33 +100,17 @@ class _ActionButtons extends StatelessWidget {
       children: [
         AppButton(
           label: T.authRegister,
-          onPressed: () => Get.to(() => const RegisterScreen()),
+          onPressed: () => Get.toNamed('/register'),
           variant: AppButtonVariant.primary,
           textStyle: WelcomeTypography.buttonLabel,
         ),
         AppGap.h14,
         AppButton(
           label: T.authLogin,
-          onPressed: () => Get.to(() => const LoginScreen()),
+          onPressed: () => Get.toNamed('/login'),
           variant: AppButtonVariant.secondary,
           textStyle: WelcomeTypography.buttonLabel,
         ),
-      ],
-    );
-  }
-}
-
-class _LanguageSwitcher extends StatelessWidget {
-  const _LanguageSwitcher();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Icon(Icons.language, size: 16, color: WelcomeColors.textMuted),
-        AppGap.w8,
-        Text('Tiếng Việt', style: WelcomeTypography.language),
       ],
     );
   }

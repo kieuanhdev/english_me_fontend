@@ -1,17 +1,17 @@
-import 'package:englishme/auth/widgets/auth_navigation_text.dart';
-import 'package:englishme/core/widgets/common_app_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:englishme/auth/register_screen.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/core/widgets/app_button.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
+import 'package:englishme/core/widgets/common_app_bar.dart';
+import 'package:englishme/modules/auth/controllers/auth_controller.dart';
+import 'package:englishme/modules/auth/views/register_screen.dart';
+import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
+import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../core/values/app_strings.dart';
-
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends GetView<AuthController> {
   const LoginScreen({super.key});
 
   @override
@@ -57,57 +57,40 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
               AppGap.h10,
-              AppButton(
-                label: T.loginNow,
-                onPressed: () {},
-                variant: AppButtonVariant.primary,
+              Obx(
+                () => AppButton(
+                  label: T.loginNow,
+                  onPressed: controller.isLoading.value ? null : () {},
+                  variant: AppButtonVariant.primary,
+                ),
               ),
               AppGap.h24,
-              const _OrDivider(),
+              const AuthOrDivider(),
               AppGap.h22,
-              AppButton(
-                label: T.buttonContinueWithGoogle,
-                onPressed: () {},
-                variant: AppButtonVariant.secondary,
-                textStyle: AppTypography.bodyLarge.copyWith(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primary,
+              Obx(
+                () => AppButton(
+                  label: T.buttonContinueWithGoogle,
+                  onPressed: controller.isLoading.value
+                      ? null
+                      : controller.signInWithGoogle,
+                  variant: AppButtonVariant.secondary,
+                  textStyle: AppTypography.bodyLarge.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
               AppGap.h18,
               AuthNavigationText(
                 promptText: T.dontHaveAccount.tr,
                 buttonText: T.registerNow.tr,
-                onTap: () {
-                  Get.to(() => const RegisterScreen());
-                },
+                onTap: () => Get.to(() => const RegisterScreen()),
               ),
             ],
           ),
         ),
       ),
-    );
-  }
-}
-
-class _OrDivider extends StatelessWidget {
-  const _OrDivider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Expanded(child: Divider(color: Color(0xFFD6DEE7), thickness: 2)),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            'HOẶC',
-            style: AppTypography.labelMedium.copyWith(fontSize: 13),
-          ),
-        ),
-        const Expanded(child: Divider(color: Color(0xFFD6DEE7), thickness: 2)),
-      ],
     );
   }
 }

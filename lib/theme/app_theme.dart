@@ -102,14 +102,14 @@ class AppTypography {
 
   static TextStyle get bodyMedium => const TextStyle(
     fontFamily: 'PlusJakartaSans',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary, // Vietnamese translations
   );
 
   static TextStyle get labelMedium => const TextStyle(
     fontFamily: 'PlusJakartaSans',
-    fontSize: 12,
+    fontSize: 20,
     fontWeight: FontWeight.w700,
     letterSpacing: 1.2,
     color: AppColors.primary,

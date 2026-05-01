@@ -1,8 +1,24 @@
 {
+  "app_name": "EnglishMe",
+  "home_welcome": "Chào mừng @name trở lại",
   "welcome_title": "Học tiếng Anh thông minh hơn",
   "welcome_subtitle": "Nâng tầm kiến thức của bạn với phương pháp học tập từ",
-  "app_name": "EnglishMe",
+  "label_email": "EMAIL",
+  "label_password": "MẬT KHẨU",
+  "button_continue_with_google": "Tiếp tục với Google",
   "auth_login": "Đăng nhập",
   "auth_register": "Đăng ký",
-  "home_welcome": "Chào mừng @name trở lại"
+  "login_welcome_title": "Chào mừng trở lại!",
+  "login_welcome_subtitle": "Đăng nhập để tiếp tục lộ trình học của bạn.",
+  "forgot_password": "Quên mật khẩu?",
+  "dont_have_account": "Chưa có tài khoản? ",
+  "register_now": "Đăng ký",
+  "register_screen_title": "Đăng ký",
+  "register_welcome_title": "Bắt đầu hành trình",
+  "register_welcome_subtitle": "Học tiếng Anh theo phong cách Editorial chuyên nghiệp.",
+  "label_full_name": "Họ và tên",
+  "label_confirm_password": "XÁC NHẬN MẬT KHẨU",
+  "button_create_account": "Tạo tài khoản",
+  "already_have_account": "Đã có tài khoản? ",
+  "login_now": "Đăng nhập"
 }

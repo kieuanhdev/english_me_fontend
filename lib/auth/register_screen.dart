@@ -1,11 +1,14 @@
+import 'package:englishme/auth/widgets/auth_navigation_text.dart';
+import 'package:englishme/gen/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/auth/login_screen.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/placement/placement_intro_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:get/get_navigation/get_navigation.dart';
+import 'package:get/utils.dart';
 
 import '../core/values/app_strings.dart';
 import '../core/widgets/common_app_bar.dart';
@@ -17,45 +20,44 @@ class RegisterScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: CommonAppBar(title: T.register),
+      appBar: CommonAppBar(title: T.authRegister),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(26, 16, 26, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // _TopHeader(onBack: () => Navigator.of(context).pop()),
+              Assets.images.iconAppEnglishMe.svg(
+                width: 80,
+                height: 80,
+                semanticsLabel: T.appName,
+              ),
               AppGap.h26,
               Text(
-                'Tạo tài khoản',
+                T.registerWelcomeTitle.tr,
                 style: AppTypography.displayLarge.copyWith(fontSize: 26),
               ),
               Text(
-                'Chỉ cần vài bước để bắt đầu học.',
+                T.registerWelcomeSubtitle.tr,
                 style: AppTypography.bodyLarge.copyWith(fontSize: 14),
               ),
               AppGap.h20,
-              const _FieldLabel('TÊN HIỂN THỊ'),
-              AppGap.h6,
-              const AppTextField(initialValue: 'Minh Anh'),
+              const AppTextField(label: T.labelFullName),
               AppGap.h14,
-              const _FieldLabel('EMAIL'),
-              AppGap.h6,
               const AppTextField(
-                initialValue: 'minhanh@englishme.vn',
+                label: T.labelEmail,
                 keyboardType: TextInputType.emailAddress,
               ),
               AppGap.h14,
-              const _FieldLabel('MẬT KHẨU'),
-              AppGap.h6,
-              const AppTextField(initialValue: '••••••••••', obscureText: true),
+              const AppTextField(label: T.labelPassword, obscureText: true),
               AppGap.h14,
-              const _FieldLabel('XÁC NHẬN MẬT KHẨU'),
-              AppGap.h6,
-              const AppTextField(initialValue: '••••••••••', obscureText: true),
+              const AppTextField(
+                label: T.labelConfirmPassword,
+                obscureText: true,
+              ),
               AppGap.h18,
               AppButton(
-                label: 'ĐĂNG KÝ',
+                label: 'Tạo tài khoản',
                 onPressed: () {
                   Navigator.of(context).push(
                     MaterialPageRoute(
@@ -69,7 +71,7 @@ class RegisterScreen extends StatelessWidget {
               const _OrDivider(),
               AppGap.h22,
               AppButton(
-                label: 'Tiếp tục với Google',
+                label: T.buttonContinueWithGoogle,
                 onPressed: () {},
                 variant: AppButtonVariant.secondary,
                 leading: const Text(
@@ -87,73 +89,17 @@ class RegisterScreen extends StatelessWidget {
                 ),
               ),
               AppGap.h18,
-              Center(
-                child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Text(
-                      'Đã có tài khoản? ',
-                      style: AppTypography.bodyLarge.copyWith(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (_) => const LoginScreen(),
-                          ),
-                        );
-                      },
-                      child: Text(
-                        'Đăng nhập',
-                        style: AppTypography.bodyLarge.copyWith(
-                          fontSize: 13,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+
+              AuthNavigationText(
+                promptText: T.alreadyHaveAccount.tr,
+                buttonText: T.loginNow.tr,
+                onTap: () {
+                  Get.to(() => const LoginScreen());
+                },
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _TopHeader extends StatelessWidget {
-  const _TopHeader({required this.onBack});
-
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBackWithProgress(
-      onBack: onBack,
-      progress: 0.3,
-      backButtonSize: 32,
-    );
-  }
-}
-
-class _FieldLabel extends StatelessWidget {
-  const _FieldLabel(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      text,
-      style: AppTypography.labelMedium.copyWith(
-        fontSize: 12,
-        letterSpacing: 0.8,
       ),
     );
   }

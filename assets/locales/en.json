@@ -1,8 +1,24 @@
 {
-  "welcome_title": "Learn English Smarter",
-  "welcome_subtitle": "Elevate your knowledge with expert-led learning methods.",
   "app_name": "EnglishMe",
+  "home_welcome": "Welcome back, @name",
+  "welcome_title": "Learn English Smarter",
+  "welcome_subtitle": "Elevate your knowledge with our learning method",
+  "label_email": "EMAIL",
+  "label_password": "PASSWORD",
+  "button_continue_with_google": "Continue with Google",
   "auth_login": "Login",
   "auth_register": "Register",
-  "home_welcome": "Welcome back, @name"
+  "login_welcome_title": "Welcome back!",
+  "login_welcome_subtitle": "Log in to continue your learning journey.",
+  "forgot_password": "Forgot password?",
+  "dont_have_account": "Don't have an account? ",
+  "register_now": "Register",
+  "register_screen_title": "Register",
+  "register_welcome_title": "Start your journey",
+  "register_welcome_subtitle": "Learn English with professional Editorial style.",
+  "label_full_name": "Full Name",
+  "label_confirm_password": "CONFIRM PASSWORD",
+  "button_create_account": "Create account",
+  "already_have_account": "Already have an account? ",
+  "login_now": "Login"
 }

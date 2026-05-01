@@ -102,15 +102,17 @@ class _ActionButtons extends StatelessWidget {
     return Column(
       children: [
         AppButton(
-          label: T.register,
+          label: T.authRegister,
           onPressed: () => Get.to(() => const RegisterScreen()),
           variant: AppButtonVariant.primary,
+          textStyle: WelcomeTypography.buttonLabel,
         ),
         AppGap.h14,
         AppButton(
-          label: T.login,
+          label: T.authLogin,
           onPressed: () => Get.to(() => const LoginScreen()),
           variant: AppButtonVariant.secondary,
+          textStyle: WelcomeTypography.buttonLabel,
         ),
       ],
     );

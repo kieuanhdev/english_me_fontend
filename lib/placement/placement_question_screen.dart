@@ -49,7 +49,7 @@ class _PlacementQuestionScreenState extends State<PlacementQuestionScreen> {
     final bool answeredCorrect = _submitted && _selectedId == question.correctId;
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(22, 16, 22, 24),
@@ -94,7 +94,7 @@ class _PlacementQuestionScreenState extends State<PlacementQuestionScreen> {
                       ? null
                       : () => setState(() => _submitted = true),
                   variant: AppButtonVariant.primary,
-                  textStyle: AppTypography.button.copyWith(fontSize: 18),
+                  textStyle: AppTypography.labelMedium.copyWith(fontSize: 18),
                 )
               else
                 _ResultPanel(
@@ -158,7 +158,7 @@ class _QuestionTopBar extends StatelessWidget {
               height: 12,
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: AppColors.progressTrack,
+                backgroundColor: AppColors.secondaryContainer,
                 valueColor: const AlwaysStoppedAnimation(AppColors.primary),
               ),
             ),
@@ -169,7 +169,7 @@ class _QuestionTopBar extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           '$lives',
-          style: AppTypography.body.copyWith(
+          style: AppTypography.bodyLarge.copyWith(
             color: AppColors.danger,
             fontWeight: FontWeight.w800,
             fontSize: 24,
@@ -196,8 +196,8 @@ class _SkillChip extends StatelessWidget {
       ),
       child: Text(
         skill,
-        style: AppTypography.caption.copyWith(
-          color: AppColors.primaryDark,
+        style: AppTypography.labelMedium.copyWith(
+          color: AppColors.primaryContainer,
           fontWeight: FontWeight.w800,
         ),
       ),
@@ -218,7 +218,7 @@ class _PromptCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border, width: 2),
+        border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: const [
           BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
         ],
@@ -252,14 +252,14 @@ class _AnswerTile extends StatelessWidget {
     final bool wrongSelected = submitted && selected && !isCorrect;
     final bool correctState = submitted && isCorrect;
 
-    Color border = AppColors.border;
+    Color border = AppColors.outlineVariant;
     Color bg = AppColors.surface;
-    Color textColor = AppColors.text;
+    Color textColor = AppColors.onSurface;
 
     if (!submitted && selected) {
       border = AppColors.primary;
       bg = AppColors.primarySoftSelected;
-      textColor = AppColors.primaryDark;
+      textColor = AppColors.primaryContainer;
     }
     if (correctState) {
       border = AppColors.success;
@@ -299,7 +299,7 @@ class _AnswerTile extends StatelessWidget {
               child: Center(
                 child: Text(
                   option.id,
-                  style: AppTypography.caption.copyWith(
+                  style: AppTypography.labelMedium.copyWith(
                     color: textColor,
                     fontWeight: FontWeight.w800,
                   ),
@@ -310,7 +310,7 @@ class _AnswerTile extends StatelessWidget {
             Expanded(
               child: Text(
                 option.text,
-                style: AppTypography.body.copyWith(
+                style: AppTypography.bodyLarge.copyWith(
                   color: textColor,
                   fontWeight: FontWeight.w800,
                   fontSize: 16,
@@ -383,7 +383,7 @@ class _ResultPanel extends StatelessWidget {
             AppGap.h8,
             Text(
               'Đáp án đúng: $correctAnswerText',
-              style: AppTypography.body.copyWith(
+              style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.dangerDark,
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
@@ -429,7 +429,7 @@ class _ContinueButton extends StatelessWidget {
         ),
         child: Text(
           'TIẾP TỤC',
-          style: AppTypography.button.copyWith(fontSize: 18, color: Colors.white),
+          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: Colors.white),
         ),
       ),
     );

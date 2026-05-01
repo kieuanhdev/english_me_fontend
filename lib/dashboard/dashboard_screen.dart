@@ -10,7 +10,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(12, 12, 12, 16),
@@ -31,9 +31,9 @@ class DashboardScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: Text(
                   'Hôm nay học thêm 15 phút nhé!',
-                  style: AppTypography.body.copyWith(
+                  style: AppTypography.bodyLarge.copyWith(
                     fontSize: 14,
-                    color: AppColors.textMuted,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ),
@@ -63,7 +63,7 @@ class _DashboardStats extends StatelessWidget {
         AppGap.w8,
         Expanded(child: _StatChip(icon: Icons.local_fire_department, text: '7', bg: AppColors.danger)),
         AppGap.w8,
-        Expanded(child: _StatChip(icon: Icons.bolt, text: '1,240', bg: AppColors.skillVocabulary, textColor: AppColors.text)),
+        Expanded(child: _StatChip(icon: Icons.bolt, text: '1,240', bg: AppColors.skillVocabulary, textColor: AppColors.onSurface)),
         AppGap.w8,
         Expanded(child: _StatChip(icon: Icons.favorite, text: '5', bg: AppColors.skillListening)),
       ],
@@ -99,7 +99,7 @@ class _StatChip extends StatelessWidget {
           AppGap.w8,
           Text(
             text,
-            style: AppTypography.body.copyWith(
+            style: AppTypography.bodyLarge.copyWith(
               fontSize: 18 * 0.8,
               fontWeight: FontWeight.w800,
               color: textColor,
@@ -122,7 +122,7 @@ class _DailyGoalCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border, width: 2),
+        border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: const [
           BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
         ],
@@ -138,14 +138,14 @@ class _DailyGoalCard extends StatelessWidget {
                 CircularProgressIndicator(
                   value: 0.5,
                   strokeWidth: 5,
-                  backgroundColor: AppColors.progressTrack,
+                  backgroundColor: AppColors.secondaryContainer,
                   valueColor: const AlwaysStoppedAnimation(AppColors.primary),
                 ),
                 Center(
                   child: Text(
                     '50%',
-                    style: AppTypography.body.copyWith(
-                      color: AppColors.text,
+                    style: AppTypography.bodyLarge.copyWith(
+                      color: AppColors.onSurface,
                       fontWeight: FontWeight.w800,
                       fontSize: 14,
                     ),
@@ -166,9 +166,9 @@ class _DailyGoalCard extends StatelessWidget {
                 AppGap.h6,
                 Text(
                   '15 / 30 phút • còn 2 bài học',
-                  style: AppTypography.body.copyWith(
+                  style: AppTypography.bodyLarge.copyWith(
                     fontSize: 14,
-                    color: AppColors.textMuted,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -193,14 +193,14 @@ class _UnitCard extends StatelessWidget {
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(16),
         boxShadow: const [
-          BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4)),
+          BoxShadow(color: AppColors.primaryContainer, offset: Offset(0, 4)),
         ],
       ),
       child: Row(
         children: [
           Text(
             'UNIT 1 • A1',
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.labelMedium.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w800,
             ),
@@ -209,7 +209,7 @@ class _UnitCard extends StatelessWidget {
           Expanded(
             child: Text(
               'Chào hỏi & Giới thiệu',
-              style: AppTypography.body.copyWith(
+              style: AppTypography.bodyLarge.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w800,
                 fontSize: 18 * 0.9,
@@ -267,7 +267,7 @@ class _LearningPath extends StatelessWidget {
                     color: AppColors.primarySoft,
                     border: Border.all(color: AppColors.neutralShadow, width: 2),
                   ),
-                  child: const Icon(Icons.flutter_dash, size: 52, color: AppColors.primaryDark),
+                  child: const Icon(Icons.flutter_dash, size: 52, color: AppColors.primaryContainer),
                 ),
               ),
             ],
@@ -314,7 +314,7 @@ class _PathNode extends StatelessWidget {
             color: color,
             boxShadow: [
               BoxShadow(
-                color: color == AppColors.primary ? AppColors.primaryDark : const Color(0xFFC28712),
+                color: color == AppColors.primary ? AppColors.primaryContainer : const Color(0xFFC28712),
                 offset: const Offset(0, 4),
               ),
             ],
@@ -349,8 +349,8 @@ class _PathNode extends StatelessWidget {
               ),
               child: Text(
                 label!,
-                style: AppTypography.caption.copyWith(
-                  color: AppColors.primaryDark,
+                style: AppTypography.labelMedium.copyWith(
+                  color: AppColors.primaryContainer,
                   fontWeight: FontWeight.w800,
                   fontSize: 13,
                 ),
@@ -408,7 +408,7 @@ class _BottomNavState extends State<_BottomNav> {
       height: 78,
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.border, width: 2)),
+        border: Border(top: BorderSide(color: AppColors.outlineVariant, width: 2)),
       ),
       child: Row(
         children: [
@@ -458,7 +458,7 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = active ? AppColors.primary : AppColors.textMuted.withValues(alpha: 0.75);
+    final Color color = active ? AppColors.primary : AppColors.textSecondary.withValues(alpha: 0.75);
     return InkWell(
       onTap: onTap,
       child: Column(
@@ -468,7 +468,7 @@ class _NavItem extends StatelessWidget {
           AppGap.h6,
           Text(
             label,
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.labelMedium.copyWith(
               color: color,
               fontWeight: active ? FontWeight.w800 : FontWeight.w700,
             ),

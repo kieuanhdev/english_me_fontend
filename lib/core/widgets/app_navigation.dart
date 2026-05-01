@@ -23,12 +23,12 @@ class AppBackButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.border, width: 2),
+          border: Border.all(color: AppColors.outlineVariant, width: 2),
           boxShadow: const [
             BoxShadow(color: Color(0xFFCBD5DD), offset: Offset(0, 3)),
           ],
         ),
-        child: const Icon(Icons.chevron_left, color: AppColors.textMuted),
+        child: const Icon(Icons.chevron_left, color: AppColors.textSecondary),
       ),
     );
   }

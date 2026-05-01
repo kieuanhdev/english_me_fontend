@@ -7,20 +7,24 @@ import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/placement/placement_intro_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
 
+import '../core/values/app_strings.dart';
+import '../core/widgets/common_app_bar.dart';
+
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
+      appBar: CommonAppBar(title: T.register),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(26, 16, 26, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _TopHeader(onBack: () => Navigator.of(context).pop()),
+              // _TopHeader(onBack: () => Navigator.of(context).pop()),
               AppGap.h26,
               Text(
                 'Tạo tài khoản',
@@ -28,7 +32,7 @@ class RegisterScreen extends StatelessWidget {
               ),
               Text(
                 'Chỉ cần vài bước để bắt đầu học.',
-                style: AppTypography.body.copyWith(fontSize: 14),
+                style: AppTypography.bodyLarge.copyWith(fontSize: 14),
               ),
               AppGap.h20,
               const _FieldLabel('TÊN HIỂN THỊ'),
@@ -44,17 +48,11 @@ class RegisterScreen extends StatelessWidget {
               AppGap.h14,
               const _FieldLabel('MẬT KHẨU'),
               AppGap.h6,
-              const AppTextField(
-                initialValue: '••••••••••',
-                obscureText: true,
-              ),
+              const AppTextField(initialValue: '••••••••••', obscureText: true),
               AppGap.h14,
               const _FieldLabel('XÁC NHẬN MẬT KHẨU'),
               AppGap.h6,
-              const AppTextField(
-                initialValue: '••••••••••',
-                obscureText: true,
-              ),
+              const AppTextField(initialValue: '••••••••••', obscureText: true),
               AppGap.h18,
               AppButton(
                 label: 'ĐĂNG KÝ',
@@ -82,7 +80,7 @@ class RegisterScreen extends StatelessWidget {
                     color: Color(0xFFEA4335),
                   ),
                 ),
-                textStyle: AppTypography.body.copyWith(
+                textStyle: AppTypography.bodyLarge.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -95,10 +93,10 @@ class RegisterScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Đã có tài khoản? ',
-                      style: AppTypography.body.copyWith(
+                      style: AppTypography.bodyLarge.copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textMuted,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     GestureDetector(
@@ -111,7 +109,7 @@ class RegisterScreen extends StatelessWidget {
                       },
                       child: Text(
                         'Đăng nhập',
-                        style: AppTypography.body.copyWith(
+                        style: AppTypography.bodyLarge.copyWith(
                           fontSize: 13,
                           color: AppColors.primary,
                           fontWeight: FontWeight.w800,
@@ -153,7 +151,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: AppTypography.caption.copyWith(
+      style: AppTypography.labelMedium.copyWith(
         fontSize: 12,
         letterSpacing: 0.8,
       ),
@@ -168,19 +166,15 @@ class _OrDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(
-          child: Divider(color: Color(0xFFD6DEE7), thickness: 2),
-        ),
+        const Expanded(child: Divider(color: Color(0xFFD6DEE7), thickness: 2)),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'HOẶC',
-            style: AppTypography.caption.copyWith(fontSize: 13),
+            style: AppTypography.labelMedium.copyWith(fontSize: 13),
           ),
         ),
-        const Expanded(
-          child: Divider(color: Color(0xFFD6DEE7), thickness: 2),
-        ),
+        const Expanded(child: Divider(color: Color(0xFFD6DEE7), thickness: 2)),
       ],
     );
   }

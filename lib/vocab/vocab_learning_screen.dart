@@ -20,7 +20,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -130,7 +130,7 @@ class _RevealStep extends StatelessWidget {
                 title: 'Dễ',
                 subtitle: '1 ngày',
                 color: AppColors.primary,
-                shadow: AppColors.primaryDark,
+                shadow: AppColors.primaryContainer,
                 onTap: () => onRate('good'),
               ),
             ),
@@ -175,7 +175,7 @@ class _DoneStep extends StatelessWidget {
         AppGap.h6,
         Text(
           'Bạn vừa ôn xong 3 thẻ từ vựng.',
-          style: AppTypography.body.copyWith(fontSize: 14),
+          style: AppTypography.bodyLarge.copyWith(fontSize: 14),
         ),
         AppGap.h20,
         const Row(
@@ -234,7 +234,7 @@ class _VocabTopBar extends StatelessWidget {
               height: 12,
               child: LinearProgressIndicator(
                 value: progress,
-                backgroundColor: AppColors.progressTrack,
+                backgroundColor: AppColors.secondaryContainer,
                 valueColor: const AlwaysStoppedAnimation(AppColors.primary),
               ),
             ),
@@ -243,8 +243,8 @@ class _VocabTopBar extends StatelessWidget {
         AppGap.w12,
         Text(
           '1/3',
-          style: AppTypography.body.copyWith(
-            color: AppColors.text,
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.onSurface,
             fontWeight: FontWeight.w800,
             fontSize: 24 * 0.6,
           ),
@@ -270,8 +270,8 @@ class _SkillPill extends StatelessWidget {
         ),
         child: Text(
           label,
-          style: AppTypography.caption.copyWith(
-            color: AppColors.primaryDark,
+          style: AppTypography.labelMedium.copyWith(
+            color: AppColors.primaryContainer,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.2,
           ),
@@ -292,7 +292,7 @@ class _WordPreviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppColors.border, width: 2),
+        border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: const [
           BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 4)),
         ],
@@ -308,12 +308,12 @@ class _WordPreviewCard extends StatelessWidget {
           AppGap.h8,
           Text(
             '/ˈdɪlɪdʒənt/',
-            style: AppTypography.body.copyWith(fontSize: 16, color: AppColors.textMuted),
+            style: AppTypography.bodyLarge.copyWith(fontSize: 16, color: AppColors.textSecondary),
           ),
           AppGap.h6,
           Text(
             'ADJ',
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.labelMedium.copyWith(
               color: AppColors.primary,
               fontWeight: FontWeight.w900,
             ),
@@ -331,8 +331,8 @@ class _WordPreviewCard extends StatelessWidget {
           AppGap.h8,
           Text(
             'CHẠM ĐỂ XEM NGHĨA',
-            style: AppTypography.caption.copyWith(
-              color: AppColors.textMuted,
+            style: AppTypography.labelMedium.copyWith(
+              color: AppColors.textSecondary,
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -354,7 +354,7 @@ class _WordMeaningCard extends StatelessWidget {
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(24),
         boxShadow: const [
-          BoxShadow(color: AppColors.primaryDark, offset: Offset(0, 4)),
+          BoxShadow(color: AppColors.primaryContainer, offset: Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -370,7 +370,7 @@ class _WordMeaningCard extends StatelessWidget {
           AppGap.h6,
           Text(
             '/ˈdɪlɪdʒənt/ • adj',
-            style: AppTypography.body.copyWith(
+            style: AppTypography.bodyLarge.copyWith(
               color: Colors.white.withValues(alpha: 0.9),
               fontWeight: FontWeight.w700,
               fontSize: 16,
@@ -392,7 +392,7 @@ class _WordMeaningCard extends StatelessWidget {
           Center(
             child: Text(
               'ĐÁNH GIÁ KHẢ NĂNG GHI NHỚ BÊN DƯỚI ↓',
-              style: AppTypography.caption.copyWith(
+              style: AppTypography.labelMedium.copyWith(
                 color: Colors.white.withValues(alpha: 0.7),
                 fontWeight: FontWeight.w800,
               ),
@@ -429,7 +429,7 @@ class _InfoBox extends StatelessWidget {
         children: [
           Text(
             title,
-            style: AppTypography.caption.copyWith(
+            style: AppTypography.labelMedium.copyWith(
               color: Colors.white.withValues(alpha: 0.8),
               fontWeight: FontWeight.w800,
             ),
@@ -437,7 +437,7 @@ class _InfoBox extends StatelessWidget {
           AppGap.h6,
           Text(
             content,
-            style: AppTypography.body.copyWith(
+            style: AppTypography.bodyLarge.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.w800,
               fontSize: 18 * 0.9,
@@ -448,7 +448,7 @@ class _InfoBox extends StatelessWidget {
             AppGap.h8,
             Text(
               secondary!,
-              style: AppTypography.body.copyWith(
+              style: AppTypography.bodyLarge.copyWith(
                 color: Colors.white.withValues(alpha: 0.9),
                 fontStyle: FontStyle.italic,
                 fontWeight: FontWeight.w600,
@@ -507,7 +507,7 @@ class _RatingButton extends StatelessWidget {
             ),
             Text(
               subtitle,
-              style: AppTypography.body.copyWith(
+              style: AppTypography.bodyLarge.copyWith(
                 color: Colors.white.withValues(alpha: 0.92),
                 fontWeight: FontWeight.w800,
                 fontSize: 12,
@@ -532,7 +532,7 @@ class _DoneMascot extends StatelessWidget {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: AppColors.primary,
-        border: Border.all(color: AppColors.primaryDark, width: 4),
+        border: Border.all(color: AppColors.primaryContainer, width: 4),
       ),
       child: const Icon(Icons.flutter_dash, color: AppColors.primarySoft, size: 84),
     );
@@ -559,7 +559,7 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.border, width: 2),
+        border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: const [
           BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
         ],
@@ -582,7 +582,7 @@ class _StatCard extends StatelessWidget {
             style: AppTypography.displayLarge.copyWith(fontSize: 38 * 0.6),
           ),
           AppGap.h6,
-          Text(label, style: AppTypography.body.copyWith(fontSize: 14)),
+          Text(label, style: AppTypography.bodyLarge.copyWith(fontSize: 14)),
         ],
       ),
     );

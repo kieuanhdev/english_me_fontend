@@ -12,7 +12,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(26, 16, 26, 20),
@@ -27,7 +27,7 @@ class LoginScreen extends StatelessWidget {
               ),
               Text(
                 'Đăng nhập để tiếp tục lộ trình học của bạn.',
-                style: AppTypography.body.copyWith(fontSize: 14),
+                style: AppTypography.bodyLarge.copyWith(fontSize: 14),
               ),
               AppGap.h20,
               const _FieldLabel('EMAIL'),
@@ -50,7 +50,7 @@ class LoginScreen extends StatelessWidget {
                   onPressed: () {},
                   child: Text(
                     'Quên mật khẩu?',
-                    style: AppTypography.body.copyWith(
+                    style: AppTypography.bodyLarge.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w800,
                       fontSize: 14,
@@ -79,7 +79,7 @@ class LoginScreen extends StatelessWidget {
                     color: Color(0xFFEA4335),
                   ),
                 ),
-                textStyle: AppTypography.body.copyWith(
+                textStyle: AppTypography.bodyLarge.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -92,10 +92,10 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Chưa có tài khoản? ',
-                      style: AppTypography.body.copyWith(
+                      style: AppTypography.bodyLarge.copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textMuted,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                     GestureDetector(
@@ -106,7 +106,7 @@ class LoginScreen extends StatelessWidget {
                       },
                       child: Text(
                         'Đăng ký',
-                        style: AppTypography.body.copyWith(
+                        style: AppTypography.bodyLarge.copyWith(
                           fontSize: 13,
                           color: AppColors.primary,
                           fontWeight: FontWeight.w800,
@@ -148,7 +148,7 @@ class _FieldLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: AppTypography.caption.copyWith(
+      style: AppTypography.labelMedium.copyWith(
         fontSize: 12,
         letterSpacing: 0.8,
       ),
@@ -170,7 +170,7 @@ class _OrDivider extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'HOẶC',
-            style: AppTypography.caption.copyWith(fontSize: 13),
+            style: AppTypography.labelMedium.copyWith(fontSize: 13),
           ),
         ),
         const Expanded(

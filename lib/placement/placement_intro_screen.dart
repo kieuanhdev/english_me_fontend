@@ -12,7 +12,7 @@ class PlacementIntroScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
@@ -32,8 +32,8 @@ class PlacementIntroScreen extends StatelessWidget {
                   ),
                   child: Text(
                     'BÀI KIỂM TRA ĐẦU VÀO',
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.primaryDark,
+                    style: AppTypography.labelMedium.copyWith(
+                      color: AppColors.primaryContainer,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.4,
                     ),
@@ -56,7 +56,7 @@ class PlacementIntroScreen extends StatelessWidget {
                 child: Text(
                   'Một bài kiểm tra ngắn ~5 phút để hệ thống xếp bạn\nvào lộ trình phù hợp theo chuẩn CEFR (A1-C1).',
                   textAlign: TextAlign.center,
-                  style: AppTypography.body.copyWith(fontSize: 14),
+                  style: AppTypography.bodyLarge.copyWith(fontSize: 14),
                 ),
               ),
               AppGap.h18,
@@ -109,7 +109,7 @@ class PlacementIntroScreen extends StatelessWidget {
                   },
                   child: Text(
                     'Bỏ qua, vào thẳng Dashboard',
-                    style: AppTypography.body.copyWith(
+                    style: AppTypography.bodyLarge.copyWith(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w800,
                       fontSize: 16,
@@ -155,7 +155,7 @@ class _PlacementMascot extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.primary,
-                border: Border.all(color: AppColors.primaryDark, width: 4),
+                border: Border.all(color: AppColors.primaryContainer, width: 4),
               ),
               child: const Icon(
                 Icons.flutter_dash,
@@ -173,13 +173,13 @@ class _PlacementMascot extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primaryDark, width: 2),
+                border: Border.all(color: AppColors.primaryContainer, width: 2),
               ),
               child: Center(
                 child: Text(
                   '?',
-                  style: AppTypography.caption.copyWith(
-                    color: AppColors.primaryDark,
+                  style: AppTypography.labelMedium.copyWith(
+                    color: AppColors.primaryContainer,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
@@ -209,9 +209,9 @@ class _SkillCard extends StatelessWidget {
       height: 104,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
-        color: AppColors.bg,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.border, width: 2),
+        border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: const [
           BoxShadow(
             color: Color(0xFFCBD5DD),
@@ -235,10 +235,10 @@ class _SkillCard extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: AppTypography.body.copyWith(
+            style: AppTypography.bodyLarge.copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: AppColors.text,
+              color: AppColors.onSurface,
               height: 1.1,
             ),
           ),

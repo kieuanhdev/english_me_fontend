@@ -10,7 +10,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -30,12 +30,12 @@ class ProfileScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.primarySoft,
-                    border: Border.all(color: AppColors.border, width: 2),
+                    border: Border.all(color: AppColors.outlineVariant, width: 2),
                   ),
                   child: const Icon(
                     Icons.person_rounded,
                     size: 54,
-                    color: AppColors.primaryDark,
+                    color: AppColors.primaryContainer,
                   ),
                 ),
               ),
@@ -50,7 +50,7 @@ class ProfileScreen extends StatelessWidget {
               Center(
                 child: Text(
                   'minhanh@englishme.vn',
-                  style: AppTypography.body.copyWith(fontSize: 14),
+                  style: AppTypography.bodyLarge.copyWith(fontSize: 14),
                 ),
               ),
               AppGap.h24,
@@ -60,12 +60,12 @@ class ProfileScreen extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.border, width: 2),
+                  border: Border.all(color: AppColors.outlineVariant, width: 2),
                 ),
                 child: Text(
                   'Tài khoản của bạn đã được đồng bộ.\nBạn có thể đăng xuất bất kỳ lúc nào.',
-                  style: AppTypography.body.copyWith(
-                    color: AppColors.textMuted,
+                  style: AppTypography.bodyLarge.copyWith(
+                    color: AppColors.textSecondary,
                     fontSize: 14,
                   ),
                 ),
@@ -98,7 +98,7 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   child: Text(
                     'ĐĂNG XUẤT',
-                    style: AppTypography.button.copyWith(color: Colors.white),
+                    style: AppTypography.labelMedium.copyWith(color: Colors.white),
                   ),
                 ),
               ),

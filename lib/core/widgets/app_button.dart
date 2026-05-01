@@ -36,10 +36,10 @@ class AppButton extends StatelessWidget {
     final String displayLabel = isTranslate ? label.tr : label;
 
     final Color shadowColor = isPrimary
-        ? AppColors.primaryDark
+        ? AppColors.primaryContainer
         : AppColors.neutralShadow;
 
-    final TextStyle resolvedTextStyle = (textStyle ?? AppTypography.button)
+    final TextStyle resolvedTextStyle = (textStyle ?? AppTypography.labelMedium)
         .copyWith(color: isPrimary ? Colors.white : AppColors.primary);
 
     final Widget buttonChild = isLoading
@@ -69,7 +69,7 @@ class AppButton extends StatelessWidget {
           foregroundColor: isPrimary ? Colors.white : AppColors.primary,
           side: isPrimary
               ? BorderSide.none
-              : const BorderSide(color: AppColors.border, width: 2),
+              : const BorderSide(color: AppColors.outlineVariant, width: 2),
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(

@@ -21,21 +21,21 @@ class AppTextField extends StatelessWidget {
       initialValue: initialValue,
       obscureText: obscureText,
       keyboardType: keyboardType,
-      style: AppTypography.body.copyWith(
+      style: AppTypography.bodyLarge.copyWith(
         fontSize: 15,
         fontWeight: FontWeight.w700,
-        color: AppColors.text,
+        color: AppColors.onSurface,
         height: 1.0,
       ),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: AppTypography.body.copyWith(
+        hintStyle: AppTypography.bodyLarge.copyWith(
           fontSize: 15,
           fontWeight: FontWeight.w600,
-          color: AppColors.textMuted,
+          color: AppColors.textSecondary,
         ),
         filled: true,
-        fillColor: AppColors.bg,
+        fillColor: AppColors.surfaceContainerHigh,
         contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),

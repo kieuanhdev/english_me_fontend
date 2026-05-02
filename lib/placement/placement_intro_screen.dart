@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
-import 'package:englishme/dashboard/dashboard_screen.dart';
-import 'package:englishme/placement/placement_question_screen.dart';
+import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:get/get.dart';
 
 class PlacementIntroScreen extends StatelessWidget {
   const PlacementIntroScreen({super.key});
@@ -90,23 +90,19 @@ class PlacementIntroScreen extends StatelessWidget {
               AppGap.h24,
               AppButton(
                 label: 'BẮT ĐẦU KIỂM TRA',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const PlacementQuestionScreen(),
-                    ),
-                  );
+                onPressed: () async {
+                  final controller = Get.find<PlacementTestController>();
+                  await controller.startTest();
+                  if (controller.state.value == PlacementTestState.questioning) {
+                    Get.toNamed('/placement-test/question');
+                  }
                 },
                 variant: AppButtonVariant.primary,
               ),
               AppGap.h18,
               Center(
                 child: TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => const DashboardScreen()),
-                    );
-                  },
+                  onPressed: () => Get.offAllNamed('/dashboard'),
                   child: Text(
                     'Bỏ qua, vào thẳng Dashboard',
                     style: AppTypography.bodyLarge.copyWith(

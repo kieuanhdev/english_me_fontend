@@ -25,6 +25,22 @@ class AuthService {
     return userCredential.user?.getIdToken();
   }
 
+  Future<String?> signUpWithEmail(String email, String password) async {
+    final userCredential = await _firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return userCredential.user?.getIdToken();
+  }
+
+  Future<String?> signInWithEmail(String email, String password) async {
+    final userCredential = await _firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return userCredential.user?.getIdToken();
+  }
+
   Future<void> signOut() async {
     await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
   }

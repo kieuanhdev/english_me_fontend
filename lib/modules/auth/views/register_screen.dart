@@ -5,7 +5,6 @@ import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
 import 'package:englishme/gen/assets.gen.dart';
 import 'package:englishme/modules/auth/controllers/auth_controller.dart';
-import 'package:englishme/modules/auth/views/login_screen.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -14,6 +13,36 @@ import 'package:get/get.dart';
 
 class RegisterScreen extends GetView<AuthController> {
   const RegisterScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const _RegisterView();
+  }
+}
+
+class _RegisterView extends StatefulWidget {
+  const _RegisterView();
+
+  @override
+  State<_RegisterView> createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<_RegisterView> {
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  AuthController get _controller => Get.find<AuthController>();
+
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,24 +70,40 @@ class RegisterScreen extends GetView<AuthController> {
                 style: AppTypography.bodyLarge.copyWith(fontSize: 14),
               ),
               AppGap.h20,
-              const AppTextField(label: T.labelFullName),
-              AppGap.h14,
-              const AppTextField(
-                label: T.labelEmail,
-                keyboardType: TextInputType.emailAddress,
+              AppTextField(
+                label: T.labelFullName,
+                controller: _fullNameController,
               ),
               AppGap.h14,
-              const AppTextField(label: T.labelPassword, obscureText: true),
+              AppTextField(
+                label: T.labelEmail,
+                keyboardType: TextInputType.emailAddress,
+                controller: _emailController,
+              ),
               AppGap.h14,
-              const AppTextField(
+              AppTextField(
+                label: T.labelPassword,
+                obscureText: true,
+                controller: _passwordController,
+              ),
+              AppGap.h14,
+              AppTextField(
                 label: T.labelConfirmPassword,
                 obscureText: true,
+                controller: _confirmPasswordController,
               ),
               AppGap.h18,
               Obx(
                 () => AppButton(
-                  label: T.registerNow,
-                  onPressed: controller.isLoading.value ? null : () {},
+                  label: T.buttonCreateAccount,
+                  onPressed: _controller.isLoading.value
+                      ? null
+                      : () => _controller.signUpWithEmail(
+                            _fullNameController.text,
+                            _emailController.text,
+                            _passwordController.text,
+                            _confirmPasswordController.text,
+                          ),
                   variant: AppButtonVariant.primary,
                 ),
               ),
@@ -68,9 +113,9 @@ class RegisterScreen extends GetView<AuthController> {
               Obx(
                 () => AppButton(
                   label: T.buttonContinueWithGoogle,
-                  onPressed: controller.isLoading.value
+                  onPressed: _controller.isLoading.value
                       ? null
-                      : controller.signInWithGoogle,
+                      : _controller.signInWithGoogle,
                   variant: AppButtonVariant.secondary,
                   leading: const Text(
                     'G',
@@ -91,7 +136,7 @@ class RegisterScreen extends GetView<AuthController> {
               AuthNavigationText(
                 promptText: T.alreadyHaveAccount.tr,
                 buttonText: T.loginNow.tr,
-                onTap: () => Get.to(() => const LoginScreen()),
+                onTap: () => Get.toNamed('/login'),
               ),
             ],
           ),

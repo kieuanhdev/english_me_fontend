@@ -3,6 +3,7 @@ abstract class AppRoutes {
   static const login = '/login';
   static const register = '/register';
   static const home = '/home';
+  static const flashcards = '/flashcards';
   static const placementTest = '/placement-test';
   static const placementTestQuestion = '/placement-test/question';
   static const placementTestResult = '/placement-test/result';

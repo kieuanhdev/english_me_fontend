@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppBottomNav extends StatefulWidget {
@@ -14,11 +15,11 @@ class _AppBottomNavState extends State<AppBottomNav> {
   late int _currentIndex;
 
   static const List<_NavItemData> _items = [
-    _NavItemData(icon: Icons.home_rounded, inactiveIcon: Icons.home_outlined, label: 'Home'),
-    _NavItemData(icon: Icons.style_rounded, inactiveIcon: Icons.style_outlined, label: 'Flashcards'),
-    _NavItemData(icon: Icons.mic_rounded, inactiveIcon: Icons.mic_none_rounded, label: 'Pronunciation'),
-    _NavItemData(icon: Icons.smart_toy_rounded, inactiveIcon: Icons.smart_toy_outlined, label: 'Chat AI'),
-    _NavItemData(icon: Icons.analytics_rounded, inactiveIcon: Icons.analytics_outlined, label: 'Progress'),
+    _NavItemData(icon: Icons.home_rounded, inactiveIcon: Icons.home_outlined, label: 'Home', route: '/home'),
+    _NavItemData(icon: Icons.style_rounded, inactiveIcon: Icons.style_outlined, label: 'Flashcards', route: '/flashcards'),
+    _NavItemData(icon: Icons.mic_rounded, inactiveIcon: Icons.mic_none_rounded, label: 'Pronunciation', route: '/pronunciation'),
+    _NavItemData(icon: Icons.smart_toy_rounded, inactiveIcon: Icons.smart_toy_outlined, label: 'Chat AI', route: '/chat-ai'),
+    _NavItemData(icon: Icons.analytics_rounded, inactiveIcon: Icons.analytics_outlined, label: 'Progress', route: '/progress'),
   ];
 
   @override
@@ -52,7 +53,11 @@ class _AppBottomNavState extends State<AppBottomNav> {
             child: _NavItem(
               data: item,
               active: active,
-              onTap: () => setState(() => _currentIndex = i),
+              onTap: () {
+                if (i == _currentIndex) return;
+                setState(() => _currentIndex = i);
+                Get.offAllNamed(item.route);
+              },
             ),
           );
         }),
@@ -65,11 +70,13 @@ class _NavItemData {
   final IconData icon;
   final IconData inactiveIcon;
   final String label;
+  final String route;
 
   const _NavItemData({
     required this.icon,
     required this.inactiveIcon,
     required this.label,
+    required this.route,
   });
 }
 

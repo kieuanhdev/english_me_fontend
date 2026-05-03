@@ -1,6 +1,8 @@
 import 'package:englishme/modules/auth/bindings/auth_binding.dart';
 import 'package:englishme/modules/auth/views/login_screen.dart';
 import 'package:englishme/modules/auth/views/register_screen.dart';
+import 'package:englishme/modules/flashcard/bindings/flashcard_binding.dart';
+import 'package:englishme/modules/flashcard/views/flashcard_screen.dart';
 import 'package:englishme/modules/home/bindings/home_binding.dart';
 import 'package:englishme/modules/home/views/home_screen.dart';
 import 'package:englishme/modules/placement_test/bindings/placement_test_binding.dart';
@@ -33,6 +35,11 @@ class AppPages {
       name: AppRoutes.home,
       page: () => const HomeScreen(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.flashcards,
+      page: () => const FlashcardScreen(),
+      binding: FlashcardBinding(),
     ),
     GetPage(
       name: AppRoutes.placementTest,

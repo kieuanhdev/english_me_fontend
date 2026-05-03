@@ -1,13 +1,5 @@
 import 'package:englishme/core/services/localization_service.dart';
-import 'package:englishme/dashboard/dashboard_screen.dart';
-import 'package:englishme/modules/auth/bindings/auth_binding.dart';
-import 'package:englishme/modules/auth/views/login_screen.dart';
-import 'package:englishme/modules/auth/views/register_screen.dart';
-import 'package:englishme/modules/placement_test/bindings/placement_test_binding.dart';
-import 'package:englishme/modules/placement_test/views/placement_question_screen.dart';
-import 'package:englishme/modules/placement_test/views/placement_result_screen.dart';
-import 'package:englishme/placement/placement_intro_screen.dart';
-import 'package:englishme/welcome/welcome_screen.dart';
+import 'package:englishme/routes/app_pages.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -25,24 +17,8 @@ void main() async {
       locale: const Locale('vi', 'VN'),
       fallbackLocale: const Locale('en', 'US'),
       theme: AppTheme.lightTheme,
-      initialRoute: '/welcome',
-      getPages: [
-        GetPage(name: '/welcome', page: () => WelcomeScreen()),
-        GetPage(
-          name: '/login',
-          page: () => const LoginScreen(),
-          binding: AuthBinding(),
-        ),
-        GetPage(
-          name: '/register',
-          page: () => const RegisterScreen(),
-          binding: AuthBinding(),
-        ),
-        GetPage(name: '/placement-test', page: () => PlacementIntroScreen(), binding: PlacementTestBinding()),
-        GetPage(name: '/placement-test/question', page: () => const PlacementQuestionScreen(), binding: PlacementTestBinding()),
-        GetPage(name: '/placement-test/result', page: () => const PlacementResultScreen(), binding: PlacementTestBinding()),
-        GetPage(name: '/dashboard', page: () => DashboardScreen()),
-      ],
+      initialRoute: AppPages.initial,
+      getPages: AppPages.pages,
     ),
   );
 }

@@ -278,7 +278,7 @@ class _GoToDashboardButton extends StatelessWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () => Get.offAllNamed('/dashboard'),
+        onPressed: () => Get.offAllNamed('/home'),
         style: ElevatedButton.styleFrom(
           elevation: 0,
           shadowColor: Colors.transparent,

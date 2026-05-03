@@ -102,7 +102,7 @@ class PlacementIntroScreen extends StatelessWidget {
               AppGap.h18,
               Center(
                 child: TextButton(
-                  onPressed: () => Get.offAllNamed('/dashboard'),
+                  onPressed: () => Get.offAllNamed('/home'),
                   child: Text(
                     'Bỏ qua, vào thẳng Dashboard',
                     style: AppTypography.bodyLarge.copyWith(

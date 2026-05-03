@@ -86,7 +86,7 @@ class AuthController extends GetxController {
     if (!result.isOnboarded) {
       Get.offAllNamed('/placement-test');
     } else {
-      Get.offAllNamed('/dashboard');
+      Get.offAllNamed('/home');
     }
   }
 

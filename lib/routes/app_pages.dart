@@ -1,7 +1,8 @@
-import 'package:englishme/dashboard/dashboard_screen.dart';
 import 'package:englishme/modules/auth/bindings/auth_binding.dart';
 import 'package:englishme/modules/auth/views/login_screen.dart';
 import 'package:englishme/modules/auth/views/register_screen.dart';
+import 'package:englishme/modules/home/bindings/home_binding.dart';
+import 'package:englishme/modules/home/views/home_screen.dart';
 import 'package:englishme/modules/placement_test/bindings/placement_test_binding.dart';
 import 'package:englishme/modules/placement_test/views/placement_intro_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_question_screen.dart';
@@ -29,8 +30,9 @@ class AppPages {
       binding: AuthBinding(),
     ),
     GetPage(
-      name: AppRoutes.dashboard,
-      page: () => DashboardScreen(),
+      name: AppRoutes.home,
+      page: () => const HomeScreen(),
+      binding: HomeBinding(),
     ),
     GetPage(
       name: AppRoutes.placementTest,

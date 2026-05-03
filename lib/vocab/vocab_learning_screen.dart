@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
-import 'package:englishme/dashboard/dashboard_screen.dart';
+import 'package:get/get.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 enum _VocabStep { preview, reveal, done }
@@ -44,12 +44,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         );
       case _VocabStep.done:
         return _DoneStep(
-          onBackHome: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const DashboardScreen()),
-              (route) => false,
-            );
-          },
+          onBackHome: () => Get.offAllNamed('/home'),
         );
     }
   }

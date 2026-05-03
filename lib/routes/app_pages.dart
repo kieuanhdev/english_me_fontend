@@ -9,6 +9,10 @@ import 'package:englishme/modules/placement_test/bindings/placement_test_binding
 import 'package:englishme/modules/placement_test/views/placement_intro_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_question_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_result_screen.dart';
+import 'package:englishme/modules/study_session/bindings/study_session_binding.dart';
+import 'package:englishme/modules/study_session/views/session_summary_screen.dart';
+import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
+import 'package:englishme/modules/study_session/views/study_session_front_screen.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/welcome/welcome_screen.dart';
 import 'package:get/get.dart';
@@ -55,6 +59,19 @@ class AppPages {
       name: AppRoutes.placementTestResult,
       page: () => PlacementResultScreen(),
       binding: PlacementTestBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.studySession,
+      page: () => const StudySessionFrontScreen(),
+      binding: StudySessionBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.studySessionBack,
+      page: () => const StudySessionBackScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.sessionSummary,
+      page: () => const SessionSummaryScreen(),
     ),
   ];
 }

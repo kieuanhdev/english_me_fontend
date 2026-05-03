@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 enum DeckLevel { advanced, intermediate, essential }
 
@@ -83,7 +84,7 @@ class FlashcardController extends GetxController {
   }
 
   void onStartStudy(FlashcardDeck deck) {
-    // TODO: navigate to flashcard study screen
+    Get.toNamed(AppRoutes.studySession);
   }
 
   void onCreateDeck() {

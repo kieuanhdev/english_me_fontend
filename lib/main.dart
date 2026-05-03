@@ -1,4 +1,5 @@
 import 'package:englishme/core/services/localization_service.dart';
+import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/routes/app_pages.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await LocalizationService.init();
+  Get.put(TtsService());
 
   runApp(
     GetMaterialApp(

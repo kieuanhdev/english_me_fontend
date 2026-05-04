@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/data/models/flashcard_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
-import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class StudySessionBackScreen extends StatelessWidget {
@@ -36,14 +36,18 @@ class StudySessionBackScreen extends StatelessWidget {
                     icon: const Icon(Icons.close_rounded, size: 22),
                     color: AppColors.primary,
                   ),
-                  Text(
-                    'Daily Session',
-                    style: AppTypography.displayLarge.copyWith(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Text(
+                      controller.deskTitle.isNotEmpty
+                          ? controller.deskTitle
+                          : 'Daily Session',
+                      style: AppTypography.displayLarge.copyWith(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  const Spacer(),
                   IconButton(
                     onPressed: () {},
                     icon: const Icon(Icons.settings_rounded, size: 22),
@@ -65,7 +69,10 @@ class StudySessionBackScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                child: Obx(() => _FlashcardBack(card: controller.currentCard)),
+                child: Obx(() => _FlashcardBack(
+                      card: controller.currentCard,
+                      onSpeak: controller.speak,
+                    )),
               ),
             ),
           ],
@@ -84,6 +91,7 @@ class _ProgressSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final progress = total > 0 ? current / total : 0.0;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -132,7 +140,7 @@ class _ProgressSection extends StatelessWidget {
               children: [
                 Container(color: const Color(0xFFC9CFFD)),
                 FractionallySizedBox(
-                  widthFactor: current / total,
+                  widthFactor: progress,
                   child: Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
@@ -153,11 +161,13 @@ class _ProgressSection extends StatelessWidget {
 // ─── Flashcard Back ───────────────────────────────────────────────────────────
 
 class _FlashcardBack extends StatelessWidget {
-  const _FlashcardBack({required this.card});
-  final StudyCard card;
+  const _FlashcardBack({required this.card, required this.onSpeak});
+  final FlashcardModel card;
+  final VoidCallback onSpeak;
 
   @override
   Widget build(BuildContext context) {
+    final posLabel = card.pos.isNotEmpty ? card.pos.first.toUpperCase() : '';
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -170,7 +180,6 @@ class _FlashcardBack extends StatelessWidget {
       child: Stack(
         clipBehavior: Clip.hardEdge,
         children: [
-          // Accent circle top-right
           Positioned(
             top: -20,
             right: -20,
@@ -192,25 +201,28 @@ class _FlashcardBack extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFDCBE),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        card.partOfSpeech.toUpperCase(),
-                        style: const TextStyle(
-                          fontFamily: 'BeVietnamPro',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.2,
-                          color: Color(0xFF2C1600),
+                    if (posLabel.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFDCBE),
+                          borderRadius: BorderRadius.circular(999),
                         ),
-                      ),
-                    ),
+                        child: Text(
+                          posLabel,
+                          style: const TextStyle(
+                            fontFamily: 'BeVietnamPro',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.2,
+                            color: Color(0xFF2C1600),
+                          ),
+                        ),
+                      )
+                    else
+                      const SizedBox.shrink(),
                     GestureDetector(
-                      onTap: () => Get.find<TtsService>().speak(card.word),
+                      onTap: onSpeak,
                       child: Container(
                         width: 44,
                         height: 44,
@@ -226,7 +238,7 @@ class _FlashcardBack extends StatelessWidget {
                 AppGap.h20,
                 // Word
                 Text(
-                  card.word.toLowerCase(),
+                  card.word,
                   style: const TextStyle(
                     fontFamily: 'BeVietnamPro',
                     fontSize: 38,
@@ -235,88 +247,94 @@ class _FlashcardBack extends StatelessWidget {
                     color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(height: 6),
-                // Phonetic
-                Text(
-                  card.phonetic,
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 15,
-                    fontStyle: FontStyle.italic,
-                    color: AppColors.textSecondary,
+                if (card.ipa.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    card.ipa,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 15,
+                      fontStyle: FontStyle.italic,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
-                ),
+                ],
                 AppGap.h24,
-                // Tonal divider
                 Container(height: 1.5, color: AppColors.surfaceContainerLow),
                 AppGap.h20,
                 // Vietnamese meaning
-                Text(
-                  card.vietnameseMeaning,
-                  style: const TextStyle(
-                    fontFamily: 'BeVietnamPro',
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF643900),
+                if (card.vietnamese.isNotEmpty)
+                  Text(
+                    card.vietnamese,
+                    style: const TextStyle(
+                      fontFamily: 'BeVietnamPro',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF643900),
+                    ),
                   ),
-                ),
                 AppGap.h10,
-                // English definition
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 2),
-                      child: Icon(Icons.translate_rounded, size: 16, color: Color(0x661A1C1C)),
-                    ),
-                    AppGap.w8,
-                    Expanded(
-                      child: Text(
-                        card.meaning,
-                        style: AppTypography.bodyLarge.copyWith(
-                          fontSize: 15,
-                          height: 1.55,
-                          color: AppColors.onSurface.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                AppGap.h20,
-                // Example box
-                Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerLow,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border(
-                      left: BorderSide(color: AppColors.primaryContainer, width: 3.5),
-                    ),
-                  ),
-                  child: Column(
+                // Definition
+                if (card.viDefinition.isNotEmpty || card.definition.isNotEmpty)
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text.rich(
-                        TextSpan(
+                      const Padding(
+                        padding: EdgeInsets.only(top: 2),
+                        child: Icon(Icons.translate_rounded, size: 16, color: Color(0x661A1C1C)),
+                      ),
+                      AppGap.w8,
+                      Expanded(
+                        child: Text(
+                          card.viDefinition.isNotEmpty ? card.viDefinition : card.definition,
                           style: AppTypography.bodyLarge.copyWith(
                             fontSize: 15,
-                            fontStyle: FontStyle.italic,
-                            height: 1.6,
-                            color: AppColors.onSurface,
+                            height: 1.55,
+                            color: AppColors.onSurface.withValues(alpha: 0.6),
                           ),
-                          children: _buildSpans(card.exampleEn, card.word),
-                        ),
-                      ),
-                      AppGap.h10,
-                      Text(
-                        card.exampleVi,
-                        style: AppTypography.bodyLarge.copyWith(
-                          fontSize: 13,
-                          color: AppColors.textSecondary,
                         ),
                       ),
                     ],
                   ),
-                ),
+                // Example box
+                if (card.example.isNotEmpty) ...[
+                  AppGap.h20,
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border(
+                        left: BorderSide(color: AppColors.primaryContainer, width: 3.5),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text.rich(
+                          TextSpan(
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontSize: 15,
+                              fontStyle: FontStyle.italic,
+                              height: 1.6,
+                              color: AppColors.onSurface,
+                            ),
+                            children: _buildSpans(card.example, card.word),
+                          ),
+                        ),
+                        if (card.viExample.isNotEmpty) ...[
+                          AppGap.h10,
+                          Text(
+                            card.viExample,
+                            style: AppTypography.bodyLarge.copyWith(
+                              fontSize: 13,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -442,4 +460,3 @@ class _RatingBtn extends StatelessWidget {
     );
   }
 }
-

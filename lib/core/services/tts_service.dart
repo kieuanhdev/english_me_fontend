@@ -19,7 +19,9 @@ class TtsService extends GetxService {
     await _tts.speak(text);
   }
 
-  Future<void> stop() async => _tts.stop();
+  Future<void> stop() async {
+    await _tts.stop();
+  }
 
   @override
   void onClose() {

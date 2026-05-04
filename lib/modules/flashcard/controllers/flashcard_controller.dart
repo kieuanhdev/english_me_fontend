@@ -1,97 +1,58 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
-import 'package:englishme/routes/app_routes.dart';
-
-enum DeckLevel { advanced, intermediate, essential }
-
-class FlashcardDeck {
-  final String id;
-  final String title;
-  final int cardCount;
-  final String category;
-  final DeckLevel level;
-  final double mastery;
-  final String iconName;
-  final int iconBgColorHex;
-  final int iconColorHex;
-
-  const FlashcardDeck({
-    required this.id,
-    required this.title,
-    required this.cardCount,
-    required this.category,
-    required this.level,
-    required this.mastery,
-    required this.iconName,
-    required this.iconBgColorHex,
-    required this.iconColorHex,
-  });
-
-  String get levelLabel => switch (level) {
-    DeckLevel.advanced => 'ADVANCED',
-    DeckLevel.intermediate => 'INTERMEDIATE',
-    DeckLevel.essential => 'ESSENTIAL',
-  };
-}
+import 'package:englishme/core/network/dio_client.dart';
+import 'package:englishme/data/models/desk_model.dart';
+import 'package:englishme/data/repositories/flashcard_repository.dart';
+import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
+import 'package:englishme/modules/study_session/views/study_session_front_screen.dart';
 
 class FlashcardController extends GetxController {
-  // Word of the day
-  final RxString wordOfDay = 'Eloquent'.obs;
-  final RxString wordDefinition = 'Fluent or persuasive in speaking or writing.'.obs;
+  late final FlashcardRepository _repo;
 
-  // Stats
+  final RxList<DeskModel> desks = <DeskModel>[].obs;
+  final RxBool isLoading = true.obs;
+  final RxString errorMessage = ''.obs;
+
+  // Stats (mock — sẽ lấy từ user profile sau)
   final RxInt dayStreak = 12.obs;
   final RxInt avgMastery = 85.obs;
 
-  // Decks
-  final RxList<FlashcardDeck> decks = <FlashcardDeck>[
-    const FlashcardDeck(
-      id: '1',
-      title: 'IELTS Academic',
-      cardCount: 120,
-      category: 'Vocabulary',
-      level: DeckLevel.advanced,
-      mastery: 0.68,
-      iconName: 'school',
-      iconBgColorHex: 0xFFDEE0FF,
-      iconColorHex: 0xFF24389C,
-    ),
-    const FlashcardDeck(
-      id: '2',
-      title: 'Daily Expressions',
-      cardCount: 45,
-      category: 'Phrases',
-      level: DeckLevel.essential,
-      mastery: 0.92,
-      iconName: 'chat_bubble',
-      iconBgColorHex: 0xFFC9CFFD,
-      iconColorHex: 0xFF565C84,
-    ),
-    const FlashcardDeck(
-      id: '3',
-      title: 'Business English',
-      cardCount: 82,
-      category: 'Meetings',
-      level: DeckLevel.intermediate,
-      mastery: 0.34,
-      iconName: 'work',
-      iconBgColorHex: 0xFFFFDCBE,
-      iconColorHex: 0xFF643900,
-    ),
-  ].obs;
+  // Word of the day (mock)
+  final RxString wordOfDay = 'Eloquent'.obs;
+  final RxString wordDefinition = 'Fluent or persuasive in speaking or writing.'.obs;
 
-  void onPracticeWordOfDay() {
-    // TODO: navigate to word detail / study session
+  @override
+  void onInit() {
+    super.onInit();
+    _repo = FlashcardRepository(DioClient.instance);
+    loadDesks();
   }
 
-  void onStartStudy(FlashcardDeck deck) {
-    Get.toNamed(AppRoutes.studySession);
+  Future<void> loadDesks() async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      desks.value = await _repo.getDesks();
+    } on DioException catch (e) {
+      errorMessage.value = e.message ?? 'Lỗi kết nối';
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void onCreateDeck() {
-    // TODO: open create deck dialog / screen
+  void onStartStudy(DeskModel desk) {
+    if (Get.isRegistered<StudySessionController>()) {
+      Get.delete<StudySessionController>();
+    }
+    Get.put<StudySessionController>(
+      StudySessionController(deskId: desk.id, deskTitle: desk.title),
+    );
+    Get.to(() => const StudySessionFrontScreen());
   }
 
-  void onViewAll() {
-    // TODO: navigate to full deck list
-  }
+  void onPracticeWordOfDay() {}
+
+  void onCreateDeck() {}
+
+  void onViewAll() {}
 }

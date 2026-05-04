@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/data/models/desk_model.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -19,7 +20,7 @@ class FlashcardDeckList extends GetView<FlashcardController> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'Your Decks',
+                'Bộ thẻ',
                 style: AppTypography.displayLarge.copyWith(
                   fontSize: 22,
                   color: AppColors.primary,
@@ -28,7 +29,7 @@ class FlashcardDeckList extends GetView<FlashcardController> {
               GestureDetector(
                 onTap: controller.onViewAll,
                 child: Text(
-                  'View All',
+                  'Xem tất cả',
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -40,41 +41,100 @@ class FlashcardDeckList extends GetView<FlashcardController> {
           ),
         ),
         AppGap.h16,
-        Obx(() => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              for (final deck in controller.decks) ...[
-                _DeckCard(
-                  deck: deck,
-                  onStartStudy: () => controller.onStartStudy(deck),
-                ),
-                AppGap.h14,
+        Obx(() {
+          if (controller.isLoading.value) {
+            return const Padding(
+              padding: EdgeInsets.symmetric(vertical: 40),
+              child: Center(child: CircularProgressIndicator()),
+            );
+          }
+          if (controller.errorMessage.isNotEmpty) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  Text(
+                    controller.errorMessage.value,
+                    style: AppTypography.bodyLarge.copyWith(color: AppColors.danger),
+                    textAlign: TextAlign.center,
+                  ),
+                  AppGap.h12,
+                  GestureDetector(
+                    onTap: controller.loadDesks,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Thử lại',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                for (final desk in controller.desks) ...[
+                  _DeckCard(
+                    desk: desk,
+                    onStartStudy: () => controller.onStartStudy(desk),
+                  ),
+                  AppGap.h14,
+                ],
+                _CreateDeckTile(onTap: controller.onCreateDeck),
               ],
-              _CreateDeckTile(onTap: controller.onCreateDeck),
-            ],
-          ),
-        )),
+            ),
+          );
+        }),
       ],
     );
   }
 }
 
-class _DeckCard extends StatelessWidget {
-  const _DeckCard({required this.deck, required this.onStartStudy});
+// ─── Deck Card ────────────────────────────────────────────────────────────────
 
-  final FlashcardDeck deck;
+class _DeckCard extends StatelessWidget {
+  const _DeckCard({required this.desk, required this.onStartStudy});
+
+  final DeskModel desk;
   final VoidCallback onStartStudy;
 
-  static IconData _iconFor(String name) => switch (name) {
-    'school' => Icons.school_rounded,
-    'chat_bubble' => Icons.chat_bubble_rounded,
-    'work' => Icons.work_rounded,
-    _ => Icons.style_rounded,
-  };
+  // Map CEFR → màu sắc
+  static Color _bgColor(String cefr) => switch (cefr.toUpperCase()) {
+        'A1' || 'A2' => const Color(0xFFDEF7EC),
+        'B1' || 'B2' => const Color(0xFFDEE0FF),
+        'C1' || 'C2' => const Color(0xFFFFDCBE),
+        _ => const Color(0xFFEEEEEE),
+      };
+
+  static Color _fgColor(String cefr) => switch (cefr.toUpperCase()) {
+        'A1' || 'A2' => const Color(0xFF1B5E20),
+        'B1' || 'B2' => const Color(0xFF24389C),
+        'C1' || 'C2' => const Color(0xFF643900),
+        _ => const Color(0xFF454652),
+      };
+
+  static IconData _icon(String cefr) => switch (cefr.toUpperCase()) {
+        'A1' || 'A2' => Icons.eco_rounded,
+        'B1' || 'B2' => Icons.school_rounded,
+        'C1' || 'C2' => Icons.military_tech_rounded,
+        _ => Icons.style_rounded,
+      };
 
   @override
   Widget build(BuildContext context) {
+    final bg = _bgColor(desk.cefrLevel);
+    final fg = _fgColor(desk.cefrLevel);
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
@@ -88,37 +148,30 @@ class _DeckCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon + Level badge row
+            // Icon + CEFR badge
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: BoxDecoration(
-                    color: Color(deck.iconBgColorHex),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    _iconFor(deck.iconName),
-                    color: Color(deck.iconColorHex),
-                    size: 26,
-                  ),
+                  decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(16)),
+                  child: Icon(_icon(desk.cefrLevel), color: fg, size: 26),
                 ),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerLow,
+                    color: bg,
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    deck.levelLabel,
+                    desk.cefrLevel,
                     style: AppTypography.bodyLarge.copyWith(
-                      fontSize: 10,
+                      fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.8,
-                      color: AppColors.textSecondary,
+                      color: fg,
                     ),
                   ),
                 ),
@@ -126,74 +179,14 @@ class _DeckCard extends StatelessWidget {
             ),
             AppGap.h14,
             // Title
-            Text(
-              deck.title,
-              style: AppTypography.displayLarge.copyWith(fontSize: 18),
-            ),
+            Text(desk.title, style: AppTypography.displayLarge.copyWith(fontSize: 18)),
             const SizedBox(height: 4),
-            // Subtitle
-            Row(
-              children: [
-                Text(
-                  '${deck.cardCount} Cards',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.textSecondary.withValues(alpha: 0.4),
-                    shape: BoxShape.circle,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  deck.category,
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            AppGap.h16,
-            // Mastery progress
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'MASTERY',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.2,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                Text(
-                  '${(deck.mastery * 100).toInt()}%',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.tertiary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(999),
-              child: SizedBox(
-                height: 8,
-                child: LinearProgressIndicator(
-                  value: deck.mastery,
-                  backgroundColor: AppColors.secondaryContainer,
-                  valueColor: const AlwaysStoppedAnimation(AppColors.tertiary),
-                ),
+            // Card count
+            Text(
+              '${desk.flashcardCount} từ vựng',
+              style: AppTypography.bodyLarge.copyWith(
+                fontSize: 13,
+                color: AppColors.textSecondary,
               ),
             ),
             AppGap.h16,
@@ -204,20 +197,20 @@ class _DeckCard extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceContainerHigh,
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.play_arrow_rounded, color: AppColors.primary, size: 20),
+                    const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
                     const SizedBox(width: 6),
                     Text(
-                      'Start Study',
+                      'Bắt đầu học',
                       style: AppTypography.bodyLarge.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
+                        color: Colors.white,
                       ),
                     ),
                   ],
@@ -231,9 +224,10 @@ class _DeckCard extends StatelessWidget {
   }
 }
 
+// ─── Create Deck Tile ─────────────────────────────────────────────────────────
+
 class _CreateDeckTile extends StatelessWidget {
   const _CreateDeckTile({required this.onTap});
-
   final VoidCallback onTap;
 
   @override
@@ -245,10 +239,7 @@ class _CreateDeckTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 40),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(
-            color: AppColors.outlineVariant,
-            width: 2,
-          ),
+          border: Border.all(color: AppColors.outlineVariant, width: 2),
         ),
         child: Column(
           children: [
@@ -263,7 +254,7 @@ class _CreateDeckTile extends StatelessWidget {
             ),
             AppGap.h12,
             Text(
-              'Create New Deck',
+              'Tạo bộ thẻ mới',
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -272,7 +263,7 @@ class _CreateDeckTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Add custom words and phrases',
+              'Thêm từ vựng tùy chỉnh',
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 12,
                 color: AppColors.textSecondary,

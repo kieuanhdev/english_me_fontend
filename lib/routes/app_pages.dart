@@ -1,6 +1,8 @@
 import 'package:englishme/modules/auth/bindings/auth_binding.dart';
 import 'package:englishme/modules/auth/views/login_screen.dart';
 import 'package:englishme/modules/auth/views/register_screen.dart';
+import 'package:englishme/modules/chat_ai/bindings/chat_ai_binding.dart';
+import 'package:englishme/modules/chat_ai/views/chat_ai_screen.dart';
 import 'package:englishme/modules/flashcard/bindings/flashcard_binding.dart';
 import 'package:englishme/modules/flashcard/views/flashcard_screen.dart';
 import 'package:englishme/modules/home/bindings/home_binding.dart';
@@ -44,6 +46,11 @@ class AppPages {
       name: AppRoutes.flashcards,
       page: () => const FlashcardScreen(),
       binding: FlashcardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.chatAi,
+      page: () => const ChatAiScreen(),
+      binding: ChatAiBinding(),
     ),
     GetPage(
       name: AppRoutes.placementTest,

@@ -3,9 +3,11 @@ import 'package:dio/dio.dart';
 class DioClient {
   DioClient._();
 
+  static const String baseUrl = 'http://10.0.2.2:8080';
+
   static final Dio _instance = Dio(
     BaseOptions(
-      baseUrl: 'http://10.0.2.2:8080/api',
+      baseUrl: '$baseUrl/api',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 10),
     ),

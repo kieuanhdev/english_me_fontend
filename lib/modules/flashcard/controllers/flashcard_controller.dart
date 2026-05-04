@@ -45,7 +45,9 @@ class FlashcardController extends GetxController {
 
   void onPracticeWordOfDay() {}
 
-  void onCreateDeck() {}
+  void onCreateDeck() {
+    Get.toNamed(AppRoutes.createDesk);
+  }
 
   void onViewAll() {}
 }

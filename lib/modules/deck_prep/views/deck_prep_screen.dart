@@ -161,12 +161,14 @@ class _DeckHeader extends StatelessWidget {
                 ),
               ),
               AppGap.h6,
-              Text(
-                '${desk.flashcardCount} thẻ • ${_levelLabel(desk.cefrLevel)}',
-                style: AppTypography.bodyLarge.copyWith(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+              Obx(
+                () => Text(
+                  '${controller.cardCount} thẻ • ${_levelLabel(desk.cefrLevel)}',
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -205,8 +207,9 @@ class _WeeklyMasteryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pct = controller.weeklyMasteryPercent;
-    return Container(
+    return Obx(() {
+      final pct = controller.weeklyMasteryPercent;
+      return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
       decoration: BoxDecoration(
@@ -288,6 +291,7 @@ class _WeeklyMasteryCard extends StatelessWidget {
         ],
       ),
     );
+    });
   }
 }
 

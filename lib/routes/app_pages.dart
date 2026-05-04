@@ -3,6 +3,10 @@ import 'package:englishme/modules/auth/views/login_screen.dart';
 import 'package:englishme/modules/auth/views/register_screen.dart';
 import 'package:englishme/modules/chat_ai/bindings/chat_ai_binding.dart';
 import 'package:englishme/modules/chat_ai/views/chat_ai_screen.dart';
+import 'package:englishme/modules/add_flashcard/bindings/add_flashcard_binding.dart';
+import 'package:englishme/modules/add_flashcard/views/add_flashcard_screen.dart';
+import 'package:englishme/modules/create_desk/bindings/create_desk_binding.dart';
+import 'package:englishme/modules/create_desk/views/create_desk_screen.dart';
 import 'package:englishme/modules/deck_prep/bindings/deck_prep_binding.dart';
 import 'package:englishme/modules/deck_prep/views/deck_prep_screen.dart';
 import 'package:englishme/modules/flashcard/bindings/flashcard_binding.dart';
@@ -53,6 +57,16 @@ class AppPages {
       name: AppRoutes.deckPrep,
       page: () => const DeckPrepScreen(),
       binding: DeckPrepBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.addFlashcard,
+      page: () => const AddFlashcardScreen(),
+      binding: AddFlashcardBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.createDesk,
+      page: () => const CreateDeskScreen(),
+      binding: CreateDeskBinding(),
     ),
     GetPage(
       name: AppRoutes.chatAi,

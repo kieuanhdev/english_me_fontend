@@ -5,6 +5,8 @@ abstract class AppRoutes {
   static const home = '/home';
   static const flashcards = '/flashcards';
   static const deckPrep = '/flashcards/deck-prep';
+  static const addFlashcard = '/flashcards/add-card';
+  static const createDesk = '/flashcards/create-desk';
   static const placementTest = '/placement-test';
   static const placementTestQuestion = '/placement-test/question';
   static const placementTestResult = '/placement-test/result';

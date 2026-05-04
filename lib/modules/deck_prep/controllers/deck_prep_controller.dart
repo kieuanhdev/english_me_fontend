@@ -5,8 +5,11 @@ import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/data/models/desk_model.dart';
 import 'package:englishme/data/models/flashcard_model.dart';
 import 'package:englishme/data/repositories/flashcard_repository.dart';
+import 'package:englishme/modules/add_flashcard/controllers/add_flashcard_controller.dart';
+import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/modules/study_session/views/study_session_front_screen.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 class DeckPrepController extends GetxController {
   DeckPrepController({required this.desk});
@@ -19,21 +22,26 @@ class DeckPrepController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
 
+  /// Số thẻ thêm trong phiên này (desk từ API chưa cập nhật `flashcardCount`).
+  final RxInt addedSinceOpen = 0.obs;
+
+  int get cardCount => desk.flashcardCount + addedSinceOpen.value;
+
   /// Tiến độ tuần (mock — đồng bộ số thẻ với bộ; API thống kê sau sẽ thay).
   int get weeklyMasteryPercent {
-    final n = desk.flashcardCount;
+    final n = cardCount;
     if (n <= 0) return 0;
     final mastered = (n * 0.67).round().clamp(0, n);
     return ((mastered / n) * 100).round();
   }
 
   int get newCardsCount {
-    final n = desk.flashcardCount;
+    final n = cardCount;
     if (n <= 0) return 0;
     return (n * 0.29).round().clamp(0, n);
   }
 
-  int get masteredCardsCount => (desk.flashcardCount - newCardsCount).clamp(0, desk.flashcardCount);
+  int get masteredCardsCount => (cardCount - newCardsCount).clamp(0, cardCount);
 
   @override
   void onInit() {
@@ -63,7 +71,7 @@ class DeckPrepController extends GetxController {
   }
 
   void startStudySession() {
-    if (desk.flashcardCount == 0) {
+    if (previewCards.isEmpty) {
       Get.snackbar('Bộ thẻ trống', 'Chưa có thẻ để học.');
       return;
     }
@@ -76,7 +84,27 @@ class DeckPrepController extends GetxController {
     Get.off(() => const StudySessionFrontScreen());
   }
 
-  void onAddCard() {}
+  Future<void> onAddCard() async {
+    final created = await Get.toNamed<dynamic>(AppRoutes.addFlashcard, arguments: desk);
+    if (created == true) {
+      addedSinceOpen.value++;
+      await _loadPreview();
+      if (Get.isRegistered<FlashcardController>()) {
+        Get.find<FlashcardController>().loadDesks();
+      }
+    }
+  }
 
-  void onEditCard(FlashcardModel card) {}
+  Future<void> onEditCard(FlashcardModel card) async {
+    final updated = await Get.toNamed<dynamic>(
+      AppRoutes.addFlashcard,
+      arguments: AddFlashcardArgs(desk: desk, editCard: card),
+    );
+    if (updated == true) {
+      await _loadPreview();
+      if (Get.isRegistered<FlashcardController>()) {
+        Get.find<FlashcardController>().loadDesks();
+      }
+    }
+  }
 }

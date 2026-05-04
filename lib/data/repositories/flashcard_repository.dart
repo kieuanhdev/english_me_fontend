@@ -15,20 +15,16 @@ class FlashcardRepository {
   }
 
   Future<DeskModel> createDesk({
-    required String title,
-    String description = '',
-    String cefrLevel = 'A1',
-    String? color,
-    String? icon,
+    required String cefrLevel,
+    String? title,
+    int? sortOrder,
   }) async {
     final response = await _dio.post(
       '/desks',
       data: {
-        'title': title,
-        'description': description,
         'cefrLevel': cefrLevel,
-        if (color != null) 'color': color,
-        if (icon != null) 'icon': icon,
+        if (title != null && title.trim().isNotEmpty) 'title': title.trim(),
+        if (sortOrder != null) 'sortOrder': sortOrder,
       },
     );
     final parsed = _extractDeskJson(response.data);
@@ -41,10 +37,38 @@ class FlashcardRepository {
     );
   }
 
+  Future<DeskModel> updateDesk({
+    required String deskId,
+    String? cefrLevel,
+    String? title,
+    int? sortOrder,
+  }) async {
+    final response = await _dio.put(
+      '/desks/$deskId',
+      data: {
+        if (cefrLevel != null) 'cefrLevel': cefrLevel,
+        if (title != null) 'title': title.trim(),
+        if (sortOrder != null) 'sortOrder': sortOrder,
+      },
+    );
+    final parsed = _extractDeskJson(response.data);
+    if (parsed != null) return DeskModel.fromJson(_normalizeDeskJson(parsed));
+    throw DioException(
+      requestOptions: response.requestOptions,
+      response: response,
+      type: DioExceptionType.badResponse,
+      message: 'Dữ liệu bộ thẻ cập nhật không hợp lệ',
+    );
+  }
+
+  Future<void> deleteDesk(String deskId) async {
+    await _dio.delete('/desks/$deskId');
+  }
+
   Future<FlashcardPage> getFlashcards(
     String deskId, {
     int page = 0,
-    int size = 40,
+    int size = 20,
   }) async {
     final response = await _dio.get(
       '/desks/$deskId/flashcards',

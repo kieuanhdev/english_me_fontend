@@ -88,6 +88,8 @@ class FlashcardDeckList extends GetView<FlashcardController> {
                   _DeckCard(
                     desk: desk,
                     onStartStudy: () => controller.onStartStudy(desk),
+                    onEdit: () => controller.onEditDeck(desk),
+                    onDelete: () => controller.onDeleteDeck(desk),
                   ),
                   AppGap.h14,
                 ],
@@ -104,10 +106,17 @@ class FlashcardDeckList extends GetView<FlashcardController> {
 // ─── Deck Card ────────────────────────────────────────────────────────────────
 
 class _DeckCard extends StatelessWidget {
-  const _DeckCard({required this.desk, required this.onStartStudy});
+  const _DeckCard({
+    required this.desk,
+    required this.onStartStudy,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   final DeskModel desk;
   final VoidCallback onStartStudy;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
   // Map CEFR → màu sắc
   static Color _bgColor(String cefr) => switch (cefr.toUpperCase()) {
@@ -174,6 +183,24 @@ class _DeckCard extends StatelessWidget {
                       color: fg,
                     ),
                   ),
+                ),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert_rounded, size: 22, color: AppColors.iconMuted),
+                  padding: EdgeInsets.zero,
+                  onSelected: (v) {
+                    if (v == 'edit') onEdit();
+                    if (v == 'delete') onDelete();
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(value: 'edit', child: Text('Sửa bộ thẻ')),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(
+                        'Xóa bộ thẻ',
+                        style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

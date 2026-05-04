@@ -37,6 +37,26 @@ class DeckPrepScreen extends StatelessWidget {
         title: 'EnglishMe',
         isTranslate: false,
         showBackButton: true,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert_rounded),
+            offset: const Offset(0, 48),
+            onSelected: (v) {
+              if (v == 'edit') c.openEditDesk();
+              if (v == 'delete') c.confirmDeleteThisDesk();
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: 'edit', child: Text('Sửa bộ thẻ')),
+              PopupMenuItem(
+                value: 'delete',
+                child: Text(
+                  'Xóa bộ thẻ',
+                  style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: SafeArea(
         top: false,

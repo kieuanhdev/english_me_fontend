@@ -11,10 +11,16 @@ class CreateDeskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ctl = Get.find<CreateDeskController>();
+    final isEdit = ctl.isEditMode;
+    final appTitle = isEdit ? 'Sửa bộ thẻ' : 'Tạo bộ thẻ mới';
+    final primaryActionLabel = isEdit ? 'Lưu' : 'Tạo';
+    final bottomPrimaryLabel = isEdit ? 'Lưu thay đổi' : 'Tạo bộ thẻ';
+    final bottomIcon = isEdit ? Icons.save_rounded : Icons.add_circle_rounded;
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: CommonAppBar(
-        title: 'Tạo bộ thẻ mới',
+        title: appTitle,
         isTranslate: false,
         actions: [
           Obx(
@@ -24,9 +30,9 @@ class CreateDeskScreen extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: TextButton(
-                  onPressed: busy ? null : c.createDesk,
+                  onPressed: busy ? null : c.submitDesk,
                   child: Text(
-                    'Tạo',
+                    primaryActionLabel,
                     style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w800,
                       color: busy ? AppColors.textSecondary : AppColors.primary,
@@ -51,7 +57,7 @@ class CreateDeskScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _HeaderHero(),
+                        _HeaderHero(isEditMode: ctl.isEditMode),
                         AppGap.h24,
                         _SectionTitle(title: 'Tên bộ thẻ', required: true),
                         AppGap.h10,
@@ -96,10 +102,62 @@ class CreateDeskScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+                        AppGap.h22,
+                        const _SectionTitle(title: 'Trình độ CEFR', required: true),
+                        AppGap.h10,
+                        Obx(
+                          () => Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: CreateDeskController.cefrOptions.map((level) {
+                              final selected = c.selectedCefr.value == level;
+                              return GestureDetector(
+                                onTap: () => c.selectedCefr.value = level,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    gradient: selected ? AppColors.primaryGradient : null,
+                                    color: selected ? null : AppColors.surfaceContainerHigh,
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text(
+                                    level,
+                                    style: AppTypography.bodyLarge.copyWith(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w800,
+                                      color: selected ? Colors.white : AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
                         AppGap.h24,
                         _ColorSection(controller: c),
                         AppGap.h24,
                         _IconSection(controller: c),
+                        if (isEdit) ...[
+                          AppGap.h28,
+                          Obx(
+                            () {
+                              final ctrl = Get.find<CreateDeskController>();
+                              final busy = ctrl.isSubmitting.value;
+                              return Center(
+                                child: TextButton(
+                                  onPressed: busy ? null : ctrl.confirmAndDeleteDesk,
+                                  child: Text(
+                                    'Xóa bộ thẻ',
+                                    style: AppTypography.bodyLarge.copyWith(
+                                      color: AppColors.danger,
+                                      fontWeight: FontWeight.w800,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -109,9 +167,11 @@ class CreateDeskScreen extends StatelessWidget {
                       color: AppColors.surface.withValues(alpha: 0.9),
                       padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
                       child: Obx(
-                        () => _PrimaryCreateButton(
+                        () => _PrimaryDeskButton(
+                          label: bottomPrimaryLabel,
+                          icon: bottomIcon,
                           isLoading: c.isSubmitting.value,
-                          onPressed: c.createDesk,
+                          onPressed: c.submitDesk,
                         ),
                       ),
                     ),
@@ -127,8 +187,15 @@ class CreateDeskScreen extends StatelessWidget {
 }
 
 class _HeaderHero extends StatelessWidget {
+  const _HeaderHero({required this.isEditMode});
+  final bool isEditMode;
+
   @override
   Widget build(BuildContext context) {
+    final title = isEditMode ? 'Cập nhật bộ thẻ' : 'Bắt đầu hành trình mới';
+    final subtitle = isEditMode
+        ? 'Chỉnh tên và trình độ CEFR phù hợp — thay đổi CEFR có thể báo conflict nếu đã có bộ cùng cấp.'
+        : 'Tổ chức kiến thức theo cách của riêng bạn với thiết kế tối giản.';
     return Row(
       children: [
         Expanded(
@@ -142,7 +209,7 @@ class _HeaderHero extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bắt đầu hành trình mới',
+                  title,
                   style: AppTypography.displayLarge.copyWith(
                     fontSize: 26,
                     color: AppColors.primary,
@@ -151,7 +218,7 @@ class _HeaderHero extends StatelessWidget {
                 ),
                 AppGap.h8,
                 Text(
-                  'Tổ chức kiến thức theo cách của riêng bạn với thiết kế tối giản.',
+                  subtitle,
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 14,
                     color: AppColors.textSecondary,
@@ -318,12 +385,16 @@ class _IconSection extends StatelessWidget {
   }
 }
 
-class _PrimaryCreateButton extends StatelessWidget {
-  const _PrimaryCreateButton({
+class _PrimaryDeskButton extends StatelessWidget {
+  const _PrimaryDeskButton({
+    required this.label,
+    required this.icon,
     required this.isLoading,
     required this.onPressed,
   });
 
+  final String label;
+  final IconData icon;
   final bool isLoading;
   final VoidCallback onPressed;
 
@@ -355,10 +426,10 @@ class _PrimaryCreateButton extends StatelessWidget {
                   ),
                 )
               else ...[
-                const Icon(Icons.add_circle_rounded, color: Colors.white),
+                Icon(icon, color: Colors.white),
                 const SizedBox(width: 8),
                 Text(
-                  'Tạo bộ thẻ',
+                  label,
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,

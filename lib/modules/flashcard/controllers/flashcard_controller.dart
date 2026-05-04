@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/data/models/desk_model.dart';
 import 'package:englishme/data/repositories/flashcard_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
+import 'package:englishme/theme/app_theme.dart';
 
 class FlashcardController extends GetxController {
   late final FlashcardRepository _repo;
@@ -47,6 +49,38 @@ class FlashcardController extends GetxController {
 
   void onCreateDeck() {
     Get.toNamed(AppRoutes.createDesk);
+  }
+
+  void onEditDeck(DeskModel desk) {
+    Get.toNamed(AppRoutes.createDesk, arguments: desk);
+  }
+
+  Future<void> onDeleteDeck(DeskModel desk) async {
+    final confirmed = await Get.dialog<bool>(
+      AlertDialog(
+        title: const Text('Xóa bộ thẻ?'),
+        content: Text('Toàn bộ thẻ trong "${desk.title}" sẽ không còn trên máy chủ của bạn.'),
+        actions: [
+          TextButton(onPressed: () => Get.back(result: false), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Get.back(result: true),
+            child: Text(
+              'Xóa',
+              style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w800),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    try {
+      await _repo.deleteDesk(desk.id);
+      await loadDesks();
+      Get.snackbar('Đã xóa', desk.title);
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map ? (e.response!.data as Map)['message']?.toString() : null;
+      Get.snackbar('Không xóa được', msg ?? e.message ?? 'Lỗi mạng');
+    }
   }
 
   void onViewAll() {}

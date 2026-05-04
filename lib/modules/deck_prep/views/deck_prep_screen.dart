@@ -1,0 +1,495 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/widgets/common_app_bar.dart';
+import 'package:englishme/data/models/flashcard_model.dart';
+import 'package:englishme/modules/deck_prep/controllers/deck_prep_controller.dart';
+import 'package:englishme/theme/app_theme.dart';
+
+const Color _kOnSurfaceVariant = Color(0xFF454652);
+const Color _kInventoryAccent = Color(0xFFFFB870);
+
+class DeckPrepScreen extends StatelessWidget {
+  const DeckPrepScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    if (!Get.isRegistered<DeckPrepController>()) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (context.mounted && Navigator.canPop(context)) Get.back();
+      });
+      return Scaffold(
+        backgroundColor: AppColors.surface,
+        appBar: CommonAppBar(
+          title: 'EnglishMe',
+          isTranslate: false,
+          showBackButton: true,
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final c = Get.find<DeckPrepController>();
+    return Scaffold(
+      backgroundColor: AppColors.surface,
+      appBar: CommonAppBar(
+        title: 'EnglishMe',
+        isTranslate: false,
+        showBackButton: true,
+      ),
+      body: SafeArea(
+        top: false,
+        child: Obx(() {
+          if (c.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (c.errorMessage.isNotEmpty) {
+            return _ErrorState(
+              message: c.errorMessage.value,
+              onRetry: c.retryLoad,
+            );
+          }
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _DeckHeader(controller: c),
+                AppGap.h24,
+                _WeeklyMasteryCard(controller: c),
+                AppGap.h20,
+                _PrimaryActions(controller: c),
+                AppGap.h28,
+                const _InventoryHeader(),
+                AppGap.h16,
+                ...c.previewCards.map((card) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _InventoryWordCard(
+                        card: card,
+                        onSpeak: () => c.speakWord(card.word),
+                        onEdit: () => c.onEditCard(card),
+                      ),
+                    )),
+                if (c.previewCards.isEmpty) const _EmptyPreview(),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: AppTypography.bodyLarge.copyWith(color: AppColors.danger),
+            ),
+            AppGap.h16,
+            AppButton(
+              label: 'Thử lại',
+              onPressed: onRetry,
+              variant: AppButtonVariant.primary,
+              isTranslate: false,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DeckHeader extends StatelessWidget {
+  const _DeckHeader({required this.controller});
+
+  final DeckPrepController controller;
+
+  String _levelLabel(String cefr) {
+    final u = cefr.toUpperCase();
+    return switch (u) {
+      'A1' => 'Trình độ A1 (Cơ bản)',
+      'A2' => 'Trình độ A2 (Tiền trung cấp)',
+      'B1' => 'Trình độ B1 (Trung cấp)',
+      'B2' => 'Trình độ B2 (Trung cấp cao)',
+      'C1' => 'Trình độ C1 (Cao cấp)',
+      'C2' => 'Trình độ C2 (Thành thạo)',
+      _ => 'Trình độ $cefr',
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final desk = controller.desk;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'BỘ TỪ VỰNG',
+                style: AppTypography.bodyLarge.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2,
+                  color: AppColors.tertiary,
+                ),
+              ),
+              AppGap.h6,
+              Text(
+                desk.title,
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 26,
+                  height: 1.15,
+                  color: AppColors.primary,
+                ),
+              ),
+              AppGap.h6,
+              Text(
+                '${desk.flashcardCount} thẻ • ${_levelLabel(desk.cefrLevel)}',
+                style: AppTypography.bodyLarge.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.star_rounded, color: AppColors.tertiary, size: 22),
+              const SizedBox(width: 6),
+              Text(
+                '4.9',
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 17,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WeeklyMasteryCard extends StatelessWidget {
+  const _WeeklyMasteryCard({required this.controller});
+
+  final DeckPrepController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    final pct = controller.weeklyMasteryPercent;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x08000000),
+            blurRadius: 24,
+            offset: Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Tiến độ tuần',
+                style: AppTypography.displayLarge.copyWith(fontSize: 17),
+              ),
+              Text(
+                '$pct%',
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 17,
+                  color: AppColors.tertiary,
+                ),
+              ),
+            ],
+          ),
+          AppGap.h14,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: SizedBox(
+              height: 10,
+              width: double.infinity,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  const ColoredBox(color: AppColors.secondaryContainer),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: (pct / 100.0).clamp(0.0, 1.0),
+                      heightFactor: 1,
+                      child: const ColoredBox(color: AppColors.tertiary),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          AppGap.h14,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '${controller.newCardsCount} thẻ mới',
+                style: AppTypography.bodyLarge.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              Text(
+                '${controller.masteredCardsCount} đã thuộc',
+                style: AppTypography.bodyLarge.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PrimaryActions extends StatelessWidget {
+  const _PrimaryActions({required this.controller});
+
+  final DeckPrepController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: controller.startStudySession,
+            borderRadius: BorderRadius.circular(24),
+            child: Ink(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Bắt đầu phiên học',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        AppGap.h12,
+        AppButton(
+          label: 'Thêm thẻ mới',
+          onPressed: controller.onAddCard,
+          variant: AppButtonVariant.secondary,
+          height: 56,
+          leading: const Icon(Icons.add_rounded, color: AppColors.primary, size: 22),
+          isTranslate: false,
+        ),
+      ],
+    );
+  }
+}
+
+class _InventoryHeader extends StatelessWidget {
+  const _InventoryHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Danh sách thẻ',
+          style: AppTypography.displayLarge.copyWith(
+            fontSize: 20,
+            color: AppColors.primary,
+          ),
+        ),
+        Row(
+          children: [
+            Icon(Icons.sort_rounded, size: 20, color: AppColors.textSecondary),
+            const SizedBox(width: 4),
+            Text(
+              'Mới nhất',
+              style: AppTypography.bodyLarge.copyWith(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _InventoryWordCard extends StatelessWidget {
+  const _InventoryWordCard({
+    required this.card,
+    required this.onSpeak,
+    required this.onEdit,
+  });
+
+  final FlashcardModel card;
+  final VoidCallback onSpeak;
+  final VoidCallback onEdit;
+
+  @override
+  Widget build(BuildContext context) {
+    final vi = card.viDefinition.isNotEmpty ? card.viDefinition : card.vietnamese;
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(22, 20, 12, 20),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        card.word,
+                        style: AppTypography.displayLarge.copyWith(
+                          fontSize: 22,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: onSpeak,
+                      icon: Icon(
+                        Icons.volume_up_rounded,
+                        size: 22,
+                        color: AppColors.iconMuted,
+                      ),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                    ),
+                  ],
+                ),
+                if (card.ipa.isNotEmpty) ...[
+                  AppGap.h6,
+                  Text(
+                    card.ipa,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 13,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+                AppGap.h12,
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.only(left: 16),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      left: BorderSide(color: _kInventoryAccent, width: 4),
+                    ),
+                  ),
+                  child: Text(
+                    vi,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 16,
+                      height: 1.45,
+                      fontWeight: FontWeight.w500,
+                      color: _kOnSurfaceVariant,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: onEdit,
+            style: IconButton.styleFrom(
+              backgroundColor: AppColors.surfaceContainerHigh,
+              foregroundColor: AppColors.iconMuted,
+            ),
+            icon: const Icon(Icons.edit_rounded, size: 20),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _EmptyPreview extends StatelessWidget {
+  const _EmptyPreview();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24),
+      child: Center(
+        child: Text(
+          'Chưa có thẻ trong bộ này.',
+          style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+        ),
+      ),
+    );
+  }
+}

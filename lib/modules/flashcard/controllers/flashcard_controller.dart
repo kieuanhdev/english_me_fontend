@@ -3,8 +3,7 @@ import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/data/models/desk_model.dart';
 import 'package:englishme/data/repositories/flashcard_repository.dart';
-import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
-import 'package:englishme/modules/study_session/views/study_session_front_screen.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 class FlashcardController extends GetxController {
   late final FlashcardRepository _repo;
@@ -41,13 +40,7 @@ class FlashcardController extends GetxController {
   }
 
   void onStartStudy(DeskModel desk) {
-    if (Get.isRegistered<StudySessionController>()) {
-      Get.delete<StudySessionController>();
-    }
-    Get.put<StudySessionController>(
-      StudySessionController(deskId: desk.id, deskTitle: desk.title),
-    );
-    Get.to(() => const StudySessionFrontScreen());
+    Get.toNamed(AppRoutes.deckPrep, arguments: desk);
   }
 
   void onPracticeWordOfDay() {}

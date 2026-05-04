@@ -4,10 +4,12 @@ abstract class AppRoutes {
   static const register = '/register';
   static const home = '/home';
   static const flashcards = '/flashcards';
+  static const deckPrep = '/flashcards/deck-prep';
   static const placementTest = '/placement-test';
   static const placementTestQuestion = '/placement-test/question';
   static const placementTestResult = '/placement-test/result';
   static const studySession = '/study-session';
   static const studySessionBack = '/study-session/back';
   static const sessionSummary = '/study-session/summary';
+  static const chatAi = '/chat-ai';
 }

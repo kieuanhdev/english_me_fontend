@@ -6,6 +6,7 @@ import 'package:englishme/data/models/flashcard_model.dart';
 import 'package:englishme/data/repositories/flashcard_repository.dart';
 import 'package:englishme/modules/study_session/views/session_summary_screen.dart';
 import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 enum CardRating { forget, vague, remember, mastered }
 
@@ -93,6 +94,10 @@ class StudySessionController extends GetxController {
     }
   }
 
-  void closeSession() =>
-      Get.until((route) => route.settings.name == '/flashcards' || route.isFirst);
+  void closeSession() {
+    Get.until(
+      (route) => route.settings.name == AppRoutes.flashcards || route.isFirst,
+    );
+    Get.delete<StudySessionController>();
+  }
 }

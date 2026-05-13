@@ -28,7 +28,7 @@ class AppBackButton extends StatelessWidget {
             BoxShadow(color: Color(0xFFCBD5DD), offset: Offset(0, 3)),
           ],
         ),
-        child: const Icon(Icons.chevron_left, color: AppColors.textSecondary),
+        child: Icon(Icons.chevron_left, color: AppColors.textSecondary),
       ),
     );
   }
@@ -60,7 +60,7 @@ class AppBackWithProgress extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 backgroundColor: const Color(0xFFD3DAE2),
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
           ),

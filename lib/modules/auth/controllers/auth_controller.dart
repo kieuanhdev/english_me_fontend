@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:englishme/core/services/auth_service.dart';
 import 'package:englishme/data/models/user_model.dart';
 import 'package:englishme/data/repositories/auth_repository.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {
@@ -79,14 +80,34 @@ class AuthController extends GetxController {
     }
   }
 
+  // ── Auto-login ───────────────────────────────────────────────────────────
+
+  /// Trả về tên route cần navigate tới, hoặc null nếu không có session.
+  Future<String?> tryAutoLogin() async {
+    try {
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return null;
+
+      final idToken = await currentUser.getIdToken();
+      if (idToken == null) return null;
+
+      final result = await _repository.syncUserWithBackend(idToken);
+      user.value = result;
+      return result.isOnboarded ? AppRoutes.home : AppRoutes.placementTest;
+    } catch (_) {
+      await FirebaseAuth.instance.signOut();
+      return null;
+    }
+  }
+
   // ── Private helpers ─────────────────────────────────────────────────────
 
   Future<void> _navigateAfterSync(UserModel result) async {
     user.value = result;
     if (!result.isOnboarded) {
-      Get.offAllNamed('/placement-test');
+      Get.offAllNamed(AppRoutes.placementTest);
     } else {
-      Get.offAllNamed('/home');
+      Get.offAllNamed(AppRoutes.home);
     }
   }
 

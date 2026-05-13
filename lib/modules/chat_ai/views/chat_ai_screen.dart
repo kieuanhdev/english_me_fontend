@@ -44,7 +44,7 @@ class ChatAiScreen extends GetView<ChatAiController> {
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: const AppBottomNav(initialIndex: 3),
+      bottomNavigationBar: const AppBottomNav(initialIndex: 1),
       body: SafeArea(
         child: Column(
           children: [
@@ -145,7 +145,7 @@ class _InputComposer extends StatelessWidget {
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 10, 12, 12),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
           border: Border(
             top: BorderSide(color: AppColors.outlineVariant, width: 1),

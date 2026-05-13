@@ -264,7 +264,7 @@ class AddFlashcardScreen extends StatelessWidget {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(14),
-                                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                                borderSide: BorderSide(color: AppColors.primary, width: 2),
                               ),
                             ),
                           ),

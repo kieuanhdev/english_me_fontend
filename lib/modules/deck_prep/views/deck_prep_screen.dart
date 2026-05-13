@@ -271,13 +271,13 @@ class _WeeklyMasteryCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  const ColoredBox(color: AppColors.secondaryContainer),
+                  ColoredBox(color: AppColors.secondaryContainer),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: FractionallySizedBox(
                       widthFactor: (pct / 100.0).clamp(0.0, 1.0),
                       heightFactor: 1,
-                      child: const ColoredBox(color: AppColors.tertiary),
+                      child: ColoredBox(color: AppColors.tertiary),
                     ),
                   ),
                 ],
@@ -358,7 +358,7 @@ class _PrimaryActions extends StatelessWidget {
           onPressed: controller.onAddCard,
           variant: AppButtonVariant.secondary,
           height: 56,
-          leading: const Icon(Icons.add_rounded, color: AppColors.primary, size: 22),
+          leading: Icon(Icons.add_rounded, color: AppColors.primary, size: 22),
           isTranslate: false,
         ),
       ],
@@ -418,8 +418,8 @@ class _InventoryWordCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
       ),
       padding: const EdgeInsets.fromLTRB(22, 20, 12, 20),

@@ -45,10 +45,10 @@ class HomeContinueLearning extends GetView<HomeController> {
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
                     color: AppColors.neutralShadow,
-                    offset: Offset(0, 3),
+                    offset: const Offset(0, 3),
                     blurRadius: 8,
                   ),
                 ],
@@ -157,7 +157,7 @@ class _LessonInfo extends GetView<HomeController> {
               child: LinearProgressIndicator(
                 value: controller.lessonProgress.value,
                 backgroundColor: AppColors.secondaryContainer,
-                valueColor: const AlwaysStoppedAnimation(AppColors.tertiary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.tertiary),
               ),
             ),
           )),

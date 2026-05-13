@@ -69,7 +69,7 @@ class AppButton extends StatelessWidget {
           foregroundColor: isPrimary ? Colors.white : AppColors.primary,
           side: isPrimary
               ? BorderSide.none
-              : const BorderSide(color: AppColors.outlineVariant, width: 2),
+              : BorderSide(color: AppColors.outlineVariant, width: 2),
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(

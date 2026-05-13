@@ -148,8 +148,8 @@ class _DeckCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
       ),
       child: Padding(
@@ -277,7 +277,7 @@ class _CreateDeckTile extends StatelessWidget {
                 color: AppColors.surfaceContainerLow,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.add_rounded, size: 28, color: AppColors.iconMuted),
+              child: Icon(Icons.add_rounded, size: 28, color: AppColors.iconMuted),
             ),
             AppGap.h12,
             Text(

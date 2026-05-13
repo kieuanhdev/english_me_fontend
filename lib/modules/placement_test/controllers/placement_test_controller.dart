@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:englishme/data/models/placement_test_models.dart';
 import 'package:englishme/data/repositories/placement_test_repository.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:get/get.dart';
 
 enum PlacementTestState { idle, loading, questioning, submitting, completed, error }
@@ -111,7 +112,7 @@ class PlacementTestController extends GetxController {
       final result = await _repository.completeTest(_sessionId, idToken);
       testResult.value = result;
       state.value = PlacementTestState.completed;
-      Get.offNamed('/placement-test/result');
+      Get.offNamed(AppRoutes.placementTestResult);
     } catch (_) {
       _completing = false;
       _showError('Không thể hoàn thành bài kiểm tra. Vui lòng thử lại.');

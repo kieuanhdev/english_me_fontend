@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/profile/profile_screen.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:englishme/vocab/vocab_learning_screen.dart';
+import 'package:get/get.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -57,7 +58,7 @@ class _DashboardStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       children: [
         Expanded(child: _StatChip(icon: Icons.language, text: 'VI', bg: AppColors.primary)),
         AppGap.w8,
@@ -123,8 +124,8 @@ class _DailyGoalCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
       ),
       child: Row(
@@ -139,7 +140,7 @@ class _DailyGoalCard extends StatelessWidget {
                   value: 0.5,
                   strokeWidth: 5,
                   backgroundColor: AppColors.secondaryContainer,
-                  valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
                 Center(
                   child: Text(
@@ -192,8 +193,8 @@ class _UnitCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: AppColors.primaryContainer, offset: Offset(0, 4)),
+        boxShadow: [
+          BoxShadow(color: AppColors.primaryContainer, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -234,7 +235,7 @@ class _LearningPath extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Expanded(
+              Expanded(
                 child: _PathNode(
                   done: true,
                   color: AppColors.skillVocabulary,
@@ -242,7 +243,7 @@ class _LearningPath extends StatelessWidget {
                 ),
               ),
               AppGap.w12,
-              const Expanded(
+              Expanded(
                 child: _PathNode(
                   done: true,
                   color: AppColors.skillVocabulary,
@@ -250,7 +251,7 @@ class _LearningPath extends StatelessWidget {
                 ),
               ),
               AppGap.w12,
-              const Expanded(
+              Expanded(
                 child: _PathNode(
                   done: false,
                   color: AppColors.primary,
@@ -267,7 +268,7 @@ class _LearningPath extends StatelessWidget {
                     color: AppColors.primarySoft,
                     border: Border.all(color: AppColors.neutralShadow, width: 2),
                   ),
-                  child: const Icon(Icons.flutter_dash, size: 52, color: AppColors.primaryContainer),
+                  child: Icon(Icons.flutter_dash, size: 52, color: AppColors.primaryContainer),
                 ),
               ),
             ],
@@ -333,7 +334,7 @@ class _PathNode extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: AppColors.skillVocabulary, width: 2),
               ),
-              child: const Icon(Icons.check, size: 18, color: AppColors.skillVocabulary),
+              child: Icon(Icons.check, size: 18, color: AppColors.skillVocabulary),
             ),
           ),
         if (label != null)
@@ -406,7 +407,7 @@ class _BottomNavState extends State<_BottomNav> {
 
     return Container(
       height: 78,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.outlineVariant, width: 2)),
       ),
@@ -427,12 +428,11 @@ class _BottomNavState extends State<_BottomNav> {
                       ),
                     );
                   }
+                  if (i == 2) {
+                    Get.toNamed(AppRoutes.pronunciation);
+                  }
                   if (i == 4) {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const ProfileScreen(),
-                      ),
-                    );
+                    Get.toNamed(AppRoutes.profile);
                   }
                 },
               ),

@@ -6,6 +6,7 @@ import 'package:englishme/gen/assets.gen.dart';
 import 'package:englishme/welcome/styles/welcome_tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -100,14 +101,14 @@ class _ActionButtons extends StatelessWidget {
       children: [
         AppButton(
           label: T.authRegister,
-          onPressed: () => Get.toNamed('/register'),
+          onPressed: () => Get.toNamed(AppRoutes.register),
           variant: AppButtonVariant.primary,
           textStyle: WelcomeTypography.buttonLabel,
         ),
         AppGap.h14,
         AppButton(
           label: T.authLogin,
-          onPressed: () => Get.toNamed('/login'),
+          onPressed: () => Get.toNamed(AppRoutes.login),
           variant: AppButtonVariant.secondary,
           textStyle: WelcomeTypography.buttonLabel,
         ),

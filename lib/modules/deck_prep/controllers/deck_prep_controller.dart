@@ -82,6 +82,7 @@ class DeckPrepController extends GetxController {
     }
     Get.put<StudySessionController>(
       StudySessionController(deskId: desk.id, deskTitle: desk.title),
+      permanent: true,
     );
     Get.off(() => const StudySessionFrontScreen());
   }

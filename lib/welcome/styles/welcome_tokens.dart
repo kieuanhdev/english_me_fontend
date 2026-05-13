@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class WelcomeColors {
-  static const Color bg = AppColors.surface;
-  static const Color surface = AppColors.surfaceContainerLowest;
-  static const Color primary = AppColors.primary;
-  static const Color primaryDark = AppColors.primaryContainer;
-  static const Color primarySoft = AppColors.primarySoft;
-  static const Color text = AppColors.onSurface;
-  static const Color textMuted = AppColors.textSecondary;
-  static const Color border = AppColors.outlineVariant;
+  static Color get bg => AppColors.surface;
+  static Color get surface => AppColors.surfaceContainerLowest;
+  static Color get primary => AppColors.primary;
+  static Color get primaryDark => AppColors.primaryContainer;
+  static Color get primarySoft => AppColors.primarySoft;
+  static Color get text => AppColors.onSurface;
+  static Color get textMuted => AppColors.textSecondary;
+  static Color get border => AppColors.outlineVariant;
 }
 
 class WelcomeTypography {

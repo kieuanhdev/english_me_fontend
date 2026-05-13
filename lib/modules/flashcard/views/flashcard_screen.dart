@@ -7,6 +7,7 @@ import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/flashcard/views/widgets/flashcard_deck_list.dart';
 import 'package:englishme/modules/flashcard/views/widgets/flashcard_stats.dart';
 import 'package:englishme/modules/flashcard/views/widgets/flashcard_word_of_day.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class FlashcardScreen extends GetView<FlashcardController> {
@@ -22,15 +23,110 @@ class FlashcardScreen extends GetView<FlashcardController> {
           slivers: [
             SliverToBoxAdapter(child: AppGap.h14),
             const SliverToBoxAdapter(
-              child: AppMainAppBar(title: 'Flashcards', showSearch: true),
+              child: AppMainAppBar(title: 'Học', showSearch: true),
             ),
             SliverToBoxAdapter(child: AppGap.h24),
+            const SliverToBoxAdapter(child: _LearnModules()),
+            SliverToBoxAdapter(child: AppGap.h20),
             const SliverToBoxAdapter(child: FlashcardWordOfDay()),
             SliverToBoxAdapter(child: AppGap.h20),
             const SliverToBoxAdapter(child: FlashcardStats()),
             SliverToBoxAdapter(child: AppGap.h28),
             const SliverToBoxAdapter(child: FlashcardDeckList()),
             SliverToBoxAdapter(child: AppGap.h32),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LearnModules extends StatelessWidget {
+  const _LearnModules();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: _ModuleCard(
+              icon: Icons.menu_book_rounded,
+              title: 'Ngữ pháp',
+              subtitle: 'Bài học nền tảng',
+              onTap: () => Get.toNamed(AppRoutes.grammar),
+            ),
+          ),
+          AppGap.w10,
+          Expanded(
+            child: _ModuleCard(
+              icon: Icons.record_voice_over_rounded,
+              title: 'Phát âm',
+              subtitle: 'Luyện nói mỗi ngày',
+              onTap: () => Get.toNamed(AppRoutes.pronunciation),
+            ),
+          ),
+          AppGap.w10,
+          Expanded(
+            child: _ModuleCard(
+              icon: Icons.smart_toy_rounded,
+              title: 'AI Coach',
+              subtitle: 'Hỏi đáp nhanh',
+              onTap: () => Get.toNamed(AppRoutes.chatAi),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ModuleCard extends StatelessWidget {
+  const _ModuleCard({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Ink(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.outlineVariant),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: AppColors.primary, size: 22),
+            AppGap.h8,
+            Text(
+              title,
+              style: AppTypography.bodyLarge.copyWith(
+                fontWeight: FontWeight.w800,
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTypography.bodyLarge.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 10,
+              ),
+            ),
           ],
         ),
       ),

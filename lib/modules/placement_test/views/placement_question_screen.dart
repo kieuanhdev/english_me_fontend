@@ -109,7 +109,7 @@ class _QuestionTopBar extends StatelessWidget {
       children: [
         IconButton(
           onPressed: onClose,
-          icon: const Icon(Icons.close, color: AppColors.iconMuted, size: 30),
+          icon: Icon(Icons.close, color: AppColors.iconMuted, size: 30),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
         ),
@@ -122,7 +122,7 @@ class _QuestionTopBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 backgroundColor: AppColors.secondaryContainer,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
           ),
@@ -180,8 +180,8 @@ class _PromptCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
       ),
       child: Text(
@@ -243,8 +243,8 @@ class _AnswerTile extends StatelessWidget {
           color: bg,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: border, width: 2.5),
-          boxShadow: const [
-            BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+          boxShadow: [
+            BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
           ],
         ),
         child: Row(

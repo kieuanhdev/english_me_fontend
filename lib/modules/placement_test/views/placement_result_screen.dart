@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:get/get.dart';
 
@@ -124,8 +125,8 @@ class _ScoreCard extends StatelessWidget {
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
       ),
       child: Column(
@@ -153,7 +154,7 @@ class _ScoreCard extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: percent,
                 backgroundColor: AppColors.secondaryContainer,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
           ),
@@ -278,7 +279,7 @@ class _GoToDashboardButton extends StatelessWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () => Get.offAllNamed('/home'),
+        onPressed: () => Get.offAllNamed(AppRoutes.home),
         style: ElevatedButton.styleFrom(
           elevation: 0,
           shadowColor: Colors.transparent,

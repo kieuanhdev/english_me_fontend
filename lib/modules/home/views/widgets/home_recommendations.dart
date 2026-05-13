@@ -84,7 +84,9 @@ class _RecommendCard extends StatelessWidget {
     final Color iconColor =
         item.isOrange ? AppColors.tertiary : AppColors.primary;
     final Color bgColor =
-        item.isOrange ? const Color(0xFFFFF3E0) : AppColors.surfaceContainerLow;
+        item.isOrange
+            ? AppColors.recommendationOrangeBg
+            : AppColors.recommendationMutedBg;
 
     return GestureDetector(
       onTap: onTap,
@@ -140,8 +142,8 @@ class _RecommendCardHorizontal extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 2)),
+          boxShadow: [
+            BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 2)),
           ],
         ),
         child: Row(
@@ -153,7 +155,7 @@ class _RecommendCardHorizontal extends StatelessWidget {
                 color: AppColors.primarySoft,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.smart_toy_rounded,
                 color: AppColors.primary,
                 size: 24,
@@ -185,7 +187,7 @@ class _RecommendCardHorizontal extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(
+            Icon(
               Icons.chevron_right_rounded,
               color: AppColors.iconMuted,
               size: 20,

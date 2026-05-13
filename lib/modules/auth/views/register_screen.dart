@@ -7,6 +7,7 @@ import 'package:englishme/gen/assets.gen.dart';
 import 'package:englishme/modules/auth/controllers/auth_controller.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -136,7 +137,7 @@ class _RegisterViewState extends State<_RegisterView> {
               AuthNavigationText(
                 promptText: T.alreadyHaveAccount.tr,
                 buttonText: T.loginNow.tr,
-                onTap: () => Get.toNamed('/login'),
+                onTap: () => Get.toNamed(AppRoutes.login),
               ),
             ],
           ),

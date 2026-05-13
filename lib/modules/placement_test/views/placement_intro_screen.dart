@@ -3,6 +3,7 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:get/get.dart';
 
@@ -60,7 +61,7 @@ class PlacementIntroScreen extends StatelessWidget {
                 ),
               ),
               AppGap.h18,
-              const Row(
+              Row(
                 children: [
                   Expanded(
                     child: _SkillCard(
@@ -94,7 +95,7 @@ class PlacementIntroScreen extends StatelessWidget {
                   final controller = Get.find<PlacementTestController>();
                   await controller.startTest();
                   if (controller.state.value == PlacementTestState.questioning) {
-                    Get.toNamed('/placement-test/question');
+                    Get.toNamed(AppRoutes.placementTestQuestion);
                   }
                 },
                 variant: AppButtonVariant.primary,
@@ -102,7 +103,7 @@ class PlacementIntroScreen extends StatelessWidget {
               AppGap.h18,
               Center(
                 child: TextButton(
-                  onPressed: () => Get.offAllNamed('/home'),
+                  onPressed: () => Get.offAllNamed(AppRoutes.home),
                   child: Text(
                     'Bỏ qua, vào thẳng Dashboard',
                     style: AppTypography.bodyLarge.copyWith(
@@ -153,7 +154,7 @@ class _PlacementMascot extends StatelessWidget {
                 color: AppColors.primary,
                 border: Border.all(color: AppColors.primaryContainer, width: 4),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.flutter_dash,
                 size: 76,
                 color: AppColors.primarySoft,

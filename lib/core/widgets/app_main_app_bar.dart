@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:englishme/core/widgets/app_settings_icon_button.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 /// AppBar dùng chung cho các màn hình chính (Home, Flashcards, ...).
@@ -13,15 +14,20 @@ class AppMainAppBar extends StatelessWidget {
     this.title,
     this.subtitle,
     this.showSearch = false,
+    this.showSettings = true,
     this.onSearch,
     this.onNotification,
+    this.onSettings,
   });
 
   final String? title;
   final String? subtitle;
   final bool showSearch;
+  /// Nút mở màn Profile / Cài đặt ([AppRoutes.profile]).
+  final bool showSettings;
   final VoidCallback? onSearch;
   final VoidCallback? onNotification;
+  final VoidCallback? onSettings;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +44,7 @@ class AppMainAppBar extends StatelessWidget {
               color: AppColors.secondaryContainer,
               border: Border.all(color: AppColors.outlineVariant, width: 2),
             ),
-            child: const Icon(Icons.person_rounded, size: 22, color: AppColors.primary),
+            child: Icon(Icons.person_rounded, size: 22, color: AppColors.primary),
           ),
           const SizedBox(width: 10),
           // Title area
@@ -84,6 +90,17 @@ class AppMainAppBar extends StatelessWidget {
             color: AppColors.primary,
             onTap: onNotification,
           ),
+          if (showSettings) ...[
+            const SizedBox(width: 8),
+            if (onSettings != null)
+              _IconButton(
+                icon: Icons.settings_outlined,
+                color: AppColors.primary,
+                onTap: onSettings,
+              )
+            else
+              const AppSettingsIconButton(),
+          ],
         ],
       ),
     );
@@ -107,8 +124,8 @@ class _IconButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
           shape: BoxShape.circle,
-          boxShadow: const [
-            BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 2)),
+          boxShadow: [
+            BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 2)),
           ],
         ),
         child: Icon(icon, size: 20, color: color),

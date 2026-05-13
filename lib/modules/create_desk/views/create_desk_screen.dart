@@ -98,7 +98,7 @@ class CreateDeskScreen extends StatelessWidget {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(20),
-                              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                              borderSide: BorderSide(color: AppColors.primary, width: 2),
                             ),
                           ),
                         ),
@@ -240,7 +240,7 @@ class _HeaderHero extends StatelessWidget {
               colors: [Color(0xFFDEE0FF), Color(0xFFF3F3F4)],
             ),
           ),
-          child: const Icon(Icons.auto_stories_rounded, color: AppColors.primary, size: 34),
+          child: Icon(Icons.auto_stories_rounded, color: AppColors.primary, size: 34),
         ),
       ],
     );
@@ -364,7 +364,7 @@ class _IconSection extends StatelessWidget {
                 onTap: () => controller.selectedIcon.value = iconName,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: selected ? const Color(0xFFE9EEFF) : AppColors.surfaceContainerHigh,
+                    color: selected ? AppColors.chipHighlightBg : AppColors.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(16),
                     border: selected
                         ? Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 2)
@@ -417,7 +417,7 @@ class _PrimaryDeskButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (isLoading)
-                const SizedBox(
+                SizedBox(
                   width: 22,
                   height: 22,
                   child: CircularProgressIndicator(

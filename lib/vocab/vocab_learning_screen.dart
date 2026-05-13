@@ -4,6 +4,7 @@ import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:get/get.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 enum _VocabStep { preview, reveal, done }
 
@@ -44,7 +45,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         );
       case _VocabStep.done:
         return _DoneStep(
-          onBackHome: () => Get.offAllNamed('/home'),
+          onBackHome: () => Get.offAllNamed(AppRoutes.home),
         );
     }
   }
@@ -173,12 +174,12 @@ class _DoneStep extends StatelessWidget {
           style: AppTypography.bodyLarge.copyWith(fontSize: 14),
         ),
         AppGap.h20,
-        const Row(
+        Row(
           children: [
             Expanded(
               child: _StatCard(
                 icon: Icons.bolt_rounded,
-                iconColor: Color(0xFFF4B12D),
+                iconColor: const Color(0xFFF4B12D),
                 value: '+30',
                 label: 'XP kiếm được',
               ),
@@ -217,7 +218,7 @@ class _VocabTopBar extends StatelessWidget {
       children: [
         IconButton(
           onPressed: onClose,
-          icon: const Icon(Icons.close, color: AppColors.iconMuted, size: 30),
+          icon: Icon(Icons.close, color: AppColors.iconMuted, size: 30),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
         ),
@@ -230,7 +231,7 @@ class _VocabTopBar extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 backgroundColor: AppColors.secondaryContainer,
-                valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
               ),
             ),
           ),
@@ -288,13 +289,13 @@ class _WordPreviewCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(22),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 4)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         children: [
-          const Icon(Icons.menu_book_rounded, size: 78, color: AppColors.primary),
+          Icon(Icons.menu_book_rounded, size: 78, color: AppColors.primary),
           AppGap.h14,
           Text(
             'diligent',
@@ -321,7 +322,7 @@ class _WordPreviewCard extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.primary, width: 3),
             ),
-            child: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 28),
+            child: Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 28),
           ),
           AppGap.h8,
           Text(
@@ -348,8 +349,8 @@ class _WordMeaningCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
-          BoxShadow(color: AppColors.primaryContainer, offset: Offset(0, 4)),
+        boxShadow: [
+          BoxShadow(color: AppColors.primaryContainer, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -529,7 +530,7 @@ class _DoneMascot extends StatelessWidget {
         color: AppColors.primary,
         border: Border.all(color: AppColors.primaryContainer, width: 4),
       ),
-      child: const Icon(Icons.flutter_dash, color: AppColors.primarySoft, size: 84),
+      child: Icon(Icons.flutter_dash, color: AppColors.primarySoft, size: 84),
     );
   }
 }
@@ -555,8 +556,8 @@ class _StatCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
-        boxShadow: const [
-          BoxShadow(color: AppColors.neutralShadow, offset: Offset(0, 3)),
+        boxShadow: [
+          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
       ),
       child: Column(

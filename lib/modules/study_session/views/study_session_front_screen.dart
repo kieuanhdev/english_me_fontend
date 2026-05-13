@@ -129,7 +129,7 @@ class _ProgressSection extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: '$current',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'BeVietnamPro',
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
@@ -138,7 +138,7 @@ class _ProgressSection extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '/$total',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'BeVietnamPro',
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -222,7 +222,7 @@ class _FlashcardFront extends StatelessWidget {
                 AppGap.h20,
                 Text(
                   card.word,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'BeVietnamPro',
                     fontSize: 52,
                     fontWeight: FontWeight.w800,
@@ -261,7 +261,7 @@ class _FlashcardFront extends StatelessWidget {
                           shape: BoxShape.circle,
                           color: AppColors.primary.withValues(alpha: 0.08),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.volume_up_rounded,
                           size: 17,
                           color: AppColors.primaryContainer,
@@ -357,14 +357,14 @@ class _TopicTip extends StatelessWidget {
               shape: BoxShape.circle,
               color: AppColors.surfaceContainerLow,
             ),
-            child: const Icon(Icons.tag_rounded, color: AppColors.primary, size: 19),
+            child: Icon(Icons.tag_rounded, color: AppColors.primary, size: 19),
           ),
           AppGap.w12,
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Chủ đề',
                   style: TextStyle(
                     fontFamily: 'BeVietnamPro',

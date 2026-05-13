@@ -101,7 +101,7 @@ class _ProgressSection extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: '$current',
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: 'BeVietnamPro',
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
@@ -110,7 +110,7 @@ class _ProgressSection extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '/$total',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'BeVietnamPro',
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -230,7 +230,7 @@ class _FlashcardBack extends StatelessWidget {
                           shape: BoxShape.circle,
                           color: AppColors.primary.withValues(alpha: 0.08),
                         ),
-                        child: const Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 22),
+                        child: Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 22),
                       ),
                     ),
                   ],
@@ -239,7 +239,7 @@ class _FlashcardBack extends StatelessWidget {
                 // Word
                 Text(
                   card.word,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontFamily: 'BeVietnamPro',
                     fontSize: 38,
                     fontWeight: FontWeight.w800,
@@ -351,7 +351,7 @@ class _FlashcardBack extends StatelessWidget {
       TextSpan(text: '"${sentence.substring(0, idx)}'),
       TextSpan(
         text: sentence.substring(idx, idx + word.length),
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.primary,
           fontWeight: FontWeight.w700,
           fontStyle: FontStyle.normal,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppBottomNav extends StatefulWidget {
@@ -15,11 +16,36 @@ class _AppBottomNavState extends State<AppBottomNav> {
   late int _currentIndex;
 
   static const List<_NavItemData> _items = [
-    _NavItemData(icon: Icons.home_rounded, inactiveIcon: Icons.home_outlined, label: 'Home', route: '/home'),
-    _NavItemData(icon: Icons.style_rounded, inactiveIcon: Icons.style_outlined, label: 'Flashcards', route: '/flashcards'),
-    _NavItemData(icon: Icons.mic_rounded, inactiveIcon: Icons.mic_none_rounded, label: 'Pronunciation', route: '/pronunciation'),
-    _NavItemData(icon: Icons.smart_toy_rounded, inactiveIcon: Icons.smart_toy_outlined, label: 'Chat AI', route: '/chat-ai'),
-    _NavItemData(icon: Icons.analytics_rounded, inactiveIcon: Icons.analytics_outlined, label: 'Progress', route: '/progress'),
+    _NavItemData(
+      icon: Icons.home_rounded,
+      inactiveIcon: Icons.home_outlined,
+      label: 'Trang chủ',
+      route: AppRoutes.home,
+    ),
+    _NavItemData(
+      icon: Icons.school_rounded,
+      inactiveIcon: Icons.school_outlined,
+      label: 'Học',
+      route: AppRoutes.learn,
+    ),
+    _NavItemData(
+      icon: Icons.fitness_center_rounded,
+      inactiveIcon: Icons.fitness_center_outlined,
+      label: 'Luyện',
+      route: AppRoutes.exercise,
+    ),
+    _NavItemData(
+      icon: Icons.assignment_turned_in_rounded,
+      inactiveIcon: Icons.assignment_turned_in_outlined,
+      label: 'Kiểm tra',
+      route: AppRoutes.test,
+    ),
+    _NavItemData(
+      icon: Icons.person_rounded,
+      inactiveIcon: Icons.person_outline_rounded,
+      label: 'Cá nhân',
+      route: AppRoutes.profile,
+    ),
   ];
 
   @override
@@ -34,7 +60,7 @@ class _AppBottomNavState extends State<AppBottomNav> {
       height: 76,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest.withValues(alpha: 0.92),
-        border: const Border(
+        border: Border(
           top: BorderSide(color: AppColors.outlineVariant, width: 1),
         ),
         boxShadow: [

@@ -6,6 +6,7 @@ import 'package:englishme/core/widgets/common_app_bar.dart';
 import 'package:englishme/modules/auth/controllers/auth_controller.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -120,7 +121,7 @@ class _LoginViewState extends State<_LoginView> {
               AuthNavigationText(
                 promptText: T.dontHaveAccount.tr,
                 buttonText: T.registerNow.tr,
-                onTap: () => Get.toNamed('/register'),
+                onTap: () => Get.toNamed(AppRoutes.register),
               ),
             ],
           ),

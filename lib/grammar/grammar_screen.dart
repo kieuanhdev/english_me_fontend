@@ -42,6 +42,36 @@ class GrammarScreen extends GetView<GrammarController> {
                   color: AppColors.textSecondary,
                 ),
               ),
+              AppGap.h12,
+              GestureDetector(
+                onTap: () => Get.toNamed(
+                  AppRoutes.grammarLessonDetail,
+                  arguments: '__mock__',
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySoft,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.visibility_outlined, size: 16, color: AppColors.primary),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Xem demo bài tập (mock data)',
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               AppGap.h16,
               Obx(() {
                 if (controller.isLoadingTopics.value) {

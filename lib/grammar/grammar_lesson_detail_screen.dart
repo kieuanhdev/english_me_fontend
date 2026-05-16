@@ -12,6 +12,122 @@ class GrammarLessonDetailScreen extends StatelessWidget {
   final String lessonId;
   static final Map<String, Future<GrammarLessonDetail>> _futureCache = {};
 
+  static GrammarLessonDetail _mockLesson() => GrammarLessonDetail(
+        id: '__mock__',
+        topicId: 'topic_1',
+        sourceId: 'src_1',
+        title: 'Present Simple — Thì Hiện Tại Đơn',
+        sortOrder: 1,
+        explanationVi:
+            'Thì hiện tại đơn diễn tả hành động xảy ra thường xuyên, thói quen, sự thật hiển nhiên hoặc lịch biểu cố định.',
+        whenToUseVi:
+            '• Thói quen hàng ngày: "I wake up at 6 every morning."\n'
+            '• Sự thật khoa học: "The sun rises in the east."\n'
+            '• Lịch trình cố định: "The train leaves at 8 AM."',
+        tipsVi:
+            'Nhớ thêm -s/-es vào động từ khi chủ ngữ là he/she/it. '
+            'Động từ kết thúc bằng -ch, -sh, -x, -o thêm -es (watches, goes).',
+        formulas: const [
+          GrammarFormula(label: 'Khẳng định', structure: 'S + V(s/es) + O'),
+          GrammarFormula(label: 'Phủ định', structure: 'S + do/does + not + V + O'),
+          GrammarFormula(label: 'Nghi vấn', structure: 'Do/Does + S + V + O?'),
+        ],
+        keyWords: const ['always', 'usually', 'often', 'sometimes', 'rarely', 'never', 'every day', 'once a week'],
+        examples: const [
+          GrammarExample(en: 'She drinks coffee every morning.', vi: 'Cô ấy uống cà phê mỗi buổi sáng.', note: 'Thói quen'),
+          GrammarExample(en: 'Water boils at 100°C.', vi: 'Nước sôi ở 100°C.', note: 'Sự thật khoa học'),
+          GrammarExample(en: 'He does not play football.', vi: 'Anh ấy không chơi bóng đá.', note: 'Phủ định với he'),
+        ],
+        commonMistakes: const [
+          GrammarMistake(
+            wrong: 'She go to school every day.',
+            correct: 'She goes to school every day.',
+            explainVi: 'Chủ ngữ "she" cần thêm -es vào động từ.',
+          ),
+          GrammarMistake(
+            wrong: 'He don\'t like pizza.',
+            correct: 'He doesn\'t like pizza.',
+            explainVi: 'Dùng "doesn\'t" (not "don\'t") khi chủ ngữ là he/she/it.',
+          ),
+        ],
+        exercises: [
+          GrammarExercise(
+            id: 'ex_1',
+            exerciseOrder: 1,
+            exerciseType: 'multiple_choice',
+            content: {
+              'type': 'multiple_choice',
+              'question': 'Chọn dạng đúng của động từ: "My sister ___ (study) English every evening."',
+              'options': ['study', 'studies', 'studied', 'is studying'],
+              'answer': 'studies',
+              'explain_vi': 'Chủ ngữ "My sister" (she) → thêm -ies (study → studies) vì tận cùng bằng -y sau phụ âm.',
+            },
+          ),
+          GrammarExercise(
+            id: 'ex_2',
+            exerciseOrder: 2,
+            exerciseType: 'multiple_choice',
+            content: {
+              'type': 'multiple_choice',
+              'question': 'Câu phủ định đúng: "He ___ (not/like) spicy food."',
+              'options': ['don\'t like', 'doesn\'t like', 'not likes', 'doesn\'t likes'],
+              'answer': 'doesn\'t like',
+              'explain_vi': 'Dùng "doesn\'t" với he/she/it, động từ chính giữ nguyên dạng (không thêm -s).',
+            },
+          ),
+          GrammarExercise(
+            id: 'ex_3',
+            exerciseOrder: 3,
+            exerciseType: 'fill_blank',
+            content: {
+              'type': 'fill_blank',
+              'sentence': 'The earth ___ around the sun.',
+              'answer': 'revolves',
+              'hints': ['revolve', 'revolves', 'revolving'],
+              'explain_vi': 'Sự thật khoa học dùng thì hiện tại đơn. Chủ ngữ "The earth" (it) → revolves.',
+            },
+          ),
+          GrammarExercise(
+            id: 'ex_4',
+            exerciseOrder: 4,
+            exerciseType: 'fill_blank',
+            content: {
+              'type': 'fill_blank',
+              'sentence': 'She ___ to the gym three times a week.',
+              'answer': 'goes',
+              'hints': ['go', 'goes', 'went'],
+              'explain_vi': '"She" (she) + go → goes. Go kết thúc bằng -o nên thêm -es.',
+            },
+          ),
+          GrammarExercise(
+            id: 'ex_5',
+            exerciseOrder: 5,
+            exerciseType: 'error_correction',
+            content: {
+              'type': 'error_correction',
+              'instruction': 'Tap vào phần SAI trong câu dưới đây:',
+              'segments': ['My brother', 'don\'t', 'eat', 'vegetables.'],
+              'answer': 'don\'t',
+              'correction': 'doesn\'t',
+              'explain_vi': 'Chủ ngữ "My brother" (he) → dùng "doesn\'t", không dùng "don\'t".',
+            },
+          ),
+          GrammarExercise(
+            id: 'ex_6',
+            exerciseOrder: 6,
+            exerciseType: 'error_correction',
+            content: {
+              'type': 'error_correction',
+              'instruction': 'Tap vào phần SAI trong câu dưới đây:',
+              'segments': ['Water', 'freeze', 'at', '0°C.'],
+              'answer': 'freeze',
+              'correction': 'freezes',
+              'explain_vi': 'Sự thật khoa học, chủ ngữ "Water" (it) → freezes.',
+            },
+          ),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
     if (lessonId.isEmpty) {
@@ -35,7 +151,9 @@ class GrammarLessonDetailScreen extends StatelessWidget {
     final repo = Get.find<GrammarRepository>();
     final future = _futureCache.putIfAbsent(
       lessonId,
-      () => repo.getLessonDetail(lessonId),
+      () => lessonId == '__mock__'
+          ? Future.value(_mockLesson())
+          : repo.getLessonDetail(lessonId),
     );
     return Scaffold(
       backgroundColor: AppColors.surface,
@@ -253,6 +371,18 @@ class _ExerciseRenderer extends StatelessWidget {
     final type = (exercise.content['type'] ?? exercise.exerciseType).toString();
     if (type == 'multiple_choice') {
       return _MultipleChoiceExerciseCard(
+        order: exercise.exerciseOrder,
+        content: exercise.content,
+      );
+    }
+    if (type == 'fill_blank') {
+      return _FillBlankExerciseCard(
+        order: exercise.exerciseOrder,
+        content: exercise.content,
+      );
+    }
+    if (type == 'error_correction') {
+      return _ErrorCorrectionExerciseCard(
         order: exercise.exerciseOrder,
         content: exercise.content,
       );
@@ -489,6 +619,382 @@ class _OptionTile extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Fill in the Blank ───────────────────────────────────────────────────────
+
+class _FillBlankExerciseCard extends StatefulWidget {
+  const _FillBlankExerciseCard({required this.order, required this.content});
+
+  final int order;
+  final Map<String, dynamic> content;
+
+  @override
+  State<_FillBlankExerciseCard> createState() => _FillBlankExerciseCardState();
+}
+
+class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
+  final _controller = TextEditingController();
+  bool _submitted = false;
+
+  String get _sentence => (widget.content['sentence'] ?? '').toString();
+  String get _answer => (widget.content['answer'] ?? '').toString().trim().toLowerCase();
+  String get _explainVi => (widget.content['explain_vi'] ?? '').toString();
+  List<String> get _hints {
+    final raw = widget.content['hints'];
+    if (raw is List) return raw.map((e) => e.toString()).toList();
+    return const [];
+  }
+
+  bool get _isCorrect => _submitted && _controller.text.trim().toLowerCase() == _answer;
+
+  void _submit() {
+    if (_controller.text.trim().isEmpty) return;
+    setState(() => _submitted = true);
+  }
+
+  void _reset() {
+    _controller.clear();
+    setState(() => _submitted = false);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final parts = _sentence.split('___');
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        border: Border.all(color: AppColors.outlineVariant),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Bài ${widget.order} • Điền từ',
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
+          ),
+          AppGap.h8,
+          // Sentence with blank rendered inline
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 4,
+            runSpacing: 4,
+            children: [
+              if (parts.isNotEmpty)
+                Text(parts[0].trimRight(), style: AppTypography.bodyLarge.copyWith(fontSize: 15)),
+              Container(
+                constraints: const BoxConstraints(minWidth: 80, maxWidth: 160),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color: _submitted
+                          ? (_isCorrect ? AppColors.success : AppColors.danger)
+                          : AppColors.primary,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                child: _submitted
+                    ? Text(
+                        _controller.text.trim(),
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          color: _isCorrect ? AppColors.success : AppColors.danger,
+                        ),
+                      )
+                    : TextField(
+                        controller: _controller,
+                        decoration: const InputDecoration(
+                          isDense: true,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        onSubmitted: (_) => _submit(),
+                      ),
+              ),
+              if (parts.length > 1)
+                Text(parts[1].trimLeft(), style: AppTypography.bodyLarge.copyWith(fontSize: 15)),
+            ],
+          ),
+          if (_hints.isNotEmpty) ...[
+            AppGap.h8,
+            Wrap(
+              spacing: 6,
+              children: _hints
+                  .map(
+                    (h) => GestureDetector(
+                      onTap: _submitted ? null : () => setState(() => _controller.text = h),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppColors.primarySoft,
+                          borderRadius: BorderRadius.circular(999),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                        ),
+                        child: Text(
+                          h,
+                          style: AppTypography.bodyLarge.copyWith(
+                            fontSize: 12,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+          AppGap.h12,
+          if (!_submitted)
+            AppButton(
+              label: 'Nộp đáp án',
+              onPressed: _submit,
+              variant: AppButtonVariant.primary,
+              isTranslate: false,
+              height: 52,
+            )
+          else ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _isCorrect ? AppColors.successSoft : AppColors.dangerSoft,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: (_isCorrect ? AppColors.success : AppColors.danger).withValues(alpha: 0.45),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _isCorrect ? 'Đúng rồi!' : 'Chưa đúng — Đáp án: $_answer',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: _isCorrect ? AppColors.successDark : AppColors.dangerDark,
+                    ),
+                  ),
+                  if (_explainVi.trim().isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      _explainVi,
+                      style: AppTypography.bodyLarge
+                          .copyWith(color: AppColors.textSecondary, fontSize: 13),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            AppGap.h10,
+            AppButton(
+              label: 'Làm lại',
+              onPressed: _reset,
+              variant: AppButtonVariant.secondary,
+              isTranslate: false,
+              height: 52,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Error Correction ────────────────────────────────────────────────────────
+
+class _ErrorCorrectionExerciseCard extends StatefulWidget {
+  const _ErrorCorrectionExerciseCard({required this.order, required this.content});
+
+  final int order;
+  final Map<String, dynamic> content;
+
+  @override
+  State<_ErrorCorrectionExerciseCard> createState() =>
+      _ErrorCorrectionExerciseCardState();
+}
+
+class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCard> {
+  String? _selected;
+  bool _submitted = false;
+
+  String get _instruction =>
+      (widget.content['instruction'] ?? 'Tìm phần sai trong câu dưới đây:').toString();
+  String get _answer => (widget.content['answer'] ?? '').toString();
+  String get _correction => (widget.content['correction'] ?? '').toString();
+  String get _explainVi => (widget.content['explain_vi'] ?? '').toString();
+
+  List<String> get _segments {
+    final raw = widget.content['segments'];
+    if (raw is List) return raw.map((e) => e.toString()).toList();
+    return const [];
+  }
+
+  bool get _isCorrect => _submitted && _selected == _answer;
+
+  Color _segmentBorder(String seg) {
+    if (!_submitted) return seg == _selected ? AppColors.primary : AppColors.outlineVariant;
+    if (seg == _answer) return AppColors.success;
+    if (seg == _selected && seg != _answer) return AppColors.danger;
+    return AppColors.outlineVariant;
+  }
+
+  Color _segmentBg(String seg) {
+    if (!_submitted) {
+      return seg == _selected ? AppColors.primarySoft : AppColors.surfaceContainerLowest;
+    }
+    if (seg == _answer) return AppColors.successSoft;
+    if (seg == _selected && seg != _answer) return AppColors.dangerSoft;
+    return AppColors.surfaceContainerLowest;
+  }
+
+  void _reset() => setState(() {
+        _selected = null;
+        _submitted = false;
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        border: Border.all(color: AppColors.outlineVariant),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Bài ${widget.order} • Tìm lỗi sai',
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
+          ),
+          AppGap.h8,
+          Text(_instruction,
+              style: AppTypography.bodyLarge.copyWith(
+                fontWeight: FontWeight.w700,
+                fontSize: 15,
+              )),
+          AppGap.h12,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _segments
+                .map(
+                  (seg) => GestureDetector(
+                    onTap: _submitted ? null : () => setState(() => _selected = seg),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: _segmentBg(seg),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: _segmentBorder(seg),
+                          width: _selected == seg ? 2 : 1,
+                        ),
+                      ),
+                      child: Text(
+                        seg,
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontSize: 14,
+                          fontWeight: _selected == seg ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+          AppGap.h12,
+          if (!_submitted)
+            AppButton(
+              label: 'Nộp đáp án',
+              onPressed: (_selected ?? '').isEmpty
+                  ? null
+                  : () => setState(() => _submitted = true),
+              variant: AppButtonVariant.primary,
+              isTranslate: false,
+              height: 52,
+            )
+          else ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: _isCorrect ? AppColors.successSoft : AppColors.dangerSoft,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: (_isCorrect ? AppColors.success : AppColors.danger).withValues(alpha: 0.45),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _isCorrect ? 'Đúng rồi!' : 'Chưa đúng',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: _isCorrect ? AppColors.successDark : AppColors.dangerDark,
+                    ),
+                  ),
+                  if (_correction.trim().isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      'Sửa lại: $_correction',
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                  if (_explainVi.trim().isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      _explainVi,
+                      style: AppTypography.bodyLarge
+                          .copyWith(color: AppColors.textSecondary, fontSize: 13),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            AppGap.h10,
+            AppButton(
+              label: 'Làm lại',
+              onPressed: _reset,
+              variant: AppButtonVariant.secondary,
+              isTranslate: false,
+              height: 52,
+            ),
+          ],
+        ],
       ),
     );
   }

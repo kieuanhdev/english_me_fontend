@@ -1,3 +1,8 @@
+import 'package:englishme/modules/vocabulary/bindings/vocabulary_binding.dart';
+import 'package:englishme/modules/vocabulary/views/vocabulary_topic_screen.dart';
+import 'package:englishme/modules/vocabulary/views/vocabulary_list_screen.dart';
+import 'package:englishme/modules/vocabulary/views/spelling_practice_screen.dart';
+import 'package:englishme/modules/vocabulary/views/spelling_result_screen.dart';
 import 'package:englishme/modules/test/bindings/test_binding.dart';
 import 'package:englishme/modules/test/views/test_home_screen.dart';
 import 'package:englishme/modules/test/views/test_question_screen.dart';
@@ -199,6 +204,23 @@ class AppPages {
       name: AppRoutes.profile,
       page: () => const ProfileScreen(),
       binding: ProfileBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.vocabulary,
+      page: () => const VocabularyTopicScreen(),
+      binding: VocabularyBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.vocabularyList,
+      page: () => const VocabularyListScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.spellingPractice,
+      page: () => const SpellingPracticeScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.spellingResult,
+      page: () => const SpellingResultScreen(),
     ),
   ];
 }

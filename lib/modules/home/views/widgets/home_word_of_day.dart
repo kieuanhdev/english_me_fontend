@@ -99,38 +99,86 @@ class HomeWordOfDay extends GetView<HomeController> {
                   ),
                 )),
                 AppGap.h16,
-                // Listen button
-                GestureDetector(
-                  onTap: controller.onListenWordOfDay,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.35),
-                          offset: const Offset(0, 4),
-                          blurRadius: 12,
+                // Action buttons row
+                Row(
+                  children: [
+                    // Listen button
+                    GestureDetector(
+                      onTap: controller.onListenWordOfDay,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.35),
+                              offset: const Offset(0, 4),
+                              blurRadius: 12,
+                            ),
+                          ],
                         ),
-                      ],
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.volume_up_rounded, color: Colors.white, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Nghe phát âm',
+                              style: AppTypography.bodyLarge.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.volume_up_rounded, color: Colors.white, size: 16),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Nghe phát âm',
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                    const SizedBox(width: 10),
+                    // Add to Flashcard button
+                    Obx(() => GestureDetector(
+                      onTap: controller.onAddWordToFlashcard,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: controller.wordSaved.value
+                              ? _wordColor
+                              : _bgColor,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: _wordColor.withValues(alpha: 0.4),
+                            width: 1.5,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              controller.wordSaved.value
+                                  ? Icons.bookmark_rounded
+                                  : Icons.bookmark_add_outlined,
+                              color: controller.wordSaved.value
+                                  ? Colors.white
+                                  : _wordColor,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              controller.wordSaved.value ? 'Đã lưu' : 'Lưu từ',
+                              style: AppTypography.bodyLarge.copyWith(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: controller.wordSaved.value
+                                    ? Colors.white
+                                    : _wordColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                  ],
                 ),
               ],
             ),

@@ -32,4 +32,8 @@ abstract class AppRoutes {
   static const sessionSummary = '/study-session/summary';
   static const progress = '/progress';
   static const profile = '/profile';
+  static const vocabulary = '/vocabulary';
+  static const vocabularyList = '/vocabulary/list';
+  static const spellingPractice = '/vocabulary/spelling';
+  static const spellingResult = '/vocabulary/spelling/result';
 }

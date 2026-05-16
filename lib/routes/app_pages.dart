@@ -1,3 +1,7 @@
+import 'package:englishme/modules/test/bindings/test_binding.dart';
+import 'package:englishme/modules/test/views/test_home_screen.dart';
+import 'package:englishme/modules/test/views/test_question_screen.dart';
+import 'package:englishme/modules/test/views/test_result_screen.dart';
 import 'package:englishme/core/shell/main_shell.dart';
 import 'package:englishme/core/shell/shell_binding.dart';
 import 'package:englishme/modules/exercise/bindings/exercise_binding.dart';
@@ -32,7 +36,8 @@ import 'package:englishme/modules/pronunciation/views/pronunciation_screen.dart'
 import 'package:englishme/modules/pronunciation/views/pronunciation_result_screen.dart';
 import 'package:englishme/modules/pronunciation/views/speaking_choice_screen.dart';
 import 'package:englishme/modules/pronunciation/views/ipa_screen.dart';
-import 'package:englishme/progress/progress_screen.dart';
+import 'package:englishme/modules/progress/bindings/progress_binding.dart';
+import 'package:englishme/modules/progress/views/progress_screen.dart';
 import 'package:englishme/modules/study_session/bindings/study_session_binding.dart';
 import 'package:englishme/modules/study_session/views/session_summary_screen.dart';
 import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
@@ -160,6 +165,7 @@ class AppPages {
     GetPage(
       name: AppRoutes.progress,
       page: () => const ProgressScreen(),
+      binding: ProgressBinding(),
     ),
     GetPage(
       name: AppRoutes.exercise,
@@ -173,6 +179,19 @@ class AppPages {
     GetPage(
       name: AppRoutes.exerciseResult,
       page: () => const ExerciseResultScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.test,
+      page: () => const TestHomeScreen(),
+      binding: TestBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.testQuestion,
+      page: () => const TestQuestionScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.testResult,
+      page: () => const TestResultScreen(),
     ),
   ];
 }

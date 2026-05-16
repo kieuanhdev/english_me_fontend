@@ -3,20 +3,20 @@ import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/modules/exercise/views/exercise_screen.dart';
 import 'package:englishme/modules/flashcard/views/flashcard_screen.dart';
 import 'package:englishme/modules/home/views/home_screen.dart';
-import 'package:englishme/profile/profile_screen.dart';
-import 'package:englishme/test/test_screen.dart';
+import 'package:englishme/modules/progress/views/progress_screen.dart';
+import 'package:englishme/modules/test/views/test_home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class MainShellScreen extends StatelessWidget {
   const MainShellScreen({super.key});
 
-  static const List<Widget> _tabs = [
-    HomeScreen(),
-    FlashcardScreen(),
-    ExerciseScreen(),
-    TestScreen(),
-    ProfileScreen(),
+  static final List<Widget> _tabs = [
+    const HomeScreen(),
+    const FlashcardScreen(),
+    const ExerciseScreen(),
+    const TestHomeScreen(),
+    const ProgressScreen(),
   ];
 
   @override

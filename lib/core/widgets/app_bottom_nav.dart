@@ -46,10 +46,10 @@ class _AppBottomNavState extends State<AppBottomNav> {
       route: AppRoutes.test,
     ),
     _NavItemData(
-      icon: Icons.person_rounded,
-      inactiveIcon: Icons.person_outline_rounded,
-      label: 'Cá nhân',
-      route: AppRoutes.profile,
+      icon: Icons.bar_chart_rounded,
+      inactiveIcon: Icons.bar_chart_outlined,
+      label: 'Tiến trình',
+      route: AppRoutes.progress,
     ),
   ];
 

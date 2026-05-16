@@ -4,6 +4,7 @@ import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:get/get.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 
 enum _VocabStep { preview, reveal, done }
@@ -45,7 +46,7 @@ class _VocabLearningScreenState extends State<VocabLearningScreen> {
         );
       case _VocabStep.done:
         return _DoneStep(
-          onBackHome: () => Get.offAllNamed(AppRoutes.home),
+          onBackHome: () => ShellController.goToTab(0),
         );
     }
   }

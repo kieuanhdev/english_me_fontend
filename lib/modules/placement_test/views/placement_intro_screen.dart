@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -103,7 +104,7 @@ class PlacementIntroScreen extends StatelessWidget {
               AppGap.h18,
               Center(
                 child: TextButton(
-                  onPressed: () => Get.offAllNamed(AppRoutes.home),
+                  onPressed: () => ShellController.goToTab(0),
                   child: Text(
                     'Bỏ qua, vào thẳng Dashboard',
                     style: AppTypography.bodyLarge.copyWith(

@@ -4,9 +4,14 @@ import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppBottomNav extends StatefulWidget {
-  const AppBottomNav({super.key, this.initialIndex = 0});
+  const AppBottomNav({
+    super.key,
+    this.initialIndex = 0,
+    this.onTap,
+  });
 
   final int initialIndex;
+  final void Function(int index, String route)? onTap;
 
   @override
   State<AppBottomNav> createState() => _AppBottomNavState();
@@ -54,6 +59,11 @@ class _AppBottomNavState extends State<AppBottomNav> {
     _currentIndex = widget.initialIndex;
   }
 
+  void switchTo(int index) {
+    if (index == _currentIndex) return;
+    setState(() => _currentIndex = index);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -81,8 +91,12 @@ class _AppBottomNavState extends State<AppBottomNav> {
               active: active,
               onTap: () {
                 if (i == _currentIndex) return;
-                setState(() => _currentIndex = i);
-                Get.offAllNamed(item.route);
+                if (widget.onTap != null) {
+                  widget.onTap!(i, item.route);
+                } else {
+                  setState(() => _currentIndex = i);
+                  Get.offAllNamed(item.route);
+                }
               },
             ),
           );

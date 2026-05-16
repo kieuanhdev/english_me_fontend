@@ -1,9 +1,8 @@
-import 'package:englishme/routes/app_routes.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
-/// Mở màn Profile / Cài đặt (đăng ký [AppRoutes.profile]).
+/// Mở màn Profile / Cài đặt (shell tab 4).
 class AppSettingsIconButton extends StatelessWidget {
   const AppSettingsIconButton({super.key, this.size = 40, this.iconSize = 20});
 
@@ -13,7 +12,7 @@ class AppSettingsIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.toNamed(AppRoutes.profile),
+      onTap: () => ShellController.goToTab(4),
       child: Container(
         width: size,
         height: size,

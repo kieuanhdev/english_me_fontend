@@ -1,5 +1,4 @@
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ class ExerciseScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: const AppBottomNav(initialIndex: 2),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:englishme/vocab/vocab_learning_screen.dart';
@@ -432,7 +433,7 @@ class _BottomNavState extends State<_BottomNav> {
                     Get.toNamed(AppRoutes.pronunciation);
                   }
                   if (i == 4) {
-                    Get.toNamed(AppRoutes.profile);
+                    ShellController.goToTab(4);
                   }
                 },
               ),

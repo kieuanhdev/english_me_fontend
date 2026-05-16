@@ -1,4 +1,5 @@
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/data/models/grammar_models.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
@@ -15,7 +16,10 @@ class GrammarScreen extends GetView<GrammarController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: const AppBottomNav(initialIndex: 1),
+      bottomNavigationBar: AppBottomNav(
+        initialIndex: 1,
+        onTap: (index, _) => ShellController.goToTab(index),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 20),

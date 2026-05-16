@@ -1,4 +1,5 @@
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
@@ -15,14 +16,17 @@ class IpaScreen extends StatelessWidget {
       Get.back();
       return;
     }
-    Get.offAllNamed(AppRoutes.home);
+    ShellController.goToTab(0);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: const AppBottomNav(initialIndex: 1),
+      bottomNavigationBar: AppBottomNav(
+        initialIndex: 1,
+        onTap: (index, _) => ShellController.goToTab(index),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),

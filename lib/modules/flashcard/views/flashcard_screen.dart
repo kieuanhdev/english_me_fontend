@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/flashcard/views/widgets/flashcard_deck_list.dart';
@@ -17,7 +16,6 @@ class FlashcardScreen extends GetView<FlashcardController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: const AppBottomNav(initialIndex: 1),
       body: SafeArea(
         child: CustomScrollView(
           slivers: [

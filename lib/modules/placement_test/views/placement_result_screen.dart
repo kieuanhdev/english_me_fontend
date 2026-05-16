@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -279,7 +280,7 @@ class _GoToDashboardButton extends StatelessWidget {
         ],
       ),
       child: ElevatedButton(
-        onPressed: () => Get.offAllNamed(AppRoutes.home),
+        onPressed: () => ShellController.goToTab(0),
         style: ElevatedButton.styleFrom(
           elevation: 0,
           shadowColor: Colors.transparent,

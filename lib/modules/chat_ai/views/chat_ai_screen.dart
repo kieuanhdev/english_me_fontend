@@ -1,3 +1,4 @@
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/chat_ai/controllers/chat_ai_controller.dart';
@@ -44,7 +45,10 @@ class ChatAiScreen extends GetView<ChatAiController> {
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: const AppBottomNav(initialIndex: 1),
+      bottomNavigationBar: AppBottomNav(
+        initialIndex: 1,
+        onTap: (index, _) => ShellController.goToTab(index),
+      ),
       body: SafeArea(
         child: Column(
           children: [

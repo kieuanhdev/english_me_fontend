@@ -93,7 +93,7 @@ class AuthController extends GetxController {
 
       final result = await _repository.syncUserWithBackend(idToken);
       user.value = result;
-      return result.isOnboarded ? AppRoutes.home : AppRoutes.placementTest;
+      return result.isOnboarded ? AppRoutes.shell : AppRoutes.placementTest;
     } catch (_) {
       await FirebaseAuth.instance.signOut();
       return null;
@@ -107,7 +107,7 @@ class AuthController extends GetxController {
     if (!result.isOnboarded) {
       Get.offAllNamed(AppRoutes.placementTest);
     } else {
-      Get.offAllNamed(AppRoutes.home);
+      Get.offAllNamed(AppRoutes.shell);
     }
   }
 

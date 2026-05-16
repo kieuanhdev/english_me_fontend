@@ -18,6 +18,8 @@ abstract class AppRoutes {
   static const addFlashcard = '/learn/flashcards/add-card';
   static const createDesk = '/learn/flashcards/create-desk';
   static const exercise = '/exercise';
+  static const exerciseQuiz = '/exercise/quiz';
+  static const exerciseResult = '/exercise/result';
   static const test = '/test';
   static const placementTest = '/placement-test';
   static const placementTestQuestion = '/placement-test/question';

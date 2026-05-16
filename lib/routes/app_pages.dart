@@ -1,5 +1,9 @@
 import 'package:englishme/core/shell/main_shell.dart';
 import 'package:englishme/core/shell/shell_binding.dart';
+import 'package:englishme/modules/exercise/bindings/exercise_binding.dart';
+import 'package:englishme/modules/exercise/views/exercise_quiz_screen.dart';
+import 'package:englishme/modules/exercise/views/exercise_result_screen.dart';
+import 'package:englishme/modules/exercise/views/exercise_screen.dart';
 import 'package:englishme/modules/auth/bindings/auth_binding.dart';
 import 'package:englishme/modules/auth/views/login_screen.dart';
 import 'package:englishme/modules/auth/views/register_screen.dart';
@@ -156,6 +160,19 @@ class AppPages {
     GetPage(
       name: AppRoutes.progress,
       page: () => const ProgressScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.exercise,
+      page: () => const ExerciseScreen(),
+      binding: ExerciseBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.exerciseQuiz,
+      page: () => const ExerciseQuizScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.exerciseResult,
+      page: () => const ExerciseResultScreen(),
     ),
   ];
 }

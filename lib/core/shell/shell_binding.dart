@@ -1,5 +1,7 @@
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/modules/exercise/controllers/exercise_controller.dart';
+import 'package:englishme/modules/profile/controllers/profile_controller.dart';
+import 'package:englishme/modules/profile/repositories/profile_repository.dart';
 import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/modules/progress/repositories/progress_repository.dart';
 import 'package:englishme/modules/test/controllers/test_controller.dart';
@@ -12,5 +14,6 @@ class ShellBinding extends Bindings {
     Get.lazyPut<ExerciseController>(() => ExerciseController());
     Get.lazyPut<TestController>(() => TestController());
     Get.lazyPut<ProgressController>(() => ProgressController(ProgressRepository()));
+    Get.lazyPut<ProfileController>(() => ProfileController(ProfileRepository()));
   }
 }

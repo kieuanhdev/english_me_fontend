@@ -36,6 +36,8 @@ import 'package:englishme/modules/pronunciation/views/pronunciation_screen.dart'
 import 'package:englishme/modules/pronunciation/views/pronunciation_result_screen.dart';
 import 'package:englishme/modules/pronunciation/views/speaking_choice_screen.dart';
 import 'package:englishme/modules/pronunciation/views/ipa_screen.dart';
+import 'package:englishme/modules/profile/bindings/profile_binding.dart';
+import 'package:englishme/modules/profile/views/profile_screen.dart';
 import 'package:englishme/modules/progress/bindings/progress_binding.dart';
 import 'package:englishme/modules/progress/views/progress_screen.dart';
 import 'package:englishme/modules/study_session/bindings/study_session_binding.dart';
@@ -192,6 +194,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.testResult,
       page: () => const TestResultScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileScreen(),
+      binding: ProfileBinding(),
     ),
   ];
 }

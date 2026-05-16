@@ -51,6 +51,12 @@ class _AppBottomNavState extends State<AppBottomNav> {
       label: 'Tiến trình',
       route: AppRoutes.progress,
     ),
+    _NavItemData(
+      icon: Icons.person_rounded,
+      inactiveIcon: Icons.person_outline_rounded,
+      label: 'Hồ sơ',
+      route: AppRoutes.profile,
+    ),
   ];
 
   @override

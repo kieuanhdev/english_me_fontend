@@ -23,7 +23,6 @@ abstract class AppRoutes {
   static const test = '/test';
   static const testQuestion = '/test/question';
   static const testResult = '/test/result';
-  static const testHistory = '/test/history';
   static const placementTest = '/placement-test';
   static const placementTestQuestion = '/placement-test/question';
   static const placementTestResult = '/placement-test/result';

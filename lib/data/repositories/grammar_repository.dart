@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/data/models/grammar_models.dart';
 
 class GrammarRepository {
@@ -8,7 +7,7 @@ class GrammarRepository {
   final Dio _dio;
 
   Future<List<GrammarTopic>> getTopics() async {
-    final response = await _dio.get('${DioClient.baseUrl}/grammar/topics');
+    final response = await _dio.get('/grammar/topics');
     final list = (response.data as List?) ?? const [];
     return list
         .whereType<Map>()
@@ -17,9 +16,7 @@ class GrammarRepository {
   }
 
   Future<List<GrammarLessonListItem>> getLessonsByTopic(String topicId) async {
-    final response = await _dio.get(
-      '${DioClient.baseUrl}/grammar/topics/$topicId/lessons',
-    );
+    final response = await _dio.get('/grammar/topics/$topicId/lessons');
     final list = (response.data as List?) ?? const [];
     return list
         .whereType<Map>()
@@ -28,9 +25,7 @@ class GrammarRepository {
   }
 
   Future<GrammarLessonDetail> getLessonDetail(String lessonId) async {
-    final response = await _dio.get(
-      '${DioClient.baseUrl}/grammar/lessons/$lessonId',
-    );
+    final response = await _dio.get('/grammar/lessons/$lessonId');
     return GrammarLessonDetail.fromJson(
       (response.data as Map).cast<String, dynamic>(),
     );

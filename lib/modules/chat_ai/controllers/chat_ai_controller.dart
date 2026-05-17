@@ -24,7 +24,7 @@ class ChatAiController extends GetxController {
     messages.add(
       const ChatMessageModel(
         role: 'assistant',
-        content: 'Xin chao! Hay gui cau ban muon minh sua va giai thich.',
+        content: 'Xin chào! Hãy gửi câu bạn muốn mình sửa và giải thích.',
       ),
     );
   }
@@ -43,8 +43,8 @@ class ChatAiController extends GetxController {
     final idToken = await FirebaseAuth.instance.currentUser?.getIdToken();
     if (idToken == null) {
       Get.snackbar(
-        'Loi',
-        'Phien dang nhap het han. Vui long dang nhap lai.',
+        'Lỗi',
+        'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.',
         snackPosition: SnackPosition.BOTTOM,
       );
       return;
@@ -67,13 +67,13 @@ class ChatAiController extends GetxController {
       final messageError =
           (e.response?.data is Map<String, dynamic>)
               ? (e.response?.data['message'] as String? ??
-                  'Khong the ket noi den AI.')
-              : 'Khong the ket noi den AI.';
-      Get.snackbar('Loi', messageError, snackPosition: SnackPosition.BOTTOM);
+                  'Không thể kết nối đến AI.')
+              : 'Không thể kết nối đến AI.';
+      Get.snackbar('Lỗi', messageError, snackPosition: SnackPosition.BOTTOM);
     } catch (_) {
       Get.snackbar(
-        'Loi',
-        'Da co loi khi gui tin nhan. Vui long thu lai.',
+        'Lỗi',
+        'Đã có lỗi khi gửi tin nhắn. Vui lòng thử lại.',
         snackPosition: SnackPosition.BOTTOM,
       );
     } finally {

@@ -84,10 +84,10 @@ class _CategoryCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: AppColors.outlineVariant),
-          boxShadow: const [
-            BoxShadow(color: Color(0x061A1C1C), blurRadius: 12, offset: Offset(0, 3)),
+          boxShadow: [
+            BoxShadow(color: AppColors.shadowSoft, blurRadius: 12, offset: Offset(0, 3)),
           ],
         ),
         child: Row(
@@ -97,7 +97,7 @@ class _CategoryCard extends StatelessWidget {
               height: 52,
               decoration: BoxDecoration(
                 color: accentColor.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Icon(icon, color: accentColor, size: 26),
             ),
@@ -108,8 +108,7 @@ class _CategoryCard extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -165,8 +164,7 @@ class _Badge extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: TextStyle(
-            fontFamily: 'PlusJakartaSans',
+          style: AppTypography.labelSmall.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.w600,
             color: color,
@@ -186,7 +184,7 @@ class _HowItWorksSection extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -197,8 +195,7 @@ class _HowItWorksSection extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'Cách thức hoạt động',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,

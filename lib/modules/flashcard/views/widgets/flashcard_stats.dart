@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -24,7 +25,7 @@ class FlashcardStats extends GetView<FlashcardController> {
           const SizedBox(width: 14),
           Expanded(
             child: _StatCard(
-              iconBg: const Color(0xFFFFDCBE),
+              iconBg: AppColors.levelCBg,
               iconColor: AppColors.tertiary,
               icon: Icons.psychology_rounded,
               value: '${controller.avgMastery.value}%',
@@ -58,7 +59,7 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         boxShadow: [
           BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 2)),
         ],
@@ -71,7 +72,7 @@ class _StatCard extends StatelessWidget {
             height: 48,
             decoration: BoxDecoration(
               color: iconBg,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Icon(icon, color: iconColor, size: 24),
           ),

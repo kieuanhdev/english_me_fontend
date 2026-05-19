@@ -29,23 +29,29 @@ class HomeHeroSection extends GetView<HomeController> {
                   ),
                 ),
                 AppGap.h6,
-                Obx(() => Text(
-                  'Bạn đã đạt ${(controller.xpProgress * 100).toInt()}% mục tiêu hôm nay. Tiếp tục nhé!',
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 13,
-                    color: AppColors.textSecondary,
-                    height: 1.4,
-                  ),
-                )),
+                Obx(() {
+                  controller.dashboard.value;
+                  return Text(
+                    'Bạn đã đạt ${(controller.xpProgress * 100).toInt()}% mục tiêu hôm nay. Tiếp tục nhé!',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  );
+                }),
               ],
             ),
           ),
           AppGap.w16,
-          Obx(() => _XpRing(
-            current: controller.currentXp.value,
-            target: controller.targetXp.value,
-            progress: controller.xpProgress,
-          )),
+          Obx(() {
+            controller.dashboard.value;
+            return _XpRing(
+              current: controller.currentXp,
+              target: controller.targetXp,
+              progress: controller.xpProgress,
+            );
+          }),
         ],
       ),
     );
@@ -115,7 +121,6 @@ class _RingPainter extends CustomPainter {
     final radius = (size.width - 10) / 2;
     const strokeWidth = 8.0;
 
-    // Track
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       0,
@@ -128,7 +133,6 @@ class _RingPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round,
     );
 
-    // Indicator
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       -math.pi / 2,

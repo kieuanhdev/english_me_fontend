@@ -27,8 +27,7 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                   const Spacer(),
                   Text(
                     'Kết quả luyện tập',
-                    style: const TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
@@ -55,7 +54,7 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: r.isCorrect ? AppColors.successPanel : AppColors.dangerPanel,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
                         color: r.isCorrect
                             ? AppColors.success.withValues(alpha: 0.3)
@@ -76,8 +75,7 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                             children: [
                               Text(
                                 r.word,
-                                style: const TextStyle(
-                                  fontFamily: 'BeVietnamPro',
+                                style: AppTypography.headlineMedium.copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
                                 ),
@@ -101,12 +99,11 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                             color: r.isCorrect
                                 ? AppColors.success.withValues(alpha: 0.15)
                                 : AppColors.danger.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                           ),
                           child: Text(
                             r.isCorrect ? 'Đúng' : 'Sai',
-                            style: TextStyle(
-                              fontFamily: 'PlusJakartaSans',
+                            style: AppTypography.labelSmall.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
                               color: r.isCorrect ? AppColors.successDark : AppColors.dangerDark,
@@ -134,9 +131,9 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                     (r) => r.settings.name == AppRoutes.vocabularyList,
                   ),
                   icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                  label: const Text(
+                  label: Text(
                     'Về danh sách',
-                    style: TextStyle(fontFamily: 'BeVietnamPro', fontWeight: FontWeight.w600),
+                    style: AppTypography.headlineMedium.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -145,10 +142,9 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                 child: FilledButton.icon(
                   onPressed: controller.startSpelling,
                   icon: const Icon(Icons.replay_rounded, size: 18),
-                  label: const Text(
+                  label: Text(
                     'Luyện lại',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -202,8 +198,7 @@ class _ScoreCircle extends StatelessWidget {
               children: [
                 Text(
                   '$pct%',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.displayLarge.copyWith(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
                     color: _color,
@@ -223,8 +218,7 @@ class _ScoreCircle extends StatelessWidget {
         AppGap.h16,
         Text(
           _message,
-          style: const TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.displayLarge.copyWith(
             fontSize: 20,
             fontWeight: FontWeight.w700,
           ),

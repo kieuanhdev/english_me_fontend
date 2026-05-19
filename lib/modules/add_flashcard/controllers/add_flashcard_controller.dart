@@ -2,9 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
-import 'package:englishme/data/models/desk_model.dart';
-import 'package:englishme/data/models/flashcard_model.dart';
-import 'package:englishme/data/repositories/flashcard_repository.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/flashcard/models/desk_model.dart';
+import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
 
 class AddFlashcardArgs {
   const AddFlashcardArgs({
@@ -93,7 +94,7 @@ class AddFlashcardController extends GetxController {
       final msg = e.response?.data is Map
           ? (e.response!.data as Map)['message']?.toString()
           : null;
-      Get.snackbar('Không lưu được', msg ?? e.message ?? 'Lỗi mạng');
+      Get.snackbar(T.errorSaveFailedTitle.tr, msg ?? e.message ?? T.errorNetwork.tr);
     } finally {
       isSubmitting.value = false;
     }

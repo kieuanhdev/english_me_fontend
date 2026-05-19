@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/profile/models/profile_model.dart';
 import 'package:englishme/modules/profile/repositories/profile_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -63,11 +63,10 @@ class ProfileController extends GetxController {
     }
     try {
       isSavingName.value = true;
-      await _repo.updateDisplayName(user.value!.uid, name);
-      user.value = user.value!.copyWith(displayName: name);
+      user.value = await _repo.updateDisplayName(name);
       isEditingName.value = false;
     } catch (_) {
-      Get.snackbar('Lỗi', 'Không thể cập nhật tên. Thử lại sau.');
+      Get.snackbar(T.errorGeneric.tr, T.errorUpdateName.tr);
     } finally {
       isSavingName.value = false;
     }
@@ -80,16 +79,16 @@ class ProfileController extends GetxController {
   Future<void> signOut() async {
     final confirm = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Đăng xuất'),
-        content: const Text('Bạn có chắc muốn đăng xuất không?'),
+        title: Text(T.actionLogout.tr),
+        content: Text(T.profileLogoutConfirmContent.tr),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Hủy'),
+            child: Text(T.actionCancel.tr),
           ),
           TextButton(
             onPressed: () => Get.back(result: true),
-            child: const Text('Đăng xuất', style: TextStyle(color: Colors.red)),
+            child: Text(T.actionLogout.tr, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -115,14 +114,4 @@ class ProfileController extends GetxController {
     return map[user.value?.cefrLevel] ?? '';
   }
 
-  // Reload after Firebase profile update
-  void reloadFirebaseUser() {
-    final firebaseUser = FirebaseAuth.instance.currentUser;
-    if (firebaseUser != null && user.value != null) {
-      user.value = user.value!.copyWith(
-        displayName: firebaseUser.displayName ?? user.value!.displayName,
-        photoUrl: firebaseUser.photoURL,
-      );
-    }
-  }
 }

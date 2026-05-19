@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/data/models/desk_model.dart';
+import 'package:englishme/modules/flashcard/models/desk_model.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class FlashcardDeckList extends GetView<FlashcardController> {
@@ -20,7 +21,7 @@ class FlashcardDeckList extends GetView<FlashcardController> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                'Bộ thẻ',
+                T.flashcardDecks.tr,
                 style: AppTypography.displayLarge.copyWith(
                   fontSize: 22,
                   color: AppColors.primary,
@@ -29,7 +30,7 @@ class FlashcardDeckList extends GetView<FlashcardController> {
               GestureDetector(
                 onTap: controller.onViewAll,
                 child: Text(
-                  'Xem tất cả',
+                  T.actionViewAll.tr,
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
@@ -65,12 +66,12 @@ class FlashcardDeckList extends GetView<FlashcardController> {
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       decoration: BoxDecoration(
                         color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                       ),
                       child: Text(
-                        'Thử lại',
+                        T.actionRetry.tr,
                         style: AppTypography.bodyLarge.copyWith(
-                          color: Colors.white,
+                          color: AppColors.onPrimaryFixed,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
@@ -120,17 +121,17 @@ class _DeckCard extends StatelessWidget {
 
   // Map CEFR → màu sắc
   static Color _bgColor(String cefr) => switch (cefr.toUpperCase()) {
-        'A1' || 'A2' => const Color(0xFFDEF7EC),
-        'B1' || 'B2' => const Color(0xFFDEE0FF),
-        'C1' || 'C2' => const Color(0xFFFFDCBE),
-        _ => const Color(0xFFEEEEEE),
+        'A1' || 'A2' => AppColors.levelABg,
+        'B1' || 'B2' => AppColors.levelBBg,
+        'C1' || 'C2' => AppColors.levelCBg,
+        _ => AppColors.surfaceContainerLow,
       };
 
   static Color _fgColor(String cefr) => switch (cefr.toUpperCase()) {
-        'A1' || 'A2' => const Color(0xFF1B5E20),
-        'B1' || 'B2' => const Color(0xFF24389C),
-        'C1' || 'C2' => const Color(0xFF643900),
-        _ => const Color(0xFF454652),
+        'A1' || 'A2' => AppColors.levelAFg,
+        'B1' || 'B2' => AppColors.levelBFg,
+        'C1' || 'C2' => AppColors.levelCFg,
+        _ => AppColors.textSecondary,
       };
 
   static IconData _icon(String cefr) => switch (cefr.toUpperCase()) {
@@ -147,7 +148,7 @@ class _DeckCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         boxShadow: [
           BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
@@ -164,7 +165,7 @@ class _DeckCard extends StatelessWidget {
                 Container(
                   width: 52,
                   height: 52,
-                  decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(AppRadius.lg)),
                   child: Icon(_icon(desk.cefrLevel), color: fg, size: 26),
                 ),
                 const Spacer(),
@@ -172,7 +173,7 @@ class _DeckCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: bg,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   child: Text(
                     desk.cefrLevel,
@@ -192,11 +193,11 @@ class _DeckCard extends StatelessWidget {
                     if (v == 'delete') onDelete();
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(value: 'edit', child: Text('Sửa bộ thẻ')),
+                    PopupMenuItem(value: 'edit', child: Text(T.flashcardEditDeck.tr)),
                     PopupMenuItem(
                       value: 'delete',
                       child: Text(
-                        'Xóa bộ thẻ',
+                        T.flashcardDeleteDeck.tr,
                         style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
                       ),
                     ),
@@ -210,7 +211,7 @@ class _DeckCard extends StatelessWidget {
             const SizedBox(height: 4),
             // Card count
             Text(
-              '${desk.flashcardCount} từ vựng',
+              T.labelVocabCount.tr.replaceAll('{count}', '${desk.flashcardCount}'),
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 13,
                 color: AppColors.textSecondary,
@@ -225,19 +226,19 @@ class _DeckCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
                   gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 20),
+                    Icon(Icons.play_arrow_rounded, color: AppColors.onPrimaryFixed, size: 20),
                     const SizedBox(width: 6),
                     Text(
-                      'Bắt đầu học',
+                      T.deckStartJourney.tr,
                       style: AppTypography.bodyLarge.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.onPrimaryFixed,
                       ),
                     ),
                   ],
@@ -265,7 +266,7 @@ class _CreateDeckTile extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 40),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
           border: Border.all(color: AppColors.outlineVariant, width: 2),
         ),
         child: Column(
@@ -281,7 +282,7 @@ class _CreateDeckTile extends StatelessWidget {
             ),
             AppGap.h12,
             Text(
-              'Tạo bộ thẻ mới',
+              T.flashcardCreateNew.tr,
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -290,7 +291,7 @@ class _CreateDeckTile extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              'Thêm từ vựng tùy chỉnh',
+              T.flashcardAddCustom.tr,
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 12,
                 color: AppColors.textSecondary,

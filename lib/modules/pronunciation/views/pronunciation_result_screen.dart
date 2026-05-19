@@ -1,6 +1,6 @@
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
-import 'package:englishme/data/models/pronunciation_models.dart';
+import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/controllers/pronunciation_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -123,7 +123,7 @@ class _ScoreHeader extends StatelessWidget {
       padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Column(
@@ -176,7 +176,7 @@ class _ScoreBreakdown extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Column(
@@ -231,7 +231,7 @@ class _ScoreBar extends StatelessWidget {
         ),
         AppGap.h8,
         ClipRRect(
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(AppRadius.sm),
           child: SizedBox(
             height: 8,
             child: LinearProgressIndicator(
@@ -259,7 +259,7 @@ class _TranscriptionCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Column(
@@ -307,7 +307,7 @@ class _TranscriptionRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.15),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(AppRadius.sm),
           ),
           child: Text(
             label,
@@ -342,7 +342,7 @@ class _ErrorList extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Column(
@@ -386,7 +386,7 @@ class _ErrorItem extends StatelessWidget {
             height: 32,
             decoration: BoxDecoration(
               color: AppColors.dangerSoft,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             alignment: Alignment.center,
             child: Text(
@@ -459,7 +459,7 @@ class _CommentCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,

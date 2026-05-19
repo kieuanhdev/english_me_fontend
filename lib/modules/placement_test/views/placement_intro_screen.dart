@@ -30,7 +30,7 @@ class PlacementIntroScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                   decoration: BoxDecoration(
                     color: AppColors.primarySoft,
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   child: Text(
                     'BÀI KIỂM TRA ĐẦU VÀO',
@@ -208,11 +208,11 @@ class _SkillCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
-            color: Color(0xFFCBD5DD),
+            color: AppColors.neutralShadow,
             offset: Offset(0, 3),
           ),
         ],
@@ -225,9 +225,9 @@ class _SkillCard extends StatelessWidget {
             height: 42,
             decoration: BoxDecoration(
               color: color,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
-            child: Icon(icon, color: Colors.white, size: 22),
+            child: Icon(icon, color: AppColors.onPrimaryFixed, size: 22),
           ),
           AppGap.h8,
           Text(

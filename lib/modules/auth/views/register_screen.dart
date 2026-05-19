@@ -118,12 +118,12 @@ class _RegisterViewState extends State<_RegisterView> {
                       ? null
                       : _controller.signInWithGoogle,
                   variant: AppButtonVariant.secondary,
-                  leading: const Text(
+                  leading: Text(
                     'G',
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.w900,
-                      color: Color(0xFFEA4335),
+                      color: AppColors.googleBrand,
                     ),
                   ),
                   textStyle: AppTypography.bodyLarge.copyWith(

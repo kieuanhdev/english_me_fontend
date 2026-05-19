@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class StreakCalendar extends StatelessWidget {
@@ -27,7 +28,7 @@ class StreakCalendar extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,8 +40,7 @@ class StreakCalendar extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'Streak học tập',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   color: AppColors.onSurface,
@@ -58,8 +58,7 @@ class StreakCalendar extends StatelessWidget {
                       child: Text(
                         d,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontFamily: 'BeVietnamPro',
+                        style: AppTypography.headlineMedium.copyWith(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
                           color: AppColors.textSecondary,
@@ -96,7 +95,7 @@ class StreakCalendar extends StatelessWidget {
                       : isStudied
                           ? AppColors.tertiary.withValues(alpha: 0.2)
                           : AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: isStudied && !isToday
                       ? Border.all(color: AppColors.tertiary.withValues(alpha: 0.5))
                       : null,
@@ -108,23 +107,21 @@ class StreakCalendar extends StatelessWidget {
                         ? (isToday
                             ? Text(
                                 '$day',
-                                style: const TextStyle(
-                                  fontFamily: 'BeVietnamPro',
+                                style: AppTypography.headlineMedium.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w800,
-                                  color: Colors.white,
+                                  color: AppColors.onPrimaryFixed,
                                 ),
                               )
                             : Icon(Icons.check_rounded,
                                 size: 12, color: AppColors.tertiary))
                         : Text(
                             '$day',
-                            style: TextStyle(
-                              fontFamily: 'BeVietnamPro',
+                            style: AppTypography.headlineMedium.copyWith(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
                               color: isToday
-                                  ? Colors.white
+                                  ? AppColors.onPrimaryFixed
                                   : AppColors.textSecondary.withValues(alpha: 0.6),
                             ),
                           ),
@@ -140,8 +137,7 @@ class StreakCalendar extends StatelessWidget {
               const Spacer(),
               Text(
                 'Dài nhất: $longestStreak ngày',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -168,12 +164,11 @@ class _StreakChip extends StatelessWidget {
         color: isHighlight
             ? AppColors.tertiary.withValues(alpha: 0.15)
             : AppColors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontFamily: 'BeVietnamPro',
+        style: AppTypography.headlineMedium.copyWith(
           fontSize: 12,
           fontWeight: FontWeight.w700,
           color: isHighlight ? AppColors.tertiary : AppColors.textSecondary,
@@ -201,8 +196,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.headlineMedium.copyWith(
             fontSize: 11,
             color: AppColors.textSecondary,
           ),

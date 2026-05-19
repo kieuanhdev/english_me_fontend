@@ -13,7 +13,6 @@ abstract class AppRoutes {
   static const pronunciationPractice = '/learn/pronunciation/practice';
   static const pronunciationResult = '/learn/pronunciation/result';
   static const ipa = '/learn/pronunciation/ipa';
-  static const chatAi = '/learn/chat-ai';
   static const deckPrep = '/learn/flashcards/deck-prep';
   static const addFlashcard = '/learn/flashcards/add-card';
   static const createDesk = '/learn/flashcards/create-desk';

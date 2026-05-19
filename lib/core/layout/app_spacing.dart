@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
 class AppSpacing {
+  static const double s2 = 2;
+  static const double s4 = 4;
   static const double s6 = 6;
   static const double s8 = 8;
   static const double s10 = 10;
@@ -19,6 +21,8 @@ class AppSpacing {
 }
 
 class AppGap {
+  static const Widget h2 = SizedBox(height: AppSpacing.s2);
+  static const Widget h4 = SizedBox(height: AppSpacing.s4);
   static const Widget h6 = SizedBox(height: AppSpacing.s6);
   static const Widget h8 = SizedBox(height: AppSpacing.s8);
   static const Widget h10 = SizedBox(height: AppSpacing.s10);
@@ -35,8 +39,29 @@ class AppGap {
   static const Widget h40 = SizedBox(height: AppSpacing.s40);
   static const Widget h48 = SizedBox(height: AppSpacing.s48);
 
+  static const Widget w4 = SizedBox(width: AppSpacing.s4);
+  static const Widget w6 = SizedBox(width: AppSpacing.s6);
   static const Widget w8 = SizedBox(width: AppSpacing.s8);
   static const Widget w10 = SizedBox(width: AppSpacing.s10);
   static const Widget w12 = SizedBox(width: AppSpacing.s12);
+  static const Widget w14 = SizedBox(width: AppSpacing.s14);
   static const Widget w16 = SizedBox(width: AppSpacing.s16);
+}
+
+/// Scale bán kính bo góc chuẩn cho toàn app.
+///
+/// Quy ước (xem docs/UI_CONSISTENCY_AUDIT.md §4):
+/// - sm  (8)   — badge, small chip
+/// - md  (12)  — dialog, secondary card, input field
+/// - lg  (16)  — option tile, panel
+/// - xl  (20)  — card chính
+/// - xxl (24)  — hero, large card
+/// - pill (999) — nút pill, avatar tròn
+class AppRadius {
+  static const double sm = 8;
+  static const double md = 12;
+  static const double lg = 16;
+  static const double xl = 20;
+  static const double xxl = 24;
+  static const double pill = 999;
 }

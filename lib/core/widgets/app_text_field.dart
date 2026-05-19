@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // Đảm bảo đã import GetX
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppTextField extends StatelessWidget {
@@ -78,19 +79,19 @@ class AppTextField extends StatelessWidget {
               vertical: 16,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: Color(0xFFCED8E2), width: 2),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: Colors.redAccent, width: 2),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               borderSide: const BorderSide(color: Colors.redAccent, width: 2),
             ),
           ),

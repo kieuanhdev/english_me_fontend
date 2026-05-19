@@ -2,8 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
-import 'package:englishme/data/models/desk_model.dart';
-import 'package:englishme/data/repositories/flashcard_repository.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/flashcard/models/desk_model.dart';
+import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -102,8 +103,8 @@ class CreateDeskController extends GetxController {
           ? (e.response!.data as Map)['message']?.toString()
           : null;
       Get.snackbar(
-        isEditMode ? 'Không cập nhật được bộ thẻ' : 'Không tạo được bộ thẻ',
-        msg ?? e.message ?? 'Lỗi mạng',
+        isEditMode ? T.errorUpdateDeskFailed.tr : T.errorCreateDeskFailed.tr,
+        msg ?? e.message ?? T.errorNetwork.tr,
       );
     } finally {
       isSubmitting.value = false;
@@ -114,14 +115,14 @@ class CreateDeskController extends GetxController {
     if (!isEditMode || isSubmitting.value) return;
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Xóa bộ thẻ?'),
-        content: Text('Bạn có chắc muốn xóa bộ "${editingDesk!.title}"?'),
+        title: Text(T.errorDeleteDeskTitle.tr),
+        content: Text(T.errorDeleteDeskContent.trParams({'title': editingDesk!.title})),
         actions: [
-          TextButton(onPressed: () => Get.back(result: false), child: const Text('Hủy')),
+          TextButton(onPressed: () => Get.back(result: false), child: Text(T.actionCancel.tr)),
           TextButton(
             onPressed: () => Get.back(result: true),
             child: Text(
-              'Xóa',
+              T.actionDelete.tr,
               style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w800),
             ),
           ),
@@ -134,12 +135,12 @@ class CreateDeskController extends GetxController {
       await _repo.deleteDesk(editingDesk!.id);
       await _reloadFlashcardListIfAny();
       Get.until((route) => route.settings.name == AppRoutes.flashcards || route.isFirst);
-      Get.snackbar('Đã xóa', editingDesk!.title);
+      Get.snackbar(T.deckDeleted.tr, editingDesk!.title);
     } on DioException catch (e) {
       final msg = e.response?.data is Map
           ? (e.response!.data as Map)['message']?.toString()
           : null;
-      Get.snackbar('Không xóa được', msg ?? e.message ?? 'Lỗi mạng');
+      Get.snackbar(T.errorDeleteFailedTitle.tr, msg ?? e.message ?? T.errorNetwork.tr);
     } finally {
       isSubmitting.value = false;
     }

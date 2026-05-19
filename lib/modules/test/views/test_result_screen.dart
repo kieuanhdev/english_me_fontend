@@ -28,13 +28,12 @@ class TestResultScreen extends StatelessWidget {
                     height: 54,
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       'Làm lại',
-                      style: TextStyle(
-                        fontFamily: 'BeVietnamPro',
+                      style: AppTypography.headlineMedium.copyWith(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         color: AppColors.onSurface,
@@ -52,16 +51,15 @@ class TestResultScreen extends StatelessWidget {
                     height: 54,
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     alignment: Alignment.center,
-                    child: const Text(
+                    child: Text(
                       'Hoàn thành',
-                      style: TextStyle(
-                        fontFamily: 'BeVietnamPro',
+                      style: AppTypography.headlineMedium.copyWith(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.onPrimaryFixed,
                       ),
                     ),
                   ),
@@ -161,8 +159,7 @@ class _ResultHeader extends StatelessWidget {
         AppGap.h14,
         Text(
           title,
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.displayLarge.copyWith(
             fontSize: 26,
             fontWeight: FontWeight.w800,
             color: AppColors.primary,
@@ -207,7 +204,7 @@ class _ScoreCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Row(
         children: [
@@ -226,8 +223,7 @@ class _ScoreCard extends StatelessWidget {
                   children: [
                     Text(
                       '$score%',
-                      style: TextStyle(
-                        fontFamily: 'BeVietnamPro',
+                      style: AppTypography.displayLarge.copyWith(
                         fontSize: 26,
                         fontWeight: FontWeight.w900,
                         color: AppColors.primary,
@@ -312,8 +308,7 @@ class _ScoreLine extends StatelessWidget {
         ),
         Text(
           value,
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.headlineMedium.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w800,
             color: color,
@@ -408,7 +403,7 @@ class _StatCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
       ),
       child: Row(
         children: [
@@ -419,8 +414,7 @@ class _StatCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.displayLarge.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: color,
@@ -453,10 +447,9 @@ class _ReviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Xem lại bài làm',
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.headlineMedium.copyWith(
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
@@ -496,7 +489,7 @@ class _ReviewTileState extends State<_ReviewTile> {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: color.withValues(alpha: 0.3)),
         ),
         child: Column(
@@ -514,8 +507,7 @@ class _ReviewTileState extends State<_ReviewTile> {
                   alignment: Alignment.center,
                   child: Text(
                     '${widget.index}',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
                       color: color,
@@ -532,8 +524,7 @@ class _ReviewTileState extends State<_ReviewTile> {
                 Expanded(
                   child: Text(
                     r.isCorrect ? 'Trả lời đúng' : 'Trả lời sai',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                       color: color,
@@ -560,7 +551,7 @@ class _ReviewTileState extends State<_ReviewTile> {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceContainerLowest.withValues(alpha: 0.7),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -613,8 +604,7 @@ class _ReviewRow extends StatelessWidget {
         Expanded(
           child: Text(
             value,
-            style: TextStyle(
-              fontFamily: 'PlusJakartaSans',
+            style: AppTypography.bodySmall.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.w600,
               color: color,

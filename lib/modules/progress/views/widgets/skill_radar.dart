@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/progress/models/progress_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -14,15 +15,14 @@ class SkillRadarChart extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Phân tích kỹ năng',
-            style: TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.headlineMedium.copyWith(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppColors.onSurface,
@@ -100,8 +100,7 @@ class _SkillBar extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: AppColors.onSurface,
@@ -110,8 +109,7 @@ class _SkillBar extends StatelessWidget {
             ),
             Text(
               '$pct%',
-              style: TextStyle(
-                fontFamily: 'BeVietnamPro',
+              style: AppTypography.headlineMedium.copyWith(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: color,
@@ -123,7 +121,7 @@ class _SkillBar extends StatelessWidget {
         SizedBox(
           width: double.infinity,
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             child: LinearProgressIndicator(
               value: value,
               minHeight: 6,
@@ -242,8 +240,7 @@ class _RadarPainter extends CustomPainter {
 
     // Labels
     final labels = ['Từ vựng', 'Ngữ pháp', 'Phát âm', 'Nghe'];
-    final textStyle = TextStyle(
-      fontFamily: 'BeVietnamPro',
+    final textStyle = AppTypography.headlineMedium.copyWith(
       fontSize: 9,
       fontWeight: FontWeight.w700,
       color: gridColor,

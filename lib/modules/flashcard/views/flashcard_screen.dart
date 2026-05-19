@@ -65,15 +65,6 @@ class _LearnModules extends StatelessWidget {
               onTap: () => Get.toNamed(AppRoutes.pronunciation),
             ),
           ),
-          AppGap.w10,
-          Expanded(
-            child: _ModuleCard(
-              icon: Icons.smart_toy_rounded,
-              title: 'AI Coach',
-              subtitle: 'Hỏi đáp nhanh',
-              onTap: () => Get.toNamed(AppRoutes.chatAi),
-            ),
-          ),
         ],
       ),
     );
@@ -96,13 +87,13 @@ class _ModuleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       onTap: onTap,
       child: Ink(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: AppColors.outlineVariant),
         ),
         child: Column(

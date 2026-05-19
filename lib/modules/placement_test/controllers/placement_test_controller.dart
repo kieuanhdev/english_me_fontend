@@ -1,8 +1,12 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:englishme/data/models/placement_test_models.dart';
-import 'package:englishme/data/repositories/placement_test_repository.dart';
-import 'package:englishme/routes/app_routes.dart';
+import 'dart:async';
+
 import 'package:get/get.dart';
+
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/placement_test/models/placement_test_models.dart';
+import 'package:englishme/modules/placement_test/repositories/placement_test_repository.dart';
+import 'package:englishme/modules/profile/controllers/profile_controller.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 enum PlacementTestState { idle, loading, questioning, submitting, completed, error }
 
@@ -38,12 +42,7 @@ class PlacementTestController extends GetxController {
   Future<void> startTest() async {
     try {
       state.value = PlacementTestState.loading;
-      final idToken = await _getIdToken();
-      if (idToken == null) {
-        _showError('Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
-        return;
-      }
-      final response = await _repository.startTest(idToken);
+      final response = await _repository.startTest();
       _sessionId = response.sessionId;
       questions.assignAll(response.questions);
       currentIndex.value = 0;
@@ -51,7 +50,7 @@ class PlacementTestController extends GetxController {
       answerResponse.value = null;
       state.value = PlacementTestState.questioning;
     } catch (_) {
-      _showError('Không thể bắt đầu bài kiểm tra. Vui lòng thử lại.');
+      _showError(T.errorStartPlacement.tr);
     }
   }
 
@@ -68,14 +67,8 @@ class PlacementTestController extends GetxController {
 
     try {
       state.value = PlacementTestState.submitting;
-      final idToken = await _getIdToken();
-      if (idToken == null) {
-        _showError('Phiên đăng nhập hết hạn.');
-        return;
-      }
       final response = await _repository.answerQuestion(
         _sessionId,
-        idToken,
         question.id,
         answer,
       );
@@ -83,7 +76,7 @@ class PlacementTestController extends GetxController {
       state.value = PlacementTestState.questioning;
     } catch (_) {
       state.value = PlacementTestState.questioning;
-      Get.snackbar('Lỗi', 'Không thể gửi câu trả lời. Vui lòng thử lại.', snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar(T.errorGeneric.tr, T.errorSubmitAnswer.tr, snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -104,29 +97,23 @@ class PlacementTestController extends GetxController {
     _completing = true;
     try {
       state.value = PlacementTestState.loading;
-      final idToken = await _getIdToken();
-      if (idToken == null) {
-        _showError('Phiên đăng nhập hết hạn.');
-        return;
-      }
-      final result = await _repository.completeTest(_sessionId, idToken);
+      final result = await _repository.completeTest(_sessionId);
       testResult.value = result;
       state.value = PlacementTestState.completed;
+      // Refresh profile để Home/Profile thấy CEFR mới ngay lập tức.
+      if (Get.isRegistered<ProfileController>()) {
+        unawaited(Get.find<ProfileController>().loadProfile());
+      }
       Get.offNamed(AppRoutes.placementTestResult);
     } catch (_) {
       _completing = false;
-      _showError('Không thể hoàn thành bài kiểm tra. Vui lòng thử lại.');
+      _showError(T.errorCompletePlacement.tr);
     }
-  }
-
-  Future<String?> _getIdToken() async {
-    final user = FirebaseAuth.instance.currentUser;
-    return user?.getIdToken();
   }
 
   void _showError(String message) {
     errorMessage.value = message;
     state.value = PlacementTestState.error;
-    Get.snackbar('Lỗi', message, snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(T.errorGeneric.tr, message, snackPosition: SnackPosition.BOTTOM);
   }
 }

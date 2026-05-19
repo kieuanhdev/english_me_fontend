@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:englishme/core/services/auth_service.dart';
-import 'package:englishme/data/models/user_model.dart';
-import 'package:englishme/data/repositories/auth_repository.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/auth/models/user_model.dart';
+import 'package:englishme/modules/auth/repositories/auth_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -25,7 +26,7 @@ class AuthController extends GetxController {
     } on FirebaseAuthException catch (e) {
       _showFirebaseError(e);
     } catch (_) {
-      _showError('Đăng nhập thất bại. Vui lòng thử lại.');
+      _showError(T.authLoginFailed.tr);
     } finally {
       isLoading.value = false;
     }
@@ -47,7 +48,7 @@ class AuthController extends GetxController {
     } on FirebaseAuthException catch (e) {
       _showFirebaseError(e);
     } catch (_) {
-      _showError('Đăng nhập thất bại. Vui lòng thử lại.');
+      _showError(T.authLoginFailed.tr);
     } finally {
       isLoading.value = false;
     }
@@ -74,7 +75,7 @@ class AuthController extends GetxController {
     } on FirebaseAuthException catch (e) {
       _showFirebaseError(e);
     } catch (_) {
-      _showError('Đăng ký thất bại. Vui lòng thử lại.');
+      _showError(T.authRegisterFailed.tr);
     } finally {
       isLoading.value = false;
     }
@@ -112,10 +113,10 @@ class AuthController extends GetxController {
   }
 
   String? _validateEmailPassword(String email, String password) {
-    if (email.trim().isEmpty) return 'Vui lòng nhập email.';
-    if (!GetUtils.isEmail(email.trim())) return 'Email không hợp lệ.';
-    if (password.isEmpty) return 'Vui lòng nhập mật khẩu.';
-    if (password.length < 6) return 'Mật khẩu phải có ít nhất 6 ký tự.';
+    if (email.trim().isEmpty) return T.authValidateEmailEmpty.tr;
+    if (!GetUtils.isEmail(email.trim())) return T.authValidateEmailInvalid.tr;
+    if (password.isEmpty) return T.authValidatePasswordEmpty.tr;
+    if (password.length < 6) return T.authValidatePasswordShort.tr;
     return null;
   }
 
@@ -125,23 +126,23 @@ class AuthController extends GetxController {
     String password,
     String confirmPassword,
   ) {
-    if (fullName.trim().isEmpty) return 'Vui lòng nhập họ và tên.';
+    if (fullName.trim().isEmpty) return T.authValidateNameEmpty.tr;
     final emailError = _validateEmailPassword(email, password);
     if (emailError != null) return emailError;
-    if (password != confirmPassword) return 'Mật khẩu xác nhận không khớp.';
+    if (password != confirmPassword) return T.authValidatePasswordMismatch.tr;
     return null;
   }
 
   void _showFirebaseError(FirebaseAuthException e) {
     final message = switch (e.code) {
-      'user-not-found' => 'Tài khoản không tồn tại.',
-      'wrong-password' => 'Mật khẩu không đúng.',
-      'email-already-in-use' => 'Email đã được sử dụng.',
-      'invalid-email' => 'Email không hợp lệ.',
-      'weak-password' => 'Mật khẩu quá yếu (tối thiểu 6 ký tự).',
-      'too-many-requests' => 'Quá nhiều yêu cầu. Vui lòng thử lại sau.',
-      'invalid-credential' => 'Email hoặc mật khẩu không đúng.',
-      _ => 'Đã xảy ra lỗi. Vui lòng thử lại.',
+      'user-not-found' => T.authErrorUserNotFound.tr,
+      'wrong-password' => T.authErrorWrongPassword.tr,
+      'email-already-in-use' => T.authErrorEmailInUse.tr,
+      'invalid-email' => T.authErrorInvalidEmail.tr,
+      'weak-password' => T.authErrorWeakPassword.tr,
+      'too-many-requests' => T.authErrorTooManyRequests.tr,
+      'invalid-credential' => T.authErrorInvalidCredential.tr,
+      _ => T.authErrorUnknown.tr,
     };
     _showError(message);
   }

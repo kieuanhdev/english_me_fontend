@@ -68,7 +68,7 @@ class _ProgressHeader extends GetView<VocabularyController> {
                 height: 36,
                 decoration: BoxDecoration(
                   color: AppColors.surfaceContainerHigh,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
                 child: Icon(Icons.close_rounded, size: 20, color: AppColors.onSurface),
               ),
@@ -83,8 +83,7 @@ class _ProgressHeader extends GetView<VocabularyController> {
                     children: [
                       Text(
                         'Luyện đánh vần',
-                        style: const TextStyle(
-                          fontFamily: 'BeVietnamPro',
+                        style: AppTypography.headlineMedium.copyWith(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
@@ -100,7 +99,7 @@ class _ProgressHeader extends GetView<VocabularyController> {
                   ),
                   const SizedBox(height: 6),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     child: LinearProgressIndicator(
                       value: progress,
                       minHeight: 5,
@@ -132,7 +131,7 @@ class _WordPromptCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Column(
@@ -158,8 +157,7 @@ class _WordPromptCard extends StatelessWidget {
           AppGap.h12,
           Text(
             word.definitionVi,
-            style: const TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.displayLarge.copyWith(
               fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
@@ -181,12 +179,11 @@ class _WordPromptCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
                 word.word,
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.displayLarge.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
                   color: state == SpellingState.correct
@@ -237,8 +234,7 @@ class _InputSection extends GetView<VocabularyController> {
             if (_enabled) controller.submitSpelling();
           },
           textCapitalization: TextCapitalization.none,
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.headlineMedium.copyWith(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: isDone
@@ -254,19 +250,19 @@ class _InputSection extends GetView<VocabularyController> {
                 : AppColors.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               borderSide: BorderSide(color: AppColors.outlineVariant),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               borderSide: BorderSide(color: AppColors.primary, width: 2),
             ),
             disabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
               borderSide: BorderSide(
                 color: isCorrect
                     ? AppColors.success.withValues(alpha: 0.4)
@@ -289,10 +285,9 @@ class _InputSection extends GetView<VocabularyController> {
             height: 50,
             child: FilledButton(
               onPressed: controller.submitSpelling,
-              child: const Text(
+              child: Text(
                 'Kiểm tra',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
@@ -320,7 +315,7 @@ class _FeedbackSection extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isCorrect ? AppColors.successPanel : AppColors.dangerPanel,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(
           color: isCorrect
               ? AppColors.success.withValues(alpha: 0.3)
@@ -340,8 +335,7 @@ class _FeedbackSection extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 isCorrect ? 'Chính xác!' : 'Chưa đúng',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 14,
                   fontWeight: FontWeight.w700,
                   color: isCorrect ? AppColors.successDark : AppColors.dangerDark,
@@ -396,8 +390,7 @@ class _BottomBar extends GetView<VocabularyController> {
               ),
               label: Text(
                 isLast ? 'Xem kết quả' : 'Từ tiếp theo',
-                style: const TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),

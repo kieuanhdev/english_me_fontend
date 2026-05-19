@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/modules/vocabulary/controllers/vocabulary_controller.dart';
 import 'package:englishme/modules/vocabulary/models/vocabulary_model.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class VocabularyListScreen extends GetView<VocabularyController> {
@@ -18,31 +20,31 @@ class VocabularyListScreen extends GetView<VocabularyController> {
             _Header(),
             Expanded(
               child: Obx(() {
-                if (controller.wordsState.value == VocabScreenState.loading) {
-                  return const Center(child: CircularProgressIndicator());
+                ApiState mapVocabState() {
+                  switch (controller.wordsState.value) {
+                    case VocabScreenState.idle:
+                    case VocabScreenState.loading:
+                      return ApiState.loading;
+                    case VocabScreenState.error:
+                      return ApiState.error;
+                    case VocabScreenState.loaded:
+                      return controller.words.isEmpty ? ApiState.empty : ApiState.success;
+                  }
                 }
-                if (controller.wordsState.value == VocabScreenState.error) {
-                  return Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.wifi_off_rounded, size: 48, color: AppColors.iconMuted),
-                        AppGap.h12,
-                        Text('Không thể tải từ vựng', style: AppTypography.bodyLarge),
-                      ],
-                    ),
-                  );
-                }
-                if (controller.words.isEmpty) {
-                  return Center(
-                    child: Text('Chưa có từ vựng', style: AppTypography.bodyLarge),
-                  );
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
-                  itemCount: controller.words.length,
-                  separatorBuilder: (_, __) => AppGap.h12,
-                  itemBuilder: (_, i) => _VocabCard(word: controller.words[i]),
+                return ApiStateView(
+                  state: mapVocabState(),
+                  errorMessage: T.errorLoadVocab.tr,
+                  emptyMessage: T.emptyVocab.tr,
+                  onRetry: () {
+                    final topic = controller.currentTopic.value;
+                    if (topic != null) controller.openTopic(topic);
+                  },
+                  builder: (_) => ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+                    itemCount: controller.words.length,
+                    separatorBuilder: (_, __) => AppGap.h12,
+                    itemBuilder: (_, i) => _VocabCard(word: controller.words[i]),
+                  ),
                 );
               }),
             ),
@@ -74,7 +76,7 @@ class _Header extends GetView<VocabularyController> {
               height: 36,
               decoration: BoxDecoration(
                 color: AppColors.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(Icons.arrow_back_rounded, size: 20, color: AppColors.onSurface),
             ),
@@ -88,8 +90,7 @@ class _Header extends GetView<VocabularyController> {
                 children: [
                   Text(
                     topic?.nameEn ?? '',
-                    style: const TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
@@ -112,7 +113,7 @@ class _Header extends GetView<VocabularyController> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: AppColors.primarySoft,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -121,9 +122,7 @@ class _Header extends GetView<VocabularyController> {
                         const SizedBox(width: 4),
                         Text(
                           '$saved',
-                          style: TextStyle(
-                            fontFamily: 'PlusJakartaSans',
-                            fontSize: 12,
+                          style: AppTypography.labelSmall.copyWith(
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
                           ),
@@ -162,7 +161,7 @@ class _VocabCard extends GetView<VocabularyController> {
             color: flipped
                 ? AppColors.primarySoft
                 : AppColors.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xl),
             border: Border.all(
               color: flipped ? AppColors.primary.withValues(alpha: 0.3) : AppColors.outlineVariant,
               width: flipped ? 1.5 : 1,
@@ -171,7 +170,7 @@ class _VocabCard extends GetView<VocabularyController> {
               BoxShadow(
                 color: flipped
                     ? AppColors.primary.withValues(alpha: 0.08)
-                    : const Color(0x061A1C1C),
+                    : AppColors.shadowSoft,
                 blurRadius: 12,
                 offset: const Offset(0, 3),
               ),
@@ -192,10 +191,7 @@ class _VocabCard extends GetView<VocabularyController> {
                           children: [
                             Text(
                               word.word,
-                              style: TextStyle(
-                                fontFamily: 'BeVietnamPro',
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
+                              style: AppTypography.labelMedium.copyWith(
                                 color: flipped ? AppColors.primary : AppColors.onSurface,
                               ),
                             ),
@@ -204,13 +200,11 @@ class _VocabCard extends GetView<VocabularyController> {
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: levelColor.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
                               ),
                               child: Text(
                                 controller.levelLabel(word.level),
-                                style: TextStyle(
-                                  fontFamily: 'PlusJakartaSans',
-                                  fontSize: 10,
+                                style: AppTypography.labelXSmall.copyWith(
                                   fontWeight: FontWeight.w700,
                                   color: levelColor,
                                 ),
@@ -221,7 +215,7 @@ class _VocabCard extends GetView<VocabularyController> {
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceContainerHigh,
-                                borderRadius: BorderRadius.circular(6),
+                                borderRadius: BorderRadius.circular(AppRadius.sm),
                               ),
                               child: Text(
                                 word.partOfSpeech,
@@ -271,7 +265,7 @@ class _VocabCard extends GetView<VocabularyController> {
                       Icon(Icons.touch_app_rounded, size: 14, color: AppColors.iconMuted),
                       const SizedBox(width: 6),
                       Text(
-                        'Nhấn để xem nghĩa',
+                        T.vocabTapForMeaning.tr,
                         style: AppTypography.bodyLarge.copyWith(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -294,8 +288,8 @@ class _VocabCard extends GetView<VocabularyController> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDA291C).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.flagRedVN.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                           ),
                           child: const Center(
                             child: Text('🇻🇳', style: TextStyle(fontSize: 14)),
@@ -305,8 +299,7 @@ class _VocabCard extends GetView<VocabularyController> {
                         Expanded(
                           child: Text(
                             word.definitionVi,
-                            style: const TextStyle(
-                              fontFamily: 'BeVietnamPro',
+                            style: AppTypography.bodyLarge.copyWith(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -323,8 +316,8 @@ class _VocabCard extends GetView<VocabularyController> {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF012169).withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(8),
+                            color: AppColors.flagBlueUK.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                           ),
                           child: const Center(
                             child: Text('🇬🇧', style: TextStyle(fontSize: 14)),
@@ -345,7 +338,7 @@ class _VocabCard extends GetView<VocabularyController> {
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceContainerHigh,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: AppColors.outlineVariant),
                       ),
                       child: Column(
@@ -356,9 +349,8 @@ class _VocabCard extends GetView<VocabularyController> {
                               Icon(Icons.format_quote_rounded, size: 14, color: AppColors.primary),
                               const SizedBox(width: 4),
                               Text(
-                                'Ví dụ',
-                                style: TextStyle(
-                                  fontFamily: 'PlusJakartaSans',
+                                T.vocabExample.tr,
+                                style: AppTypography.labelXSmall.copyWith(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.primary,
@@ -412,13 +404,9 @@ class _SpellingButton extends GetView<VocabularyController> {
             child: FilledButton.icon(
               onPressed: loaded ? controller.startSpelling : null,
               icon: const Icon(Icons.spellcheck_rounded, size: 20),
-              label: const Text(
-                'Luyện đánh vần',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
-                  fontSize: 15,
-                  fontWeight: FontWeight.w700,
-                ),
+              label: Text(
+                T.vocabSpelling.tr,
+                style: AppTypography.labelMedium.copyWith(fontSize: 15),
               ),
             ),
           );

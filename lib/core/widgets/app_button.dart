@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart'; // Thêm GetX để dùng .tr
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 enum AppButtonVariant { primary, secondary }
@@ -73,7 +74,7 @@ class AppButton extends StatelessWidget {
           elevation: 0,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ), // Bo góc tròn hơn chút
         ).copyWith(
           overlayColor: WidgetStatePropertyAll(
@@ -86,7 +87,7 @@ class AppButton extends StatelessWidget {
     return Container(
       width: expand ? double.infinity : null,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: onPressed == null || isLoading
             ? null
             : [

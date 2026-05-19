@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/modules/exercise/controllers/exercise_controller.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -8,25 +9,34 @@ import 'package:englishme/theme/app_theme.dart';
 class ExerciseQuizScreen extends GetView<ExerciseController> {
   const ExerciseQuizScreen({super.key});
 
+  ApiState _mapState(ExerciseState s, ExerciseController c) {
+    switch (s) {
+      case ExerciseState.idle:
+      case ExerciseState.loading:
+      case ExerciseState.submitting:
+        return ApiState.loading;
+      case ExerciseState.error:
+        return ApiState.error;
+      case ExerciseState.playing:
+      case ExerciseState.finished:
+        return c.currentExercise == null ? ApiState.empty : ApiState.success;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Obx(() {
-          if (controller.state.value == ExerciseState.loading) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (controller.state.value == ExerciseState.error) {
-            return _ErrorView(
-              message: controller.errorMessage.value,
-              onRetry: controller.retrySession,
-            );
-          }
-          final q = controller.currentExercise;
-          if (q == null) return const SizedBox.shrink();
-
-          return Column(
+          return ApiStateView(
+            state: _mapState(controller.state.value, controller),
+            errorMessage: controller.errorMessage.value.isEmpty
+                ? null
+                : controller.errorMessage.value,
+            emptyMessage: 'Chưa có câu hỏi cho bài tập này.',
+            onRetry: controller.retrySession,
+            builder: (_) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _QuizAppBar(onClose: controller.closeExercise),
@@ -58,6 +68,7 @@ class ExerciseQuizScreen extends GetView<ExerciseController> {
                     onNext: controller.nextQuestion,
                   )),
             ],
+            ),
           );
         }),
       ),
@@ -119,8 +130,7 @@ class _ProgressHeader extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: '$current',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.displayLarge.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -128,8 +138,7 @@ class _ProgressHeader extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '/$total',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: AppColors.iconMuted,
@@ -144,8 +153,7 @@ class _ProgressHeader extends StatelessWidget {
                 const SizedBox(width: 4),
                 Text(
                   '$correctCount đúng',
-                  style: TextStyle(
-                    fontFamily: 'PlusJakartaSans',
+                  style: AppTypography.labelSmall.copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.success,
@@ -157,7 +165,7 @@ class _ProgressHeader extends StatelessWidget {
         ),
         AppGap.h8,
         ClipRRect(
-          borderRadius: BorderRadius.circular(99),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           child: SizedBox(
             height: 8,
             child: Stack(
@@ -213,16 +221,15 @@ class _QuizBody extends StatelessWidget {
           padding: const EdgeInsets.all(22),
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLowest,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(color: AppColors.outlineVariant),
-            boxShadow: const [
-              BoxShadow(color: Color(0x0A1A1C1C), blurRadius: 16, offset: Offset(0, 4)),
+            boxShadow: [
+              BoxShadow(color: AppColors.shadowSoft, blurRadius: 16, offset: Offset(0, 4)),
             ],
           ),
           child: Text(
             question.question,
-            style: const TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.headlineMedium.copyWith(
               fontSize: 18,
               fontWeight: FontWeight.w700,
               height: 1.5,
@@ -289,17 +296,17 @@ class _OptionTile extends StatelessWidget {
       borderColor = isSelected ? AppColors.primary : AppColors.outlineVariant;
       bgColor = isSelected ? AppColors.chipHighlightBg : AppColors.surfaceContainerLowest;
       labelBg = isSelected ? AppColors.primary : AppColors.surfaceContainerHigh;
-      labelFg = isSelected ? Colors.white : AppColors.iconMuted;
+      labelFg = isSelected ? AppColors.onPrimaryFixed : AppColors.iconMuted;
     } else if (isCorrect) {
       borderColor = AppColors.success;
       bgColor = AppColors.successPanel;
       labelBg = AppColors.success;
-      labelFg = Colors.white;
+      labelFg = AppColors.onPrimaryFixed;
     } else if (isSelected && !isCorrect) {
       borderColor = AppColors.danger;
       bgColor = AppColors.dangerPanel;
       labelBg = AppColors.danger;
-      labelFg = Colors.white;
+      labelFg = AppColors.onPrimaryFixed;
     } else {
       borderColor = AppColors.outlineVariant;
       bgColor = AppColors.surfaceContainerLowest;
@@ -314,7 +321,7 @@ class _OptionTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: borderColor, width: 1.5),
         ),
         child: Row(
@@ -325,13 +332,12 @@ class _OptionTile extends StatelessWidget {
               height: 32,
               decoration: BoxDecoration(
                 color: labelBg,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               alignment: Alignment.center,
               child: Text(
                 label,
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   color: labelFg,
@@ -376,7 +382,7 @@ class _CategoryChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -385,8 +391,7 @@ class _CategoryChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(
-              fontFamily: 'PlusJakartaSans',
+            style: AppTypography.labelSmall.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.w700,
               color: color,
@@ -413,12 +418,11 @@ class _DifficultyChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Text(
         label,
-        style: TextStyle(
-          fontFamily: 'PlusJakartaSans',
+        style: AppTypography.labelSmall.copyWith(
           fontSize: 11,
           fontWeight: FontWeight.w700,
           color: color,
@@ -440,7 +444,7 @@ class _ExplanationCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -532,22 +536,21 @@ class _PrimaryButton extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: enabled ? AppColors.primaryGradient : null,
           color: enabled ? null : AppColors.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
               label,
-              style: TextStyle(
-                fontFamily: 'BeVietnamPro',
+              style: AppTypography.headlineMedium.copyWith(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
-                color: enabled ? Colors.white : AppColors.iconMuted,
+                color: enabled ? AppColors.onPrimaryFixed : AppColors.iconMuted,
               ),
             ),
             const SizedBox(width: 8),
-            Icon(icon, color: enabled ? Colors.white : AppColors.iconMuted, size: 18),
+            Icon(icon, color: enabled ? AppColors.onPrimaryFixed : AppColors.iconMuted, size: 18),
           ],
         ),
       ),
@@ -555,33 +558,3 @@ class _PrimaryButton extends StatelessWidget {
   }
 }
 
-// ─── Error View ───────────────────────────────────────────────────────────────
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, required this.onRetry});
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.wifi_off_rounded, size: 48, color: AppColors.iconMuted),
-            AppGap.h16,
-            Text(
-              message,
-              style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
-              textAlign: TextAlign.center,
-            ),
-            AppGap.h20,
-            ElevatedButton(onPressed: onRetry, child: const Text('Thử lại')),
-          ],
-        ),
-      ),
-    );
-  }
-}

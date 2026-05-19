@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:englishme/core/network/dio_client.dart';
-import 'package:englishme/data/models/pronunciation_models.dart';
-import 'package:englishme/data/repositories/pronunciation_repository.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
+import 'package:englishme/modules/pronunciation/repositories/pronunciation_repository.dart';
 import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -42,7 +43,7 @@ class PronunciationController extends GetxController {
     try {
       exercises.value = await _repository.getExercises();
     } on DioException {
-      Get.snackbar('Lỗi', 'Không thể tải danh sách bài tập.');
+      Get.snackbar(T.errorGeneric.tr, T.errorLoadPronunciation.tr);
     } finally {
       isLoadingExercises.value = false;
     }
@@ -57,7 +58,7 @@ class PronunciationController extends GetxController {
   Future<void> startRecording() async {
     final micStatus = await Permission.microphone.request();
     if (!micStatus.isGranted) {
-      Get.snackbar('Quyền bị từ chối', 'Cần cấp quyền microphone để ghi âm.');
+      Get.snackbar(T.errorPermissionDenied.tr, T.errorMicPermission.tr);
       return;
     }
 
@@ -106,11 +107,11 @@ class PronunciationController extends GetxController {
       final msg =
           (e.response?.data is Map<String, dynamic>)
               ? (e.response?.data['message'] as String? ??
-                  'Không thể phân tích phát âm.')
-              : 'Không thể kết nối đến máy chủ.';
-      Get.snackbar('Lỗi', msg);
+                  T.errorPronunciationAnalysis.tr)
+              : T.errorPronunciationServer.tr;
+      Get.snackbar(T.errorGeneric.tr, msg);
     } catch (_) {
-      Get.snackbar('Lỗi', 'Đã có lỗi xảy ra khi phân tích.');
+      Get.snackbar(T.errorGeneric.tr, T.errorPronunciationGeneric.tr);
     } finally {
       isAssessing.value = false;
     }

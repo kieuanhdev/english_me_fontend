@@ -66,8 +66,7 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label,
-      style: const TextStyle(
-        fontFamily: 'BeVietnamPro',
+      style: AppTypography.headlineMedium.copyWith(
         fontSize: 15,
         fontWeight: FontWeight.w700,
       ),
@@ -84,18 +83,19 @@ class _TopicSelector extends StatelessWidget {
   static final _topics = [
     (TestTopic.grammar, Icons.menu_book_rounded, AppColors.skillGrammar),
     (TestTopic.vocabulary, Icons.style_rounded, AppColors.skillVocabulary),
-    (TestTopic.pronunciation, Icons.record_voice_over_rounded, AppColors.skillListening),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Obx(() => Row(
-          children: _topics.map((t) {
-            final (topic, icon, color) = t;
+          children: _topics.asMap().entries.map((entry) {
+            final index = entry.key;
+            final (topic, icon, color) = entry.value;
             final isSelected = controller.selectedTopic.value == topic;
+            final isLast = index == _topics.length - 1;
             return Expanded(
               child: Padding(
-                padding: EdgeInsets.only(right: topic != TestTopic.pronunciation ? 10 : 0),
+                padding: EdgeInsets.only(right: isLast ? 0 : 10),
                 child: GestureDetector(
                   onTap: () => controller.selectTopic(topic),
                   child: AnimatedContainer(
@@ -103,7 +103,7 @@ class _TopicSelector extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     decoration: BoxDecoration(
                       color: isSelected ? color.withValues(alpha: 0.12) : AppColors.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       border: Border.all(
                         color: isSelected ? color : AppColors.outlineVariant,
                         width: isSelected ? 2 : 1,
@@ -115,8 +115,7 @@ class _TopicSelector extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           topic.label,
-                          style: TextStyle(
-                            fontFamily: 'BeVietnamPro',
+                          style: AppTypography.headlineMedium.copyWith(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
                             color: isSelected ? color : AppColors.textSecondary,
@@ -166,7 +165,7 @@ class _LevelSelector extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
                   color: isSelected ? color.withValues(alpha: 0.12) : AppColors.surfaceContainerLowest,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
                     color: isSelected ? color : AppColors.outlineVariant,
                     width: isSelected ? 2 : 1,
@@ -174,8 +173,7 @@ class _LevelSelector extends StatelessWidget {
                 ),
                 child: Text(
                   level.label,
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
                     color: isSelected ? color : AppColors.textSecondary,
@@ -197,7 +195,7 @@ class _TestInfoCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,8 +206,7 @@ class _TestInfoCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 'Thông tin bài kiểm tra',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
@@ -255,8 +252,7 @@ class _InfoChip extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: TextStyle(
-            fontFamily: 'PlusJakartaSans',
+          style: AppTypography.labelSmall.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.w700,
             color: AppColors.primary,
@@ -310,7 +306,7 @@ class _HistoryTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Row(
@@ -325,8 +321,7 @@ class _HistoryTile extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               '$score%',
-              style: TextStyle(
-                fontFamily: 'BeVietnamPro',
+              style: AppTypography.headlineMedium.copyWith(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 color: color,
@@ -340,8 +335,7 @@ class _HistoryTile extends StatelessWidget {
               children: [
                 Text(
                   '${entry.topic.label} · ${entry.level.label}',
-                  style: const TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
@@ -385,24 +379,23 @@ class _StartButton extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: canStart ? AppColors.primaryGradient : null,
                 color: canStart ? null : AppColors.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     'Bắt đầu kiểm tra',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: canStart ? Colors.white : AppColors.iconMuted,
+                      color: canStart ? AppColors.onPrimaryFixed : AppColors.iconMuted,
                     ),
                   ),
                   const SizedBox(width: 8),
                   Icon(
                     Icons.play_arrow_rounded,
-                    color: canStart ? Colors.white : AppColors.iconMuted,
+                    color: canStart ? AppColors.onPrimaryFixed : AppColors.iconMuted,
                     size: 20,
                   ),
                 ],

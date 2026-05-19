@@ -1,12 +1,14 @@
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/services/tts_service.dart';
+import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_settings_icon_button.dart';
-import 'package:englishme/data/models/pronunciation_models.dart';
+import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/controllers/pronunciation_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,7 +44,7 @@ class PronunciationScreen extends StatelessWidget {
                   AppGap.w12,
                   Expanded(
                     child: Text(
-                      'Luyện phát âm AI',
+                      T.pronunTitle.tr,
                       style: AppTypography.displayLarge.copyWith(
                         fontSize: 24,
                         color: AppColors.primary,
@@ -65,7 +67,10 @@ class PronunciationScreen extends StatelessWidget {
     return GetX<PronunciationController>(
       builder: (ctrl) {
         if (ctrl.isLoadingExercises.value) {
-          return const Center(child: CircularProgressIndicator());
+          return ApiStateView(
+            state: ApiState.loading,
+            builder: (_) => const SizedBox.shrink(),
+          );
         }
 
         if (ctrl.selectedExercise.value == null) {
@@ -86,7 +91,7 @@ class PronunciationScreen extends StatelessWidget {
             Icon(Icons.mic_off_outlined, size: 48, color: AppColors.textSecondary),
             AppGap.h16,
             Text(
-              'Chưa có bài tập nào.',
+              T.emptyExercises.tr,
               style: AppTypography.bodyLarge.copyWith(
                 color: AppColors.textSecondary,
               ),
@@ -100,7 +105,7 @@ class PronunciationScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Chọn bài tập',
+          T.pronunChooseExercise.tr,
           style: AppTypography.headlineMedium.copyWith(fontSize: 20),
         ),
         AppGap.h12,
@@ -137,7 +142,7 @@ class PronunciationScreen extends StatelessWidget {
             _AnalyzeButton(ctrl: ctrl),
           if (ctrl.isAssessing.value) ...[
             AppGap.h20,
-            const CircularProgressIndicator(),
+            CircularProgressIndicator(color: AppColors.primary),
           ],
           if (ctrl.feedback.value != null) ...[
             AppGap.h20,
@@ -161,10 +166,10 @@ class _ExerciseCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -174,7 +179,7 @@ class _ExerciseCard extends StatelessWidget {
                 height: 44,
                 decoration: BoxDecoration(
                   color: AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Icon(Icons.record_voice_over, color: AppColors.primary),
               ),
@@ -223,7 +228,7 @@ class _ExercisePromptCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Column(
@@ -238,19 +243,19 @@ class _ExercisePromptCard extends StatelessWidget {
                 height: 56,
                 decoration: BoxDecoration(
                   color: speaking ? AppColors.primary : AppColors.primarySoft,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
                 child: Icon(
                   speaking ? Icons.volume_up_rounded : Icons.volume_up_rounded,
                   size: 28,
-                  color: speaking ? Colors.white : AppColors.primary,
+                  color: speaking ? AppColors.onPrimaryFixed : AppColors.primary,
                 ),
               ),
             );
           }),
           AppGap.h16,
           Text(
-            'Đọc to từ/câu sau:',
+            T.pronunReadAloud.tr,
             style: AppTypography.body.copyWith(
               color: AppColors.textSecondary,
               fontSize: 14,
@@ -318,7 +323,7 @@ class _RecordButton extends StatelessWidget {
           ),
           child: Icon(
             recording ? Icons.stop : Icons.mic,
-            color: Colors.white,
+            color: AppColors.onPrimaryFixed,
             size: 36,
           ),
         ),
@@ -339,7 +344,7 @@ class _AnalyzeButton extends StatelessWidget {
       child: ElevatedButton.icon(
         onPressed: ctrl.isAssessing.value ? null : ctrl.assessRecording,
         icon: const Icon(Icons.analytics_outlined),
-        label: const Text('Phân tích phát âm'),
+        label: Text(T.pronunAnalysis.tr),
       ),
     );
   }
@@ -363,7 +368,7 @@ class _QuickScorePreview extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Row(
@@ -398,12 +403,12 @@ class _QuickScorePreview extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Điểm phát âm',
+                  T.pronunScore.tr,
                   style: AppTypography.body.copyWith(fontWeight: FontWeight.w700),
                 ),
                 AppGap.h6,
                 Text(
-                  feedback.overallComment ?? 'Xem chi tiết bên dưới.',
+                  feedback.overallComment ?? T.pronunSeeDetailBelow.tr,
                   style: AppTypography.body.copyWith(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -432,12 +437,12 @@ class _ViewDetailButton extends StatelessWidget {
       child: OutlinedButton.icon(
         onPressed: () => Get.toNamed(AppRoutes.pronunciationResult),
         icon: const Icon(Icons.visibility_outlined),
-        label: const Text('Xem chi tiết'),
+        label: Text(T.actionViewDetail.tr),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
           side: BorderSide(color: AppColors.primary),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
           ),
         ),
       ),

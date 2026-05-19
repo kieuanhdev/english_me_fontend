@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/data/models/flashcard_model.dart';
+import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -101,8 +101,7 @@ class _ProgressSection extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: '$current',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.displayLarge.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -110,8 +109,7 @@ class _ProgressSection extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '/$total',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: AppColors.iconMuted,
@@ -133,18 +131,18 @@ class _ProgressSection extends StatelessWidget {
         ),
         AppGap.h8,
         ClipRRect(
-          borderRadius: BorderRadius.circular(99),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           child: SizedBox(
             height: 8,
             child: Stack(
               children: [
-                Container(color: const Color(0xFFC9CFFD)),
+                Container(color: AppColors.progressTrack),
                 FractionallySizedBox(
                   widthFactor: progress,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF854d00), Color(0xFFD4761A)],
+                        colors: [AppColors.accentWarm, Color(0xFFD4761A)],
                       ),
                     ),
                   ),
@@ -172,9 +170,9 @@ class _FlashcardBack extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A1A1C1C), blurRadius: 32, offset: Offset(0, 8)),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        boxShadow: [
+          BoxShadow(color: AppColors.shadowSoft, blurRadius: 32, offset: Offset(0, 8)),
         ],
       ),
       child: Stack(
@@ -205,17 +203,16 @@ class _FlashcardBack extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFDCBE),
-                          borderRadius: BorderRadius.circular(999),
+                          color: AppColors.levelCBg,
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
                         ),
                         child: Text(
                           posLabel,
-                          style: const TextStyle(
-                            fontFamily: 'BeVietnamPro',
+                          style: AppTypography.headlineMedium.copyWith(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.2,
-                            color: Color(0xFF2C1600),
+                            color: AppColors.levelCFg,
                           ),
                         ),
                       )
@@ -239,8 +236,7 @@ class _FlashcardBack extends StatelessWidget {
                 // Word
                 Text(
                   card.word,
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.displayLarge.copyWith(
                     fontSize: 38,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -265,11 +261,10 @@ class _FlashcardBack extends StatelessWidget {
                 if (card.vietnamese.isNotEmpty)
                   Text(
                     card.vietnamese,
-                    style: const TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.displayLarge.copyWith(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF643900),
+                      color: AppColors.levelCFg,
                     ),
                   ),
                 AppGap.h10,
@@ -278,9 +273,9 @@ class _FlashcardBack extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.only(top: 2),
-                        child: Icon(Icons.translate_rounded, size: 16, color: Color(0x661A1C1C)),
+                        child: Icon(Icons.translate_rounded, size: 16, color: AppColors.onSurface.withValues(alpha: 0.4)),
                       ),
                       AppGap.w8,
                       Expanded(
@@ -302,7 +297,7 @@ class _FlashcardBack extends StatelessWidget {
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       border: Border(
                         left: BorderSide(color: AppColors.primaryContainer, width: 3.5),
                       ),
@@ -377,7 +372,7 @@ class _RatingGrid extends StatelessWidget {
           label: 'QUÊN',
           score: '(0)',
           bg: AppColors.surfaceContainerHigh,
-          fg: const Color(0xFF757684),
+          fg: AppColors.iconMuted,
           onTap: () => onRate(CardRating.forget),
         ),
         AppGap.w8,
@@ -386,7 +381,7 @@ class _RatingGrid extends StatelessWidget {
           label: 'MỜ',
           score: '(2)',
           bg: const Color(0xFFF5EDE4),
-          fg: const Color(0xFF854d00),
+          fg: AppColors.accentWarm,
           onTap: () => onRate(CardRating.vague),
         ),
         AppGap.w8,
@@ -395,7 +390,7 @@ class _RatingGrid extends StatelessWidget {
           label: 'NHỚ',
           score: '(3)',
           bg: const Color(0xFFEEF0FF),
-          fg: const Color(0xFF3F51B5),
+          fg: AppColors.primaryContainer,
           onTap: () => onRate(CardRating.remember),
         ),
         AppGap.w8,
@@ -404,7 +399,7 @@ class _RatingGrid extends StatelessWidget {
           label: 'TỐT',
           score: '(5)',
           bg: AppColors.primary,
-          fg: Colors.white,
+          fg: AppColors.onPrimaryFixed,
           shadow: true,
           onTap: () => onRate(CardRating.mastered),
         ),
@@ -441,7 +436,7 @@ class _RatingBtn extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
             boxShadow: shadow
                 ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))]
                 : null,
@@ -451,8 +446,8 @@ class _RatingBtn extends StatelessWidget {
             children: [
               Icon(icon, color: fg, size: 28),
               const SizedBox(height: 6),
-              Text(label, style: TextStyle(fontFamily: 'BeVietnamPro', fontSize: 10, fontWeight: FontWeight.w800, color: fg, letterSpacing: 0.5)),
-              Text(score, style: TextStyle(fontFamily: 'BeVietnamPro', fontSize: 13, fontWeight: FontWeight.w800, color: fg)),
+              Text(label, style: AppTypography.headlineMedium.copyWith(fontSize: 10, fontWeight: FontWeight.w800, color: fg, letterSpacing: 0.5)),
+              Text(score, style: AppTypography.headlineMedium.copyWith(fontSize: 13, fontWeight: FontWeight.w800, color: fg)),
             ],
           ),
         ),

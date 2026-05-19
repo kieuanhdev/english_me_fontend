@@ -16,13 +16,13 @@ class AppBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppRadius.md),
       child: Ink(
         width: size,
         height: size,
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: AppColors.outlineVariant, width: 2),
           boxShadow: const [
             BoxShadow(color: Color(0xFFCBD5DD), offset: Offset(0, 3)),
@@ -54,7 +54,7 @@ class AppBackWithProgress extends StatelessWidget {
         AppGap.w12,
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             child: SizedBox(
               height: 10,
               child: LinearProgressIndicator(

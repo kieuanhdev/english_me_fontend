@@ -7,7 +7,9 @@ import 'package:englishme/routes/app_routes.dart';
 enum VocabScreenState { idle, loading, loaded, error }
 
 class VocabularyController extends GetxController {
-  final _repo = VocabularyRepository();
+  final VocabularyRepository _repo;
+
+  VocabularyController(this._repo);
 
   // ── Topics ──────────────────────────────────────────────────────────────────
   final topicsState = VocabScreenState.idle.obs;

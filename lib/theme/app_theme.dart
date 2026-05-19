@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/theme/theme_controller.dart';
 
 @immutable
@@ -38,6 +39,24 @@ class AppPaletteColors {
     required this.tertiaryBgSoft,
     required this.recommendationMutedBg,
     required this.chipHighlightBg,
+    required this.flagRedVN,
+    required this.flagBlueUK,
+    required this.googleBrand,
+    required this.shadowSoft,
+    required this.levelABg,
+    required this.levelBBg,
+    required this.levelCBg,
+    required this.levelAFg,
+    required this.levelBFg,
+    required this.levelCFg,
+    required this.statBgWarm,
+    required this.statFgWarm,
+    required this.statBgCool,
+    required this.statFgCool,
+    required this.onPrimaryFixed,
+    required this.primaryShadow,
+    required this.progressTrack,
+    required this.accentWarm,
   });
 
   final Brightness brightness;
@@ -81,6 +100,43 @@ class AppPaletteColors {
   /// Highlight chọn trong form (vd. create_desk)
   final Color chipHighlightBg;
 
+  /// Cờ quốc gia — dùng trong vocabulary_list để gắn nhãn ngôn ngữ
+  final Color flagRedVN;
+  final Color flagBlueUK;
+
+  /// Brand đỏ Google (chỉ dùng cho nút "Continue with Google")
+  final Color googleBrand;
+
+  /// Shadow rất nhạt cho card khi đặt trên surface trắng
+  final Color shadowSoft;
+
+  /// Nền + chữ cho badge cấp độ CEFR (A1/A2 → B1/B2 → C1/C2)
+  final Color levelABg;
+  final Color levelBBg;
+  final Color levelCBg;
+  final Color levelAFg;
+  final Color levelBFg;
+  final Color levelCFg;
+
+  /// Cặp màu cho ô thống kê nhanh ở home (warm + cool)
+  final Color statBgWarm;
+  final Color statFgWarm;
+  final Color statBgCool;
+  final Color statFgCool;
+
+  /// Foreground cố định trên primary gradient (vd. text trắng trên CTA xanh).
+  /// Light: trắng. Dark: vẫn trắng nhưng có thể tinh chỉnh sau.
+  final Color onPrimaryFixed;
+
+  /// Shadow cho primary button / chip được chọn
+  final Color primaryShadow;
+
+  /// Nền track cho progress bar (study session)
+  final Color progressTrack;
+
+  /// Accent nâu ấm cho nội dung từ vựng (word of day, flashcard)
+  final Color accentWarm;
+
   Gradient get primaryGradient => LinearGradient(
     colors: [primary, primaryContainer],
     begin: Alignment.centerLeft,
@@ -122,6 +178,24 @@ const AppPaletteColors kLightPalette = AppPaletteColors(
   tertiaryBgSoft: Color(0xFFFFF3E0),
   recommendationMutedBg: Color(0xFFF3F3F4),
   chipHighlightBg: Color(0xFFE9EEFF),
+  flagRedVN: Color(0xFFDA291C),
+  flagBlueUK: Color(0xFF012169),
+  googleBrand: Color(0xFFEA4335),
+  shadowSoft: Color(0x0A1A1C1C),
+  levelABg: Color(0xFFDEF7EC),
+  levelBBg: Color(0xFFDEE0FF),
+  levelCBg: Color(0xFFFFDCBE),
+  levelAFg: Color(0xFF1B5E20),
+  levelBFg: Color(0xFF24389C),
+  levelCFg: Color(0xFF643900),
+  statBgWarm: Color(0xFFFFF0E8),
+  statFgWarm: Color(0xFFFF6B35),
+  statBgCool: Color(0xFFE0F2F1),
+  statFgCool: Color(0xFF00897B),
+  onPrimaryFixed: Color(0xFFFFFFFF),
+  primaryShadow: Color(0x3324389C),
+  progressTrack: Color(0xFFC9CFFD),
+  accentWarm: Color(0xFF854D00),
 );
 
 const AppPaletteColors kDarkPalette = AppPaletteColors(
@@ -158,6 +232,24 @@ const AppPaletteColors kDarkPalette = AppPaletteColors(
   tertiaryBgSoft: Color(0xFF3D2F1F),
   recommendationMutedBg: Color(0xFF171A22),
   chipHighlightBg: Color(0xFF2D3350),
+  flagRedVN: Color(0xFFFF6A60),
+  flagBlueUK: Color(0xFF6B8AFF),
+  googleBrand: Color(0xFFFF7B72),
+  shadowSoft: Color(0x66000000),
+  levelABg: Color(0xFF1E3328),
+  levelBBg: Color(0xFF222842),
+  levelCBg: Color(0xFF3A2A1A),
+  levelAFg: Color(0xFF9CE0AC),
+  levelBFg: Color(0xFFAAB4FC),
+  levelCFg: Color(0xFFFFCC99),
+  statBgWarm: Color(0xFF3A2A22),
+  statFgWarm: Color(0xFFFF9874),
+  statBgCool: Color(0xFF1E3331),
+  statFgCool: Color(0xFF4FD1C5),
+  onPrimaryFixed: Color(0xFFFFFFFF),
+  primaryShadow: Color(0x30AAB4FC),
+  progressTrack: Color(0xFF2D3350),
+  accentWarm: Color(0xFFFFB870),
 );
 
 class AppColors {
@@ -204,6 +296,28 @@ class AppColors {
   static Gradient get primaryGradient => _effective.primaryGradient;
   static Color get recommendationMutedBg => _effective.recommendationMutedBg;
   static Color get chipHighlightBg => _effective.chipHighlightBg;
+
+  static Color get flagRedVN => _effective.flagRedVN;
+  static Color get flagBlueUK => _effective.flagBlueUK;
+  static Color get googleBrand => _effective.googleBrand;
+  static Color get shadowSoft => _effective.shadowSoft;
+
+  static Color get levelABg => _effective.levelABg;
+  static Color get levelBBg => _effective.levelBBg;
+  static Color get levelCBg => _effective.levelCBg;
+  static Color get levelAFg => _effective.levelAFg;
+  static Color get levelBFg => _effective.levelBFg;
+  static Color get levelCFg => _effective.levelCFg;
+
+  static Color get statBgWarm => _effective.statBgWarm;
+  static Color get statFgWarm => _effective.statFgWarm;
+  static Color get statBgCool => _effective.statBgCool;
+  static Color get statFgCool => _effective.statFgCool;
+
+  static Color get onPrimaryFixed => _effective.onPrimaryFixed;
+  static Color get primaryShadow => _effective.primaryShadow;
+  static Color get progressTrack => _effective.progressTrack;
+  static Color get accentWarm => _effective.accentWarm;
 
   /// Nền cam nhẹ cho ô gợi ý — giữ tông ấm, đủ contrast trên dark
   static Color get recommendationOrangeBg => _effective.brightness == Brightness.dark
@@ -258,6 +372,46 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     letterSpacing: 1.2,
     color: AppColors.primary,
+  );
+
+  // ────────────────────────────────────────────────────────────────────
+  // Size tokens nhỏ — đại đa số view dùng raw fontSize 10/12/13/14.
+  // Thêm token để find/replace dần (xem docs/UI_CONSISTENCY_AUDIT.md §2).
+  // ────────────────────────────────────────────────────────────────────
+
+  /// 10pt — micro caption, tag siêu nhỏ trong card (vd. home_continue_learning)
+  static TextStyle get labelXSmall => TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 10,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 0.8,
+    color: AppColors.textSecondary,
+  );
+
+  /// 12pt — caption, meta info (timestamp, count)
+  static TextStyle get labelSmall => TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 12,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textSecondary,
+  );
+
+  /// 13pt — body phụ, mô tả ngắn
+  static TextStyle get bodySmall => TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    height: 1.45,
+    color: AppColors.textSecondary,
+  );
+
+  /// 14pt — body chính kích thước nhỏ (list item, definition)
+  static TextStyle get bodyRegular => TextStyle(
+    fontFamily: 'PlusJakartaSans',
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    height: 1.45,
+    color: AppColors.onSurface,
   );
 
   // Alias for semantic naming used in widgets
@@ -349,7 +503,7 @@ ThemeData _buildTheme(AppPaletteColors p) {
             p.brightness == Brightness.dark ? const Color(0xFF151620) : Colors.white,
         backgroundColor: p.primary,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
         ),
         textStyle: TextStyle(
           fontFamily: 'PlusJakartaSans',
@@ -366,11 +520,11 @@ ThemeData _buildTheme(AppPaletteColors p) {
       filled: true,
       fillColor: p.surfaceContainerHigh,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         borderSide: BorderSide.none,
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         borderSide: BorderSide(
           color: p.primary.withValues(alpha: p.brightness == Brightness.dark ? 0.5 : 0.2),
           width: 2,
@@ -381,7 +535,7 @@ ThemeData _buildTheme(AppPaletteColors p) {
     cardTheme: CardThemeData(
       elevation: 0,
       color: p.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xxl)),
     ),
 
     splashFactory: InkRipple.splashFactory,

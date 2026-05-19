@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/routes/app_routes.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppBottomNav extends StatefulWidget {
@@ -160,7 +162,7 @@ class _NavItem extends StatelessWidget {
                   : EdgeInsets.zero,
               decoration: BoxDecoration(
                 color: active ? AppColors.primarySoft : Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
               ),
               child: Icon(
                 active ? data.icon : data.inactiveIcon,

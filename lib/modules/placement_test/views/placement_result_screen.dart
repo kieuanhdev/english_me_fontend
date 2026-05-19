@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
-import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:get/get.dart';
 
@@ -124,7 +123,7 @@ class _ScoreCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: [
           BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
@@ -149,7 +148,7 @@ class _ScoreCard extends StatelessWidget {
           ),
           AppGap.h14,
           ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             child: SizedBox(
               height: 10,
               child: LinearProgressIndicator(
@@ -210,7 +209,7 @@ class _ReviewTile extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: borderColor.withValues(alpha: 0.4), width: 1.5),
       ),
       child: Row(
@@ -222,7 +221,7 @@ class _ReviewTile extends StatelessWidget {
             decoration: BoxDecoration(color: borderColor, shape: BoxShape.circle),
             child: Icon(
               correct ? Icons.check : Icons.close,
-              color: Colors.white,
+              color: AppColors.onPrimaryFixed,
               size: 16,
             ),
           ),
@@ -274,9 +273,9 @@ class _GoToDashboardButton extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: const [
-          BoxShadow(color: Color(0xFF1A2E7A), offset: Offset(0, 4)),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        boxShadow: [
+          BoxShadow(color: AppColors.primary.withValues(alpha: 0.35), offset: Offset(0, 4)),
         ],
       ),
       child: ElevatedButton(
@@ -285,13 +284,13 @@ class _GoToDashboardButton extends StatelessWidget {
           elevation: 0,
           shadowColor: Colors.transparent,
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onPrimaryFixed,
           minimumSize: const Size.fromHeight(56),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
         ),
         child: Text(
           'VÀO HỌC NGAY',
-          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: Colors.white),
+          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: AppColors.onPrimaryFixed),
         ),
       ),
     );

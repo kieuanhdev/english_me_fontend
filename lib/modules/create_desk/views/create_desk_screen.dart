@@ -93,11 +93,11 @@ class CreateDeskScreen extends StatelessWidget {
                             fillColor: AppColors.surfaceContainerHigh,
                             contentPadding: const EdgeInsets.all(18),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
                               borderSide: BorderSide.none,
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
                               borderSide: BorderSide(color: AppColors.primary, width: 2),
                             ),
                           ),
@@ -118,14 +118,14 @@ class CreateDeskScreen extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     gradient: selected ? AppColors.primaryGradient : null,
                                     color: selected ? null : AppColors.surfaceContainerHigh,
-                                    borderRadius: BorderRadius.circular(999),
+                                    borderRadius: BorderRadius.circular(AppRadius.pill),
                                   ),
                                   child: Text(
                                     level,
                                     style: AppTypography.bodyLarge.copyWith(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w800,
-                                      color: selected ? Colors.white : AppColors.textSecondary,
+                                      color: selected ? AppColors.onPrimaryFixed : AppColors.textSecondary,
                                     ),
                                   ),
                                 ),
@@ -203,7 +203,7 @@ class _HeaderHero extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: AppColors.surfaceContainerLow,
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(AppRadius.xxl),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,11 +233,11 @@ class _HeaderHero extends StatelessWidget {
           width: 76,
           height: 120,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            gradient: const LinearGradient(
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
+            gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Color(0xFFDEE0FF), Color(0xFFF3F3F4)],
+              colors: [AppColors.levelBBg, AppColors.surfaceContainerLow],
             ),
           ),
           child: Icon(Icons.auto_stories_rounded, color: AppColors.primary, size: 34),
@@ -271,7 +271,7 @@ class _SectionTitle extends StatelessWidget {
               fontSize: 11,
               fontWeight: FontWeight.w800,
               letterSpacing: 1.2,
-              color: const Color(0x99643900),
+              color: AppColors.levelCFg.withValues(alpha: 0.6),
             ),
           ),
       ],
@@ -289,7 +289,7 @@ class _ColorSection extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -365,7 +365,7 @@ class _IconSection extends StatelessWidget {
                 child: Container(
                   decoration: BoxDecoration(
                     color: selected ? AppColors.chipHighlightBg : AppColors.surfaceContainerHigh,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: selected
                         ? Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 2)
                         : null,
@@ -404,14 +404,14 @@ class _PrimaryDeskButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: isLoading ? null : onPressed,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         child: Ink(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
             gradient: isLoading ? null : AppColors.primaryGradient,
             color: isLoading ? AppColors.surfaceContainerHigh : null,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -426,14 +426,14 @@ class _PrimaryDeskButton extends StatelessWidget {
                   ),
                 )
               else ...[
-                Icon(icon, color: Colors.white),
+                Icon(icon, color: AppColors.onPrimaryFixed),
                 const SizedBox(width: 8),
                 Text(
                   label,
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 17,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.onPrimaryFixed,
                   ),
                 ),
               ],

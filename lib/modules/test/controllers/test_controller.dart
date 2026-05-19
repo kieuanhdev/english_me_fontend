@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/profile/controllers/profile_controller.dart';
+import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
 import 'package:englishme/modules/test/repositories/test_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -19,12 +22,16 @@ class TestController extends GetxController {
   final selectedAnswer = Rxn<String>();
   final isAnswerRevealed = false.obs;
   final results = <TestAnswerResult>[].obs;
+  final Rxn<TestSubmitResponse> submission = Rxn();
 
   final secondsRemaining = 0.obs;
   Timer? _timer;
 
   final history = <TestHistoryEntry>[].obs;
   final isHistoryLoading = false.obs;
+
+  String? _sessionId;
+  int _initialDuration = 0;
 
   @override
   void onInit() {
@@ -45,8 +52,11 @@ class TestController extends GetxController {
           : null;
 
   bool get isLastQuestion => currentIndex.value >= questions.length - 1;
-  int get correctCount => results.where((r) => r.isCorrect).length;
+  int get correctCount =>
+      submission.value?.correct ?? results.where((r) => r.isCorrect).length;
   int get totalAnswered => results.length;
+  int get xpEarned => submission.value?.xpEarned ?? 0;
+  String? get cefrSuggestion => submission.value?.cefrSuggestion;
 
   String get timerDisplay {
     final m = secondsRemaining.value ~/ 60;
@@ -73,12 +83,14 @@ class TestController extends GetxController {
     try {
       state.value = TestState.loading;
       final session = await _repo.getTestSession(topic: topic, level: level);
+      _sessionId = session.sessionId;
+      _initialDuration = session.durationSeconds;
       questions.assignAll(session.questions);
       secondsRemaining.value = session.durationSeconds;
       state.value = TestState.playing;
       _startTimer();
-    } catch (e) {
-      errorMessage.value = 'Không thể tải bài kiểm tra. Vui lòng thử lại.';
+    } catch (_) {
+      errorMessage.value = T.errorLoadTest.tr;
       state.value = TestState.error;
     }
   }
@@ -115,10 +127,10 @@ class TestController extends GetxController {
     ));
   }
 
-  void nextQuestion() {
+  Future<void> nextQuestion() async {
     if (!isAnswerRevealed.value) return;
     if (isLastQuestion) {
-      _finishTest();
+      await _finishTest();
       return;
     }
     currentIndex.value++;
@@ -126,34 +138,43 @@ class TestController extends GetxController {
     isAnswerRevealed.value = false;
   }
 
-  void _finishTest() {
+  Future<void> _finishTest() async {
     _timer?.cancel();
-    state.value = TestState.finished;
-
-    final topic = selectedTopic.value;
-    final level = selectedLevel.value;
-    if (topic != null && level != null) {
-      history.insert(
-        0,
-        TestHistoryEntry(
-          sessionId: 'test-${DateTime.now().millisecondsSinceEpoch}',
-          topic: topic,
-          level: level,
-          correct: correctCount,
-          total: totalAnswered,
-          completedAt: DateTime.now(),
-        ),
-      );
+    final sessionId = _sessionId;
+    if (sessionId == null) {
+      state.value = TestState.finished;
+      Get.offNamed(AppRoutes.testResult);
+      return;
     }
-
-    Get.offNamed(AppRoutes.testResult);
+    try {
+      state.value = TestState.submitting;
+      final answers = <Map<String, String>>[];
+      for (final r in results) {
+        final q = questions.firstWhereOrNull((e) => e.id == r.questionId);
+        final label = q?.labelFor(r.selectedAnswer) ?? r.selectedAnswer;
+        answers.add({'questionId': r.questionId, 'selectedAnswer': label});
+      }
+      final timeTaken = _initialDuration - secondsRemaining.value;
+      submission.value = await _repo.submitTest(
+        sessionId: sessionId,
+        answers: answers,
+        timeTakenSeconds: timeTaken < 0 ? 0 : timeTaken,
+      );
+      _refreshProfileAndProgress();
+      state.value = TestState.finished;
+      Get.offNamed(AppRoutes.testResult);
+      _loadHistory();
+    } catch (_) {
+      state.value = TestState.finished;
+      Get.offNamed(AppRoutes.testResult);
+    }
   }
 
-  void submitTest() {
+  Future<void> submitTest() async {
     if (!isAnswerRevealed.value && selectedAnswer.value != null) {
       confirmAnswer();
     }
-    _finishTest();
+    await _finishTest();
   }
 
   Future<void> retryTest() async {
@@ -170,22 +191,36 @@ class TestController extends GetxController {
     state.value = TestState.idle;
   }
 
+  void _refreshProfileAndProgress() {
+    if (Get.isRegistered<ProfileController>()) {
+      Get.find<ProfileController>().loadProfile();
+    }
+    if (Get.isRegistered<ProgressController>()) {
+      Get.find<ProgressController>().loadProgress();
+    }
+  }
+
   Future<void> _loadHistory() async {
     try {
       isHistoryLoading.value = true;
       final data = await _repo.getTestHistory();
       history.assignAll(data);
+    } catch (_) {
+      // ignore — history là phụ
     } finally {
       isHistoryLoading.value = false;
     }
   }
 
   void _reset() {
+    _sessionId = null;
+    _initialDuration = 0;
     currentIndex.value = 0;
     selectedAnswer.value = null;
     isAnswerRevealed.value = false;
     results.clear();
     questions.clear();
+    submission.value = null;
     secondsRemaining.value = 0;
     _timer?.cancel();
   }

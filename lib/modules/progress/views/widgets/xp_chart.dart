@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/progress/models/progress_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -24,7 +25,7 @@ class XpChart extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,8 +37,7 @@ class XpChart extends StatelessWidget {
                 children: [
                   Text(
                     'XP theo thời gian',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.onSurface,
@@ -45,8 +45,7 @@ class XpChart extends StatelessWidget {
                   ),
                   Text(
                     selectedRange == 0 ? '7 ngày gần đây' : '14 ngày gần đây',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 11,
                       color: AppColors.textSecondary,
                     ),
@@ -87,8 +86,7 @@ class XpChart extends StatelessWidget {
                                   padding: const EdgeInsets.only(bottom: 4),
                                   child: Text(
                                     '${entry.xp}',
-                                    style: TextStyle(
-                                      fontFamily: 'BeVietnamPro',
+                                    style: AppTypography.headlineMedium.copyWith(
                                       fontSize: 9,
                                       fontWeight: FontWeight.w800,
                                       color: AppColors.primary,
@@ -110,14 +108,13 @@ class XpChart extends StatelessWidget {
                                               .withValues(alpha: 0.25)
                                           : AppColors.surfaceContainerHigh,
                                   borderRadius: const BorderRadius.vertical(
-                                      top: Radius.circular(8)),
+                                      top: Radius.circular(AppRadius.sm)),
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 label,
-                                style: TextStyle(
-                                  fontFamily: 'BeVietnamPro',
+                                style: AppTypography.headlineMedium.copyWith(
                                   fontSize: 9,
                                   fontWeight: FontWeight.w700,
                                   color: isToday
@@ -149,7 +146,7 @@ class _RangeToggle extends StatelessWidget {
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -177,15 +174,14 @@ class _Tab extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
           color: selected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
         ),
         child: Text(
           label,
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.headlineMedium.copyWith(
             fontSize: 11,
             fontWeight: FontWeight.w700,
-            color: selected ? Colors.white : AppColors.textSecondary,
+            color: selected ? AppColors.onPrimaryFixed : AppColors.textSecondary,
           ),
         ),
       ),

@@ -16,7 +16,7 @@ class ProfileHeader extends GetView<ProfileController> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         children: [
@@ -33,7 +33,7 @@ class ProfileHeader extends GetView<ProfileController> {
             user.email,
             style: AppTypography.bodyLarge.copyWith(
               fontSize: 12,
-              color: Colors.white.withValues(alpha: 0.75),
+              color: AppColors.onPrimaryFixed.withValues(alpha: 0.75),
             ),
           ),
           AppGap.h16,
@@ -58,10 +58,10 @@ class _Avatar extends StatelessWidget {
       height: 90,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 3),
+        border: Border.all(color: AppColors.onPrimaryFixed.withValues(alpha: 0.4), width: 3),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
+            color: AppColors.shadowSoft,
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -88,13 +88,13 @@ class _Fallback extends StatelessWidget {
   Widget build(BuildContext context) {
     final initial = name.isNotEmpty ? name[0].toUpperCase() : '?';
     return Container(
-      color: Colors.white.withValues(alpha: 0.2),
+      color: AppColors.onPrimaryFixed.withValues(alpha: 0.2),
       alignment: Alignment.center,
       child: Text(
         initial,
         style: AppTypography.displayLarge.copyWith(
           fontSize: 36,
-          color: Colors.white,
+          color: AppColors.onPrimaryFixed,
         ),
       ),
     );
@@ -117,11 +117,11 @@ class _NameDisplay extends StatelessWidget {
             user.displayName,
             style: AppTypography.displayLarge.copyWith(
               fontSize: 20,
-              color: Colors.white,
+              color: AppColors.onPrimaryFixed,
             ),
           ),
           const SizedBox(width: 6),
-          Icon(Icons.edit_rounded, color: Colors.white.withValues(alpha: 0.7), size: 16),
+          Icon(Icons.edit_rounded, color: AppColors.onPrimaryFixed.withValues(alpha: 0.7), size: 16),
         ],
       ),
     );
@@ -146,38 +146,38 @@ class _NameEditor extends StatelessWidget {
             textAlign: TextAlign.center,
             style: AppTypography.displayLarge.copyWith(
               fontSize: 18,
-              color: Colors.white,
+              color: AppColors.onPrimaryFixed,
             ),
-            cursorColor: Colors.white,
+            cursorColor: AppColors.onPrimaryFixed,
             decoration: InputDecoration(
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.5)),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderSide: BorderSide(color: AppColors.onPrimaryFixed.withValues(alpha: 0.5)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: const BorderSide(color: Colors.white),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                borderSide: BorderSide(color: AppColors.onPrimaryFixed),
               ),
             ),
           ),
         ),
         const SizedBox(width: 8),
         Obx(() => controller.isSavingName.value
-            ? const SizedBox(
+            ? SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                child: CircularProgressIndicator(color: AppColors.onPrimaryFixed, strokeWidth: 2),
               )
             : GestureDetector(
                 onTap: controller.saveDisplayName,
-                child: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 28),
+                child: Icon(Icons.check_circle_rounded, color: AppColors.onPrimaryFixed, size: 28),
               )),
         const SizedBox(width: 4),
         GestureDetector(
           onTap: controller.cancelEditName,
-          child: Icon(Icons.cancel_rounded, color: Colors.white.withValues(alpha: 0.7), size: 28),
+          child: Icon(Icons.cancel_rounded, color: AppColors.onPrimaryFixed.withValues(alpha: 0.7), size: 28),
         ),
       ],
     );
@@ -194,32 +194,30 @@ class _CefrBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
+        color: AppColors.onPrimaryFixed.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: AppColors.onPrimaryFixed.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             level,
-            style: const TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.headlineMedium.copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w900,
-              color: Colors.white,
+              color: AppColors.onPrimaryFixed,
             ),
           ),
           const SizedBox(width: 6),
-          Container(width: 1, height: 12, color: Colors.white.withValues(alpha: 0.5)),
+          Container(width: 1, height: 12, color: AppColors.onPrimaryFixed.withValues(alpha: 0.5)),
           const SizedBox(width: 6),
           Text(
             label,
-            style: const TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.headlineMedium.copyWith(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: Colors.white,
+              color: AppColors.onPrimaryFixed,
             ),
           ),
         ],
@@ -253,7 +251,7 @@ class _Divider extends StatelessWidget {
     return Container(
       width: 1,
       height: 36,
-      color: Colors.white.withValues(alpha: 0.3),
+      color: AppColors.onPrimaryFixed.withValues(alpha: 0.3),
     );
   }
 }
@@ -271,13 +269,13 @@ class _StatItem extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: Colors.white.withValues(alpha: 0.9), size: 16),
+            Icon(icon, color: AppColors.onPrimaryFixed.withValues(alpha: 0.9), size: 16),
             const SizedBox(width: 4),
             Text(
               value,
               style: AppTypography.displayLarge.copyWith(
                 fontSize: 18,
-                color: Colors.white,
+                color: AppColors.onPrimaryFixed,
               ),
             ),
           ],
@@ -285,11 +283,10 @@ class _StatItem extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.labelXSmall.copyWith(
             fontSize: 9,
             fontWeight: FontWeight.w600,
-            color: Colors.white.withValues(alpha: 0.7),
+            color: AppColors.onPrimaryFixed.withValues(alpha: 0.7),
           ),
         ),
       ],

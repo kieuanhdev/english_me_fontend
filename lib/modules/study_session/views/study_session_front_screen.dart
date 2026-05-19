@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/data/models/flashcard_model.dart';
+import 'package:englishme/core/widgets/api_state_view.dart';
+import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class StudySessionFrontScreen extends GetView<StudySessionController> {
   const StudySessionFrontScreen({super.key});
+
+  ApiState _mapState(StudySessionController c) {
+    if (c.isLoading.value) return ApiState.loading;
+    if (c.errorMessage.isNotEmpty) return ApiState.error;
+    if (c.cards.isEmpty) return ApiState.empty;
+    return ApiState.success;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,58 +22,46 @@ class StudySessionFrontScreen extends GetView<StudySessionController> {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Obx(() {
-          if (controller.isLoading.value) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (controller.errorMessage.isNotEmpty) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(controller.errorMessage.value),
-                  AppGap.h16,
-                  ElevatedButton(
-                    onPressed: controller.retryLoad,
-                    child: const Text('Thử lại'),
-                  ),
-                ],
-              ),
-            );
-          }
-          if (controller.cards.isEmpty) {
-            return const Center(child: Text('Không có từ nào trong bộ thẻ này.'));
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _SessionAppBar(
-                title: controller.deskTitle,
-                onClose: controller.closeSession,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Obx(() => _ProgressSection(
-                      current: controller.currentIndex.value + 1,
-                      total: controller.totalCards,
-                    )),
-              ),
-              AppGap.h16,
-              Expanded(
-                child: Padding(
+          return ApiStateView(
+            state: _mapState(controller),
+            errorMessage: controller.errorMessage.value.isEmpty
+                ? null
+                : controller.errorMessage.value,
+            emptyMessage: 'Không có từ nào để học trong bộ thẻ này.',
+            emptyIcon: Icons.style_outlined,
+            onRetry: controller.retryLoad,
+            builder: (_) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _SessionAppBar(
+                  title: controller.deskTitle,
+                  onClose: controller.closeSession,
+                ),
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Obx(() => _FlashcardFront(
-                        card: controller.currentCard,
-                        onFlip: controller.flipCard,
-                        onSpeak: controller.speak,
+                  child: Obx(() => _ProgressSection(
+                        current: controller.currentIndex.value + 1,
+                        total: controller.totalCards,
                       )),
                 ),
-              ),
-              AppGap.h16,
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Obx(() => _TopicTip(topic: controller.currentCard.topic)),
-              ),
-            ],
+                AppGap.h16,
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Obx(() => _FlashcardFront(
+                          card: controller.currentCard,
+                          onFlip: controller.flipCard,
+                          onSpeak: controller.speak,
+                        )),
+                  ),
+                ),
+                AppGap.h16,
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: Obx(() => _TopicTip(topic: controller.currentCard.topic)),
+                ),
+              ],
+            ),
           );
         }),
       ),
@@ -129,8 +125,7 @@ class _ProgressSection extends StatelessWidget {
             RichText(
               text: TextSpan(
                 text: '$current',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.displayLarge.copyWith(
                   fontSize: 20,
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -138,8 +133,7 @@ class _ProgressSection extends StatelessWidget {
                 children: [
                   TextSpan(
                     text: '/$total',
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       color: AppColors.iconMuted,
@@ -161,18 +155,18 @@ class _ProgressSection extends StatelessWidget {
         ),
         AppGap.h8,
         ClipRRect(
-          borderRadius: BorderRadius.circular(99),
+          borderRadius: BorderRadius.circular(AppRadius.pill),
           child: SizedBox(
             height: 8,
             child: Stack(
               children: [
-                Container(color: const Color(0xFFC9CFFD)),
+                Container(color: AppColors.progressTrack),
                 FractionallySizedBox(
                   widthFactor: progress,
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF854d00), Color(0xFFD4761A)],
+                        colors: [AppColors.accentWarm, Color(0xFFD4761A)],
                       ),
                     ),
                   ),
@@ -205,9 +199,9 @@ class _FlashcardFront extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(color: Color(0x0A1A1C1C), blurRadius: 32, offset: Offset(0, 8)),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        boxShadow: [
+          BoxShadow(color: AppColors.shadowSoft, blurRadius: 32, offset: Offset(0, 8)),
         ],
       ),
       child: Padding(
@@ -218,12 +212,11 @@ class _FlashcardFront extends StatelessWidget {
             // Word area
             Column(
               children: [
-                const Icon(Icons.menu_book_rounded, size: 32, color: Color(0xFF643900)),
+                Icon(Icons.menu_book_rounded, size: 32, color: AppColors.levelCFg),
                 AppGap.h20,
                 Text(
                   card.word,
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.displayLarge.copyWith(
                     fontSize: 52,
                     fontWeight: FontWeight.w800,
                     color: AppColors.primary,
@@ -240,7 +233,7 @@ class _FlashcardFront extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceContainerLow,
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(AppRadius.sm),
                         ),
                         child: Text(
                           posLabel,
@@ -292,22 +285,21 @@ class _FlashcardFront extends StatelessWidget {
                     height: 58,
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'Lật thẻ',
-                          style: TextStyle(
-                            fontFamily: 'BeVietnamPro',
+                          style: AppTypography.headlineMedium.copyWith(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.onPrimaryFixed,
                           ),
                         ),
                         AppGap.w8,
-                        const Icon(Icons.refresh_rounded, color: Colors.white, size: 20),
+                        Icon(Icons.refresh_rounded, color: AppColors.onPrimaryFixed, size: 20),
                       ],
                     ),
                   ),
@@ -343,9 +335,9 @@ class _TopicTip extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: const [
-          BoxShadow(color: Color(0x061A1C1C), blurRadius: 8, offset: Offset(0, 2)),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        boxShadow: [
+          BoxShadow(color: AppColors.shadowSoft, blurRadius: 8, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -366,8 +358,7 @@ class _TopicTip extends StatelessWidget {
               children: [
                 Text(
                   'Chủ đề',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary,

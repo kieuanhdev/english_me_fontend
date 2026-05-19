@@ -24,16 +24,15 @@ class SessionSummaryScreen extends StatelessWidget {
               height: 58,
               decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
               ),
               alignment: Alignment.center,
-              child: const Text(
+              child: Text(
                 'Hoàn thành',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
+                style: AppTypography.headlineMedium.copyWith(
                   fontSize: 17,
                   fontWeight: FontWeight.w700,
-                  color: Colors.white,
+                  color: AppColors.onPrimaryFixed,
                 ),
               ),
             ),
@@ -83,21 +82,25 @@ class SessionSummaryScreen extends StatelessWidget {
                         AppGap.h24,
                         // Donut + legend
                         _DonutCard(
-                          mastered: controller.masteredCount.value,
+                          mastered: controller.summary.value?.masteredCards ??
+                              controller.masteredCount.value,
                           remember: controller.rememberCount.value,
-                          vague: controller.vagueCount.value,
-                          forget: controller.forgetCount.value,
+                          vague: controller.summary.value?.hardCards ??
+                              controller.vagueCount.value,
+                          forget: controller.summary.value?.againCards ??
+                              controller.forgetCount.value,
                           total: controller.totalReviewed,
                         ),
                         AppGap.h16,
-                        // Streak card
-                        _StreakCard(days: controller.streakDays.value),
+                        // New words card
+                        _NewWordsCard(
+                          count: controller.summary.value?.newWordsLearned ?? 0,
+                        ),
                         AppGap.h12,
                         // XP card
                         _XpCard(
-                          xp: controller.xpEarned.value,
-                          level: controller.currentLevel.value,
-                          progress: controller.xpProgress.value,
+                          xp: controller.summary.value?.xpEarned ??
+                              controller.sessionXp.value,
                         ),
                         AppGap.h32,
                       ],
@@ -123,15 +126,14 @@ class _CelebrationHeader extends StatelessWidget {
           height: 68,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: const Color(0xFFFFDCBE).withValues(alpha: 0.6),
+            color: AppColors.levelCBg.withValues(alpha: 0.6),
           ),
-          child: const Icon(Icons.celebration_rounded, size: 34, color: Color(0xFF854d00)),
+          child: Icon(Icons.celebration_rounded, size: 34, color: AppColors.accentWarm),
         ),
         AppGap.h16,
         Text(
           'Tuyệt vời!',
-          style: TextStyle(
-            fontFamily: 'BeVietnamPro',
+          style: AppTypography.displayLarge.copyWith(
             fontSize: 28,
             fontWeight: FontWeight.w800,
             color: AppColors.primary,
@@ -173,7 +175,7 @@ class _DonutCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         children: [
@@ -195,9 +197,9 @@ class _DonutCard extends StatelessWidget {
                     ],
                     colors: [
                       AppColors.primary,
-                      const Color(0xFF854d00),
+                      AppColors.accentWarm,
                       const Color(0xFF565C84),
-                      const Color(0xFF9EA8B3),
+                      AppColors.iconMuted,
                     ],
                     empty: total == 0,
                   ),
@@ -207,8 +209,7 @@ class _DonutCard extends StatelessWidget {
                   children: [
                     Text(
                       '$total',
-                      style: TextStyle(
-                        fontFamily: 'BeVietnamPro',
+                      style: AppTypography.displayLarge.copyWith(
                         fontSize: 40,
                         fontWeight: FontWeight.w800,
                         color: AppColors.primary,
@@ -234,7 +235,7 @@ class _DonutCard extends StatelessWidget {
             children: [
               _LegendTile(color: AppColors.primary, label: 'MASTERED', count: mastered),
               AppGap.w12,
-              _LegendTile(color: const Color(0xFF854d00), label: 'REMEMBER', count: remember),
+              _LegendTile(color: AppColors.accentWarm, label: 'REMEMBER', count: remember),
             ],
           ),
           AppGap.h12,
@@ -271,7 +272,7 @@ class _DonutPainter extends CustomPainter {
     canvas.drawArc(
       rect, 0, math.pi * 2, false,
       Paint()
-        ..color = const Color(0xFFE2E2E2)
+        ..color = AppColors.surfaceContainerHigh
         ..style = PaintingStyle.stroke
         ..strokeWidth = stroke,
     );
@@ -318,14 +319,14 @@ class _LegendTile extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
         child: Row(
           children: [
             Container(
               width: 5,
               height: 34,
-              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(99)),
+              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppRadius.pill)),
             ),
             AppGap.w12,
             Column(
@@ -342,8 +343,7 @@ class _LegendTile extends StatelessWidget {
                 ),
                 Text(
                   '$count',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.displayLarge.copyWith(
                     fontSize: 22,
                     fontWeight: FontWeight.w800,
                     color: AppColors.onSurface,
@@ -358,11 +358,11 @@ class _LegendTile extends StatelessWidget {
   }
 }
 
-// ─── Streak Card ──────────────────────────────────────────────────────────────
+// ─── New Words Card ───────────────────────────────────────────────────────────
 
-class _StreakCard extends StatelessWidget {
-  const _StreakCard({required this.days});
-  final int days;
+class _NewWordsCard extends StatelessWidget {
+  const _NewWordsCard({required this.count});
+  final int count;
 
   @override
   Widget build(BuildContext context) {
@@ -370,8 +370,8 @@ class _StreakCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [BoxShadow(color: Color(0x061A1C1C), blurRadius: 12, offset: Offset(0, 3))],
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        boxShadow: [BoxShadow(color: AppColors.shadowSoft, blurRadius: 12, offset: Offset(0, 3))],
       ),
       child: Row(
         children: [
@@ -379,10 +379,10 @@ class _StreakCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              color: const Color(0xFFFFDCBE).withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              color: AppColors.levelCBg.withValues(alpha: 0.5),
             ),
-            child: const Icon(Icons.local_fire_department_rounded, color: Color(0xFF854d00), size: 26),
+            child: Icon(Icons.auto_awesome_rounded, color: AppColors.accentWarm, size: 26),
           ),
           AppGap.w16,
           Expanded(
@@ -390,9 +390,8 @@ class _StreakCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Chuỗi $days ngày',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  'Từ mới hôm nay',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.onSurface,
@@ -400,19 +399,18 @@ class _StreakCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Bạn đang giữ phong độ rất tốt!',
+                  'Số từ lần đầu bạn ôn trong session này.',
                   style: AppTypography.bodyLarge.copyWith(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
-          const Text(
-            '+1',
-            style: TextStyle(
-              fontFamily: 'BeVietnamPro',
+          Text(
+            '+$count',
+            style: AppTypography.displayLarge.copyWith(
               fontSize: 26,
               fontWeight: FontWeight.w900,
-              color: Color(0xFF854d00),
+              color: AppColors.accentWarm,
             ),
           ),
         ],
@@ -424,9 +422,8 @@ class _StreakCard extends StatelessWidget {
 // ─── XP Card ─────────────────────────────────────────────────────────────────
 
 class _XpCard extends StatelessWidget {
-  const _XpCard({required this.xp, required this.level, required this.progress});
-  final int xp, level;
-  final double progress;
+  const _XpCard({required this.xp});
+  final int xp;
 
   @override
   Widget build(BuildContext context) {
@@ -434,9 +431,9 @@ class _XpCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         border: Border.all(color: AppColors.primary.withValues(alpha: 0.07), width: 1.5),
-        boxShadow: const [BoxShadow(color: Color(0x061A1C1C), blurRadius: 12, offset: Offset(0, 3))],
+        boxShadow: [BoxShadow(color: AppColors.shadowSoft, blurRadius: 12, offset: Offset(0, 3))],
       ),
       child: Row(
         children: [
@@ -444,7 +441,7 @@ class _XpCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
               color: AppColors.secondaryContainer.withValues(alpha: 0.45),
             ),
             child: Icon(Icons.military_tech_rounded, color: AppColors.primary, size: 26),
@@ -455,58 +452,29 @@ class _XpCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kinh nghiệm',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  'Kinh nghiệm session',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.onSurface,
                   ),
                 ),
-                AppGap.h8,
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(99),
-                  child: SizedBox(
-                    height: 6,
-                    child: Stack(
-                      children: [
-                        Container(color: AppColors.surfaceContainerHigh),
-                        FractionallySizedBox(
-                          widthFactor: progress.clamp(0.0, 1.0),
-                          child: Container(
-                            decoration: BoxDecoration(gradient: AppColors.primaryGradient),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                const SizedBox(height: 3),
+                Text(
+                  'XP cộng từ SM-2 (quality 5: +3, q∈{3,4}: +2).',
+                  style: AppTypography.bodyLarge.copyWith(fontSize: 12, color: AppColors.textSecondary),
                 ),
               ],
             ),
           ),
           AppGap.w16,
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                '+$xp XP',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
-                  fontSize: 22,
-                  fontWeight: FontWeight.w900,
-                  color: AppColors.primary,
-                ),
-              ),
-              Text(
-                'LEVEL $level',
-                style: AppTypography.bodyLarge.copyWith(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.2,
-                  color: AppColors.iconMuted,
-                ),
-              ),
-            ],
+          Text(
+            '+$xp XP',
+            style: AppTypography.displayLarge.copyWith(
+              fontSize: 22,
+              fontWeight: FontWeight.w900,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),

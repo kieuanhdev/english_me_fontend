@@ -3,8 +3,9 @@ import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
-import 'package:englishme/data/models/flashcard_model.dart';
+import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
 import 'package:englishme/modules/deck_prep/controllers/deck_prep_controller.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 const Color _kOnSurfaceVariant = Color(0xFF454652);
@@ -46,11 +47,11 @@ class DeckPrepScreen extends StatelessWidget {
               if (v == 'delete') c.confirmDeleteThisDesk();
             },
             itemBuilder: (context) => [
-              const PopupMenuItem(value: 'edit', child: Text('Sửa bộ thẻ')),
+              PopupMenuItem(value: 'edit', child: Text(T.deckEditDeck.tr)),
               PopupMenuItem(
                 value: 'delete',
                 child: Text(
-                  'Xóa bộ thẻ',
+                  T.deckDeleteDeck.tr,
                   style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
                 ),
               ),
@@ -122,7 +123,7 @@ class _ErrorState extends StatelessWidget {
             ),
             AppGap.h16,
             AppButton(
-              label: 'Thử lại',
+              label: T.actionRetry.tr,
               onPressed: onRetry,
               variant: AppButtonVariant.primary,
               isTranslate: false,
@@ -142,13 +143,13 @@ class _DeckHeader extends StatelessWidget {
   String _levelLabel(String cefr) {
     final u = cefr.toUpperCase();
     return switch (u) {
-      'A1' => 'Trình độ A1 (Cơ bản)',
-      'A2' => 'Trình độ A2 (Tiền trung cấp)',
-      'B1' => 'Trình độ B1 (Trung cấp)',
-      'B2' => 'Trình độ B2 (Trung cấp cao)',
-      'C1' => 'Trình độ C1 (Cao cấp)',
-      'C2' => 'Trình độ C2 (Thành thạo)',
-      _ => 'Trình độ $cefr',
+      'A1' => T.deckLevelA1.tr,
+      'A2' => T.deckLevelA2.tr,
+      'B1' => T.deckLevelB1.tr,
+      'B2' => T.deckLevelB2.tr,
+      'C1' => T.deckLevelC1.tr,
+      'C2' => T.deckLevelC2.tr,
+      _ => T.deckLevelUnknown.trParams({'level': cefr}),
     };
   }
 
@@ -163,7 +164,7 @@ class _DeckHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'BỘ TỪ VỰNG',
+                T.deckVocabSet.tr,
                 style: AppTypography.bodyLarge.copyWith(
                   fontSize: 12,
                   fontWeight: FontWeight.w800,
@@ -183,7 +184,7 @@ class _DeckHeader extends StatelessWidget {
               AppGap.h6,
               Obx(
                 () => Text(
-                  '${controller.cardCount} thẻ • ${_levelLabel(desk.cefrLevel)}',
+                  '${T.deckCardCountLabel.trParams({'count': controller.cardCount.toString()})} • ${_levelLabel(desk.cefrLevel)}',
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -198,7 +199,7 @@ class _DeckHeader extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: AppColors.surfaceContainerLow,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -234,10 +235,10 @@ class _WeeklyMasteryCard extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x08000000),
+            color: AppColors.shadowSoft,
             blurRadius: 24,
             offset: Offset(0, 12),
           ),
@@ -250,7 +251,7 @@ class _WeeklyMasteryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Tiến độ tuần',
+                T.deckProgressWeek.tr,
                 style: AppTypography.displayLarge.copyWith(fontSize: 17),
               ),
               Text(
@@ -264,7 +265,7 @@ class _WeeklyMasteryCard extends StatelessWidget {
           ),
           AppGap.h14,
           ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             child: SizedBox(
               height: 10,
               width: double.infinity,
@@ -289,7 +290,7 @@ class _WeeklyMasteryCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                '${controller.newCardsCount} thẻ mới',
+                T.deckNewCardsCount.trParams({'count': controller.newCardsCount.toString()}),
                 style: AppTypography.bodyLarge.copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -298,7 +299,7 @@ class _WeeklyMasteryCard extends StatelessWidget {
                 ),
               ),
               Text(
-                '${controller.masteredCardsCount} đã thuộc',
+                T.deckMasteredCardsCount.trParams({'count': controller.masteredCardsCount.toString()}),
                 style: AppTypography.bodyLarge.copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
@@ -328,23 +329,23 @@ class _PrimaryActions extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: controller.startStudySession,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
             child: Ink(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
                 gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(AppRadius.xxl),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Bắt đầu phiên học',
+                    T.actionStartSession.tr,
                     style: AppTypography.bodyLarge.copyWith(
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
+                      color: AppColors.onPrimaryFixed,
                     ),
                   ),
                 ],
@@ -354,7 +355,7 @@ class _PrimaryActions extends StatelessWidget {
         ),
         AppGap.h12,
         AppButton(
-          label: 'Thêm thẻ mới',
+          label: T.actionAddCard.tr,
           onPressed: controller.onAddCard,
           variant: AppButtonVariant.secondary,
           height: 56,
@@ -375,7 +376,7 @@ class _InventoryHeader extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          'Danh sách thẻ',
+          T.deckCardList.tr,
           style: AppTypography.displayLarge.copyWith(
             fontSize: 20,
             color: AppColors.primary,
@@ -386,7 +387,7 @@ class _InventoryHeader extends StatelessWidget {
             Icon(Icons.sort_rounded, size: 20, color: AppColors.textSecondary),
             const SizedBox(width: 4),
             Text(
-              'Mới nhất',
+              T.deckNewest.tr,
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 13,
                 fontWeight: FontWeight.w800,
@@ -417,7 +418,7 @@ class _InventoryWordCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         boxShadow: [
           BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
         ],
@@ -510,7 +511,7 @@ class _EmptyPreview extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 24),
       child: Center(
         child: Text(
-          'Chưa có thẻ trong bộ này.',
+          T.deckEmptyCards.tr,
           style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
         ),
       ),

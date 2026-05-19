@@ -62,7 +62,7 @@ class _SectionCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Column(children: children),
@@ -94,7 +94,7 @@ class _ThemeTile extends GetView<ProfileController> {
             height: 36,
             decoration: BoxDecoration(
               color: AppColors.tertiary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(Icons.palette_rounded, color: AppColors.tertiary, size: 18),
           ),
@@ -105,8 +105,7 @@ class _ThemeTile extends GetView<ProfileController> {
               children: [
                 Text(
                   'Giao diện',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.onSurface,
@@ -115,8 +114,7 @@ class _ThemeTile extends GetView<ProfileController> {
                 const SizedBox(height: 2),
                 Text(
                   'Chọn chế độ sáng hoặc tối',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 11,
                     color: AppColors.textSecondary,
                   ),
@@ -148,7 +146,7 @@ class _ThemeToggle extends StatelessWidget {
       height: 32,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
         border: Border.all(color: AppColors.outlineVariant),
       ),
       child: Row(
@@ -196,7 +194,7 @@ class _ThemeOption extends StatelessWidget {
         child: Icon(
           icon,
           size: 16,
-          color: selected ? Colors.white : AppColors.textSecondary,
+          color: selected ? AppColors.onPrimaryFixed : AppColors.textSecondary,
         ),
       ),
     );
@@ -224,7 +222,7 @@ class _SettingsTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppRadius.xl),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
@@ -234,7 +232,7 @@ class _SettingsTile extends StatelessWidget {
               height: 36,
               decoration: BoxDecoration(
                 color: iconColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(icon, color: iconColor, size: 18),
             ),
@@ -245,8 +243,7 @@ class _SettingsTile extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: titleColor ?? AppColors.onSurface,
@@ -256,8 +253,7 @@ class _SettingsTile extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       subtitle!,
-                      style: TextStyle(
-                        fontFamily: 'BeVietnamPro',
+                      style: AppTypography.headlineMedium.copyWith(
                         fontSize: 11,
                         color: AppColors.textSecondary,
                       ),

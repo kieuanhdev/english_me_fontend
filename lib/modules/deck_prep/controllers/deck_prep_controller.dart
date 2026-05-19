@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
-import 'package:englishme/data/models/desk_model.dart';
-import 'package:englishme/data/models/flashcard_model.dart';
-import 'package:englishme/data/repositories/flashcard_repository.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/flashcard/models/desk_model.dart';
+import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
 import 'package:englishme/modules/add_flashcard/controllers/add_flashcard_controller.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
+import 'package:englishme/modules/study_session/models/due_cards_response.dart';
+import 'package:englishme/modules/study_session/repositories/study_session_repository.dart';
 import 'package:englishme/modules/study_session/views/study_session_front_screen.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -19,8 +22,10 @@ class DeckPrepController extends GetxController {
   final DeskModel desk;
 
   late final FlashcardRepository _repo;
+  late final StudySessionRepository _sessionRepo;
 
   final RxList<FlashcardModel> previewCards = <FlashcardModel>[].obs;
+  final Rxn<DueCardsResponse> dueCards = Rxn();
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
 
@@ -29,26 +34,26 @@ class DeckPrepController extends GetxController {
 
   int get cardCount => desk.flashcardCount + addedSinceOpen.value;
 
-  /// Tiến độ tuần (mock — đồng bộ số thẻ với bộ; API thống kê sau sẽ thay).
+  /// Số thẻ đã đến hạn ôn (SM-2 nextReviewAt <= now) — lấy từ backend.
+  int get dueCardsCount => dueCards.value?.totalDue ?? 0;
+
+  /// Số thẻ mới chưa từng ôn — lấy từ backend.
+  int get newCardsCount => dueCards.value?.totalNew ?? 0;
+
+  int get masteredCardsCount =>
+      (cardCount - dueCardsCount - newCardsCount).clamp(0, cardCount);
+
   int get weeklyMasteryPercent {
     final n = cardCount;
     if (n <= 0) return 0;
-    final mastered = (n * 0.67).round().clamp(0, n);
-    return ((mastered / n) * 100).round();
+    return ((masteredCardsCount / n) * 100).round();
   }
-
-  int get newCardsCount {
-    final n = cardCount;
-    if (n <= 0) return 0;
-    return (n * 0.29).round().clamp(0, n);
-  }
-
-  int get masteredCardsCount => (cardCount - newCardsCount).clamp(0, cardCount);
 
   @override
   void onInit() {
     super.onInit();
     _repo = FlashcardRepository(DioClient.instance);
+    _sessionRepo = StudySessionRepository(DioClient.instance);
     _loadPreview();
   }
 
@@ -58,8 +63,14 @@ class DeckPrepController extends GetxController {
       errorMessage.value = '';
       final page = await _repo.getFlashcards(desk.id, page: 0, size: 30);
       previewCards.value = page.content;
+      // Due cards là phụ — không fail toàn flow nếu lỗi.
+      try {
+        dueCards.value = await _sessionRepo.getDueCards(desk.id);
+      } catch (_) {
+        dueCards.value = null;
+      }
     } on DioException catch (e) {
-      errorMessage.value = e.message ?? 'Lỗi kết nối';
+      errorMessage.value = e.message ?? T.errorConnection.tr;
     } finally {
       isLoading.value = false;
     }
@@ -74,7 +85,7 @@ class DeckPrepController extends GetxController {
 
   void startStudySession() {
     if (previewCards.isEmpty) {
-      Get.snackbar('Bộ thẻ trống', 'Chưa có thẻ để học.');
+      Get.snackbar(T.errorEmptyDeckForStudy.tr, T.deckEmptyForStudy.tr);
       return;
     }
     if (Get.isRegistered<StudySessionController>()) {
@@ -105,14 +116,14 @@ class DeckPrepController extends GetxController {
   Future<void> confirmDeleteThisDesk() async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: const Text('Xóa bộ thẻ?'),
-        content: Text('Toàn bộ thẻ trong "${desk.title}" sẽ bị xóa.'),
+        title: Text(T.errorDeleteDeskTitle.tr),
+        content: Text(T.errorDeleteDeskContent.trParams({'title': desk.title})),
         actions: [
-          TextButton(onPressed: () => Get.back(result: false), child: const Text('Hủy')),
+          TextButton(onPressed: () => Get.back(result: false), child: Text(T.actionCancel.tr)),
           TextButton(
             onPressed: () => Get.back(result: true),
             child: Text(
-              'Xóa',
+              T.actionDelete.tr,
               style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w800),
             ),
           ),
@@ -126,10 +137,10 @@ class DeckPrepController extends GetxController {
         await Get.find<FlashcardController>().loadDesks();
       }
       Get.until((route) => route.settings.name == AppRoutes.flashcards || route.isFirst);
-      Get.snackbar('Đã xóa', desk.title);
+      Get.snackbar(T.deckDeleted.tr, desk.title);
     } on DioException catch (e) {
       final msg = e.response?.data is Map ? (e.response!.data as Map)['message']?.toString() : null;
-      Get.snackbar('Không xóa được', msg ?? e.message ?? 'Lỗi mạng');
+      Get.snackbar(T.errorDeleteFailedTitle.tr, msg ?? e.message ?? T.errorNetwork.tr);
     }
   }
 

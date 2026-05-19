@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:englishme/data/models/desk_model.dart';
+import 'package:englishme/modules/flashcard/models/desk_model.dart';
 import 'package:englishme/modules/add_flashcard/controllers/add_flashcard_controller.dart';
 
 class AddFlashcardBinding extends Bindings {

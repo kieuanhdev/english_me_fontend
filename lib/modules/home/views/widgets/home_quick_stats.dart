@@ -11,41 +11,44 @@ class HomeQuickStats extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Obx(() => Row(
-        children: [
-          _StatCard(
-            icon: Icons.local_fire_department_rounded,
-            iconColor: const Color(0xFFFF6B35),
-            bgColor: const Color(0xFFFFF0E8),
-            value: '${controller.streakDays.value}',
-            label: 'Ngày liên tiếp',
-          ),
-          AppGap.w10,
-          _StatCard(
-            icon: Icons.bolt_rounded,
-            iconColor: AppColors.primary,
-            bgColor: AppColors.primarySoft,
-            value: '${controller.xpToday.value}',
-            label: 'XP hôm nay',
-          ),
-          AppGap.w10,
-          _StatCard(
-            icon: Icons.style_rounded,
-            iconColor: const Color(0xFF00897B),
-            bgColor: const Color(0xFFE0F2F1),
-            value: '${controller.cardsLearned.value}',
-            label: 'Thẻ đã học',
-          ),
-          AppGap.w10,
-          _StatCard(
-            icon: Icons.check_circle_rounded,
-            iconColor: const Color(0xFF6750A4),
-            bgColor: const Color(0xFFEEE8F8),
-            value: '${controller.exerciseDone.value}',
-            label: 'Bài tập',
-          ),
-        ],
-      )),
+      child: Obx(() {
+        controller.dashboard.value;
+        return Row(
+          children: [
+            _StatCard(
+              icon: Icons.local_fire_department_rounded,
+              iconColor: AppColors.statFgWarm,
+              bgColor: AppColors.statBgWarm,
+              value: '${controller.streakDays}',
+              label: 'Ngày liên tiếp',
+            ),
+            AppGap.w10,
+            _StatCard(
+              icon: Icons.bolt_rounded,
+              iconColor: AppColors.primary,
+              bgColor: AppColors.primarySoft,
+              value: '${controller.xpToday}',
+              label: 'XP hôm nay',
+            ),
+            AppGap.w10,
+            _StatCard(
+              icon: Icons.calendar_today_rounded,
+              iconColor: AppColors.statFgCool,
+              bgColor: AppColors.statBgCool,
+              value: '${controller.activeDaysThisWeek}',
+              label: 'Ngày học/tuần',
+            ),
+            AppGap.w10,
+            _StatCard(
+              icon: Icons.trending_up_rounded,
+              iconColor: const Color(0xFF6750A4),
+              bgColor: const Color(0xFFEEE8F8),
+              value: '${controller.xpWeek}',
+              label: 'XP tuần này',
+            ),
+          ],
+        );
+      }),
     );
   }
 }
@@ -72,7 +75,7 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: [
             BoxShadow(
               color: AppColors.neutralShadow,
@@ -89,7 +92,7 @@ class _StatCard extends StatelessWidget {
               height: 34,
               decoration: BoxDecoration(
                 color: bgColor,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
               child: Icon(icon, color: iconColor, size: 18),
             ),

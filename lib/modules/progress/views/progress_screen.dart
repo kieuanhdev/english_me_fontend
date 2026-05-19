@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/modules/progress/models/progress_model.dart';
@@ -8,10 +9,23 @@ import 'package:englishme/modules/progress/views/widgets/skill_radar.dart';
 import 'package:englishme/modules/progress/views/widgets/streak_calendar.dart';
 import 'package:englishme/modules/progress/views/widgets/weekly_summary_card.dart';
 import 'package:englishme/modules/progress/views/widgets/xp_chart.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class ProgressScreen extends GetView<ProgressController> {
   const ProgressScreen({super.key});
+
+  ApiState _mapState(ProgressLoadState s, ProgressController c) {
+    switch (s) {
+      case ProgressLoadState.idle:
+      case ProgressLoadState.loading:
+        return ApiState.loading;
+      case ProgressLoadState.error:
+        return ApiState.error;
+      case ProgressLoadState.success:
+        return c.data.value == null ? ApiState.empty : ApiState.success;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,15 +33,14 @@ class ProgressScreen extends GetView<ProgressController> {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: Obx(() {
-          if (controller.loadState.value == ProgressLoadState.loading) {
-            return const _LoadingState();
-          }
-          if (controller.loadState.value == ProgressLoadState.error) {
-            return _ErrorState(onRetry: controller.loadProgress);
-          }
-          final data = controller.data.value;
-          if (data == null) return const SizedBox.shrink();
-          return RefreshIndicator(
+          return ApiStateView(
+            state: _mapState(controller.loadState.value, controller),
+            errorMessage: T.errorLoadProgress.tr,
+            emptyMessage: T.emptyProgress.tr,
+            onRetry: controller.loadProgress,
+            builder: (_) {
+              final data = controller.data.value!;
+              return RefreshIndicator(
             onRefresh: controller.loadProgress,
             color: AppColors.primary,
             child: SingleChildScrollView(
@@ -36,10 +49,10 @@ class ProgressScreen extends GetView<ProgressController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const AppMainAppBar(title: 'Tiến trình'),
+                  AppMainAppBar(title: T.navProgress.tr),
                   AppGap.h6,
                   Text(
-                    'Theo dõi hành trình học tiếng Anh của bạn',
+                    T.progressSubtitle.tr,
                     style: AppTypography.bodyLarge.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -69,6 +82,8 @@ class ProgressScreen extends GetView<ProgressController> {
                 ],
               ),
             ),
+          );
+            },
           );
         }),
       ),
@@ -107,18 +122,15 @@ class _LevelCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         children: [
           Text(
-            'Trình độ hiện tại',
-            style: TextStyle(
-              fontFamily: 'BeVietnamPro',
-              fontSize: 10,
+            T.progressCurrentLevel.tr,
+            style: AppTypography.labelXSmall.copyWith(
               fontWeight: FontWeight.w800,
               letterSpacing: 1.0,
-              color: AppColors.textSecondary,
             ),
           ),
           AppGap.h10,
@@ -146,15 +158,14 @@ class _LevelCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               gradient: AppColors.primaryGradient,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
             ),
             child: Text(
               data.cefrLabel,
-              style: const TextStyle(
-                fontFamily: 'BeVietnamPro',
+              style: AppTypography.labelXSmall.copyWith(
                 fontSize: 9,
                 fontWeight: FontWeight.w800,
-                color: Colors.white,
+                color: AppColors.onPrimaryFixed,
                 letterSpacing: 0.5,
               ),
             ),
@@ -179,7 +190,7 @@ class _XpTodayCard extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,10 +200,8 @@ class _XpTodayCard extends StatelessWidget {
               Icon(Icons.bolt_rounded, color: AppColors.tertiaryFixedDim, size: 18),
               const SizedBox(width: 4),
               Text(
-                'XP hôm nay',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
-                  fontSize: 12,
+                T.progressXpToday.tr,
+                style: AppTypography.labelSmall.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.tertiary,
                 ),
@@ -222,7 +231,7 @@ class _XpTodayCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 8,
@@ -233,13 +242,8 @@ class _XpTodayCard extends StatelessWidget {
           ),
           AppGap.h8,
           Text(
-            'Tổng: ${data.totalXp} XP',
-            style: TextStyle(
-              fontFamily: 'BeVietnamPro',
-              fontSize: 10,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textSecondary,
-            ),
+            T.progressTotalXp.tr.replaceAll('@xp', '${data.totalXp}'),
+            style: AppTypography.labelXSmall.copyWith(),
           ),
         ],
       ),
@@ -266,25 +270,25 @@ class _NextLevelCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: AppColors.primaryGradient,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            isMax ? 'Bạn đã đạt trình độ cao nhất!' : 'Sẵn sàng lên $next?',
+            isMax ? T.progressMaxLevel.tr : T.progressReadyFor.tr.replaceAll('@next', next),
             style: AppTypography.displayLarge.copyWith(
               fontSize: 22,
-              color: Colors.white,
+              color: AppColors.onPrimaryFixed,
             ),
           ),
           AppGap.h6,
           Text(
             isMax
-                ? 'Tiếp tục duy trì và ôn luyện để giữ vững trình độ C2.'
-                : 'Hoàn thành thêm bài tập phát âm và từ vựng để nâng cấp trình độ CEFR của bạn.',
+                ? T.progressMaxLevelDesc.tr
+                : T.progressPromoteDesc.tr,
             style: AppTypography.bodyLarge.copyWith(
-              color: Colors.white.withValues(alpha: 0.85),
+              color: AppColors.onPrimaryFixed.withValues(alpha: 0.85),
               fontSize: 13,
             ),
           ),
@@ -294,14 +298,12 @@ class _NextLevelCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.onPrimaryFixed,
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Text(
-                isMax ? 'Ôn luyện ngay' : 'Bắt đầu luyện tập',
-                style: TextStyle(
-                  fontFamily: 'BeVietnamPro',
-                  fontSize: 13,
+                isMax ? T.progressKeepLearning.tr : T.progressStartPractice.tr,
+                style: AppTypography.bodySmall.copyWith(
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
                 ),
@@ -314,78 +316,3 @@ class _NextLevelCard extends StatelessWidget {
   }
 }
 
-// ─── States ───────────────────────────────────────────────────────────────────
-
-class _LoadingState extends StatelessWidget {
-  const _LoadingState();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircularProgressIndicator(color: AppColors.primary),
-          AppGap.h16,
-          Text(
-            'Đang tải tiến trình...',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorState extends StatelessWidget {
-  const _ErrorState({required this.onRetry});
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.signal_wifi_off_rounded,
-                size: 56, color: AppColors.textSecondary),
-            AppGap.h16,
-            Text(
-              'Không thể tải dữ liệu',
-              style: AppTypography.headlineMedium
-                  .copyWith(color: AppColors.onSurface),
-            ),
-            AppGap.h8,
-            Text(
-              'Kiểm tra kết nối mạng và thử lại.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-            ),
-            AppGap.h20,
-            GestureDetector(
-              onTap: onRetry,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: const Text(
-                  'Thử lại',
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/home/controllers/home_controller.dart';
+import 'package:englishme/modules/home/models/home_dashboard_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class HomeRecommendations extends GetView<HomeController> {
@@ -9,84 +10,107 @@ class HomeRecommendations extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Obx(() => Text(
-            'Gợi ý cho cấp độ ${controller.userLevel.value}',
-            style: AppTypography.displayLarge.copyWith(fontSize: 17),
-          )),
-        ),
-        AppGap.h12,
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Obx(() {
-            final items = controller.recommendations;
-            return Column(
-              children: [
-                // Row 1: wide card full width
-                _RecommendCard(
-                  item: items[0],
-                  onTap: () => controller.onRecommendTap(items[0]),
-                ),
-                AppGap.h12,
-                // Row 2: two small cards side by side
-                Row(
-                  children: [
-                    Expanded(
-                      child: _RecommendCard(
-                        item: items[1],
-                        onTap: () => controller.onRecommendTap(items[1]),
-                      ),
-                    ),
-                    AppGap.w12,
-                    Expanded(
-                      child: _RecommendCard(
-                        item: items[2],
-                        onTap: () => controller.onRecommendTap(items[2]),
-                      ),
-                    ),
-                  ],
-                ),
-                AppGap.h12,
-                // Row 3: AI chat card full width horizontal
-                _RecommendCardHorizontal(
-                  item: items[3],
-                  onTap: () => controller.onRecommendTap(items[3]),
-                ),
-              ],
-            );
-          }),
-        ),
-      ],
+    return Obx(() {
+      final items = controller.recommendations;
+      if (items.isEmpty) return const SizedBox.shrink();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Text(
+              'Gợi ý cho cấp độ ${controller.userLevel}',
+              style: AppTypography.displayLarge.copyWith(fontSize: 17),
+            ),
+          ),
+          AppGap.h12,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _buildGrid(items),
+          ),
+        ],
+      );
+    });
+  }
+
+  Widget _buildGrid(List<HomeRecommendation> items) {
+    if (items.length == 1) {
+      return _RecommendCard(
+        item: items[0],
+        onTap: () => controller.onRecommendTap(items[0]),
+      );
+    }
+
+    final rows = <Widget>[];
+    // Card đầu tiên full width
+    rows.add(
+      _RecommendCard(
+        item: items[0],
+        onTap: () => controller.onRecommendTap(items[0]),
+      ),
     );
+
+    // Các card còn lại ghép theo cặp
+    for (int i = 1; i < items.length; i += 2) {
+      rows.add(AppGap.h12);
+      if (i + 1 < items.length) {
+        rows.add(
+          Row(
+            children: [
+              Expanded(
+                child: _RecommendCard(
+                  item: items[i],
+                  onTap: () => controller.onRecommendTap(items[i]),
+                ),
+              ),
+              AppGap.w12,
+              Expanded(
+                child: _RecommendCard(
+                  item: items[i + 1],
+                  onTap: () => controller.onRecommendTap(items[i + 1]),
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        rows.add(
+          _RecommendCard(
+            item: items[i],
+            onTap: () => controller.onRecommendTap(items[i]),
+          ),
+        );
+      }
+    }
+
+    return Column(children: rows);
   }
 }
 
 class _RecommendCard extends StatelessWidget {
   const _RecommendCard({required this.item, required this.onTap});
 
-  final RecommendItem item;
+  final HomeRecommendation item;
   final VoidCallback onTap;
 
-  static IconData _iconFor(String name) => switch (name) {
-    'psychology' => Icons.psychology_rounded,
-    'quiz' => Icons.quiz_rounded,
-    'mic' => Icons.mic_rounded,
-    'smart_toy' => Icons.smart_toy_rounded,
+  static IconData _iconFor(String type) => switch (type) {
+    'vocabulary' => Icons.psychology_rounded,
+    'grammar' => Icons.menu_book_rounded,
+    'exercise' => Icons.quiz_rounded,
+    'pronunciation' => Icons.mic_rounded,
+    'flashcard' => Icons.style_rounded,
+    'test' => Icons.assignment_rounded,
     _ => Icons.star_rounded,
   };
 
+  bool get _isOrange => item.type == 'pronunciation';
+
   @override
   Widget build(BuildContext context) {
-    final Color iconColor =
-        item.isOrange ? AppColors.tertiary : AppColors.primary;
-    final Color bgColor =
-        item.isOrange
-            ? AppColors.recommendationOrangeBg
-            : AppColors.recommendationMutedBg;
+    final Color iconColor = _isOrange ? AppColors.tertiary : AppColors.primary;
+    final Color bgColor = _isOrange
+        ? AppColors.recommendationOrangeBg
+        : AppColors.recommendationMutedBg;
 
     return GestureDetector(
       onTap: onTap,
@@ -94,25 +118,25 @@ class _RecommendCard extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
         decoration: BoxDecoration(
           color: bgColor,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(_iconFor(item.icon), color: iconColor, size: 28),
+            Icon(_iconFor(item.type), color: iconColor, size: 28),
             const SizedBox(height: 28),
             Text(
               item.title,
               style: AppTypography.bodyLarge.copyWith(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: item.isOrange ? AppColors.onSurface : AppColors.primary,
+                color: _isOrange ? AppColors.onSurface : AppColors.primary,
               ),
             ),
-            if (item.subtitle.isNotEmpty) ...[
+            if (item.description.isNotEmpty) ...[
               const SizedBox(height: 2),
               Text(
-                item.subtitle,
+                item.description,
                 style: AppTypography.bodyLarge.copyWith(
                   fontSize: 11,
                   fontWeight: FontWeight.w400,
@@ -120,78 +144,6 @@ class _RecommendCard extends StatelessWidget {
                 ),
               ),
             ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _RecommendCardHorizontal extends StatelessWidget {
-  const _RecommendCardHorizontal({required this.item, required this.onTap});
-
-  final RecommendItem item;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 2)),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primarySoft,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(
-                Icons.smart_toy_rounded,
-                color: AppColors.primary,
-                size: 24,
-              ),
-            ),
-            AppGap.w12,
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item.title,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.onSurface,
-                    ),
-                  ),
-                  if (item.subtitle.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      item.subtitle,
-                      style: AppTypography.bodyLarge.copyWith(
-                        fontSize: 11,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.iconMuted,
-              size: 20,
-            ),
           ],
         ),
       ),

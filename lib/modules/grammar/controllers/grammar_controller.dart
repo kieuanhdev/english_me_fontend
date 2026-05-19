@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:englishme/data/models/grammar_models.dart';
-import 'package:englishme/data/repositories/grammar_repository.dart';
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/grammar/models/grammar_models.dart';
+import 'package:englishme/modules/grammar/repositories/grammar_repository.dart';
 import 'package:get/get.dart';
 
 class GrammarController extends GetxController {
@@ -33,7 +34,7 @@ class GrammarController extends GetxController {
         lessons.clear();
       }
     } on DioException catch (e) {
-      error.value = e.message ?? 'Không tải được chủ đề ngữ pháp';
+      error.value = e.message ?? T.errorLoadGrammar.tr;
     } finally {
       isLoadingTopics.value = false;
     }
@@ -53,10 +54,10 @@ class GrammarController extends GetxController {
       final data = await _repository.getLessonsByTopic(topicId);
       lessons.assignAll(data..sort((a, b) => a.sortOrder.compareTo(b.sortOrder)));
     } on DioException catch (e) {
-      error.value = e.message ?? 'Không tải được danh sách bài học';
+      error.value = e.message ?? T.errorLoadGrammarLessons.tr;
       lessons.clear();
     } catch (_) {
-      error.value = 'Dữ liệu bài học không hợp lệ. Vui lòng thử lại.';
+      error.value = T.errorInvalidGrammarData.tr;
       lessons.clear();
     } finally {
       isLoadingLessons.value = false;

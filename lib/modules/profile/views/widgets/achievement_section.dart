@@ -23,8 +23,7 @@ class AchievementSection extends StatelessWidget {
             const Spacer(),
             Text(
               '${badges.where((b) => b.unlocked).length}/${badges.length}',
-              style: TextStyle(
-                fontFamily: 'BeVietnamPro',
+              style: AppTypography.headlineMedium.copyWith(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textSecondary,
@@ -63,7 +62,7 @@ class _BadgeCard extends StatelessWidget {
         color: unlocked
             ? AppColors.surfaceContainerLowest
             : AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(
           color: unlocked
               ? AppColors.primary.withValues(alpha: 0.25)
@@ -77,7 +76,7 @@ class _BadgeCard extends StatelessWidget {
             badge.icon,
             style: TextStyle(
               fontSize: 30,
-              color: unlocked ? null : const Color(0x00000000),
+              color: unlocked ? null : Colors.transparent,
             ),
           ),
           AppGap.h6,
@@ -86,8 +85,7 @@ class _BadgeCard extends StatelessWidget {
             textAlign: TextAlign.center,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.headlineMedium.copyWith(
               fontSize: 10,
               fontWeight: FontWeight.w700,
               color: unlocked ? AppColors.onSurface : AppColors.textSecondary,

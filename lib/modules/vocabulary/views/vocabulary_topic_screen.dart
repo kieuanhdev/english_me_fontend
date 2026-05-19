@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/vocabulary/controllers/vocabulary_controller.dart';
 import 'package:englishme/modules/vocabulary/models/vocabulary_model.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class VocabularyTopicScreen extends GetView<VocabularyController> {
   const VocabularyTopicScreen({super.key});
+
+  ApiState _mapState(VocabScreenState s, VocabularyController c) {
+    switch (s) {
+      case VocabScreenState.idle:
+      case VocabScreenState.loading:
+        return ApiState.loading;
+      case VocabScreenState.error:
+        return ApiState.error;
+      case VocabScreenState.loaded:
+        return c.topics.isEmpty ? ApiState.empty : ApiState.success;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +36,10 @@ class VocabularyTopicScreen extends GetView<VocabularyController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const AppMainAppBar(title: 'Từ vựng'),
+                  AppMainAppBar(title: T.titleVocabulary.tr),
                   AppGap.h6,
                   Text(
-                    'Học từ vựng theo chủ đề',
+                    T.descVocabByTopic.tr,
                     style: AppTypography.bodyLarge.copyWith(
                       color: AppColors.textSecondary,
                       fontSize: 13,
@@ -37,17 +51,19 @@ class VocabularyTopicScreen extends GetView<VocabularyController> {
             AppGap.h16,
             Expanded(
               child: Obx(() {
-                if (controller.topicsState.value == VocabScreenState.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (controller.topicsState.value == VocabScreenState.error) {
-                  return _ErrorView(onRetry: controller.loadTopics);
-                }
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
-                  itemCount: controller.topics.length,
-                  separatorBuilder: (_, __) => AppGap.h12,
-                  itemBuilder: (_, i) => _TopicCard(topic: controller.topics[i]),
+                return ApiStateView(
+                  state: _mapState(controller.topicsState.value, controller),
+                  errorMessage: T.errorLoadVocabTopics.tr,
+                  emptyMessage: T.emptyVocabTopics.tr,
+                  emptyIcon: Icons.menu_book_outlined,
+                  onRetry: controller.loadTopics,
+                  builder: (_) => ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+                    itemCount: controller.topics.length,
+                    separatorBuilder: (_, _) => AppGap.h12,
+                    itemBuilder: (_, i) =>
+                        _TopicCard(topic: controller.topics[i]),
+                  ),
                 );
               }),
             ),
@@ -79,10 +95,10 @@ class _TopicCard extends GetView<VocabularyController> {
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: AppColors.outlineVariant),
-          boxShadow: const [
-            BoxShadow(color: Color(0x061A1C1C), blurRadius: 10, offset: Offset(0, 2)),
+          boxShadow: [
+            BoxShadow(color: AppColors.shadowSoft, blurRadius: 10, offset: const Offset(0, 2)),
           ],
         ),
         child: Row(
@@ -92,7 +108,7 @@ class _TopicCard extends GetView<VocabularyController> {
               height: 52,
               decoration: BoxDecoration(
                 color: _color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Center(
                 child: Text(topic.icon, style: const TextStyle(fontSize: 26)),
@@ -105,8 +121,7 @@ class _TopicCard extends GetView<VocabularyController> {
                 children: [
                   Text(
                     topic.nameEn,
-                    style: const TextStyle(
-                      fontFamily: 'BeVietnamPro',
+                    style: AppTypography.headlineMedium.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
                     ),
@@ -123,7 +138,7 @@ class _TopicCard extends GetView<VocabularyController> {
                   Row(
                     children: [
                       _Chip(
-                        label: '${topic.wordCount} từ',
+                        label: T.labelWordCount.tr.replaceAll('{count}', '${topic.wordCount}'),
                         icon: Icons.style_rounded,
                         color: _color,
                       ),
@@ -158,7 +173,7 @@ class _Chip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -167,9 +182,7 @@ class _Chip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(
-              fontFamily: 'PlusJakartaSans',
-              fontSize: 11,
+            style: AppTypography.labelXSmall.copyWith(
               fontWeight: FontWeight.w600,
               color: color,
             ),
@@ -180,25 +193,3 @@ class _Chip extends StatelessWidget {
   }
 }
 
-// ─── Error View ───────────────────────────────────────────────────────────────
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.onRetry});
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.wifi_off_rounded, size: 48, color: AppColors.iconMuted),
-          AppGap.h12,
-          Text('Không thể tải dữ liệu', style: AppTypography.bodyLarge),
-          AppGap.h12,
-          FilledButton(onPressed: onRetry, child: const Text('Thử lại')),
-        ],
-      ),
-    );
-  }
-}

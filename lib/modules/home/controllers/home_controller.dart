@@ -1,103 +1,96 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/home/models/home_dashboard_model.dart';
+import 'package:englishme/modules/home/repositories/home_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
 
+enum HomeLoadState { idle, loading, success, error }
+
 class HomeController extends GetxController {
-  // User info
-  final RxString userName = 'Kiều Anh'.obs;
-  final RxString userLevel = 'A2'.obs;
-  final RxString greetingLabel = 'Chào buổi sáng'.obs;
+  final HomeRepository _repo;
+  HomeController(this._repo);
 
-  // Daily XP progress
-  final RxInt currentXp = 35.obs;
-  final RxInt targetXp = 50.obs;
-
-  double get xpProgress => targetXp.value > 0 ? currentXp.value / targetXp.value : 0;
-
-  // Daily streak
-  final RxInt streakDays = 7.obs;
-
-  // Quick stats
-  final RxInt xpToday = 35.obs;
-  final RxInt cardsLearned = 12.obs;
-  final RxInt exerciseDone = 3.obs;
-
-  // Word of the day saved state
+  final loadState = HomeLoadState.idle.obs;
+  final Rxn<HomeDashboardResponse> dashboard = Rxn();
+  final RxString greetingLabel = T.homeGreeting.tr.obs;
   final RxBool wordSaved = false.obs;
 
-  // Continue learning card
-  final RxString lessonLevel = 'CẤP ĐỘ A2'.obs;
-  final RxString lessonTitle = 'Travel Vocabulary'.obs;
-  final RxInt lessonCurrent = 4.obs;
-  final RxInt lessonTotal = 12.obs;
-  final RxDouble lessonProgress = 0.45.obs;
-
-  // Word of the day
-  final RxString wordOfDay = 'Ethereal'.obs;
-  final RxString wordIpa = '/ɪˈθɪə.ri.əl/'.obs;
-  final RxString wordDefinitionEn = 'Extremely light and beautiful; not of this world.'.obs;
-  final RxString wordDefinitionVi = 'Thanh tao, siêu trần, không thuộc về cõi trần này.'.obs;
-
-  // Recommendations
-  final RxList<RecommendItem> recommendations = <RecommendItem>[
-    RecommendItem(
-      icon: 'psychology',
-      title: 'Luyện từ vựng',
-      subtitle: 'Chủ đề Du lịch & Công việc',
-      isWide: true,
-      isOrange: false,
-    ),
-    RecommendItem(
-      icon: 'quiz',
-      title: 'Mini Quiz: Quá khứ đơn',
-      subtitle: '',
-      isWide: false,
-      isOrange: false,
-    ),
-    RecommendItem(
-      icon: 'mic',
-      title: 'Phát âm /θ/ và /ð/',
-      subtitle: '',
-      isWide: false,
-      isOrange: true,
-    ),
-    RecommendItem(
-      icon: 'smart_toy',
-      title: 'Chat AI luyện tập',
-      subtitle: 'Phỏng vấn xin việc cơ bản',
-      isWide: true,
-      isOrange: false,
-    ),
-  ].obs;
+  static const int dailyXpTarget = 50;
 
   @override
   void onInit() {
     super.onInit();
     _updateGreeting();
+    loadDashboard();
   }
+
+  Future<void> loadDashboard() async {
+    try {
+      loadState.value = HomeLoadState.loading;
+      dashboard.value = await _repo.getDashboard();
+      loadState.value = HomeLoadState.success;
+    } catch (_) {
+      loadState.value = HomeLoadState.error;
+    }
+  }
+
+  Future<void> reloadDashboard() => loadDashboard();
+
+  // ----- User -----
+  String get userName {
+    final name = dashboard.value?.user.fullName;
+    return (name != null && name.isNotEmpty) ? name : T.homeDefaultName.tr;
+  }
+
+  String get userLevel => dashboard.value?.user.cefrLevel ?? '—';
+
+  // ----- Daily XP -----
+  int get currentXp => dashboard.value?.dailyStats.xpToday ?? 0;
+  int get targetXp => dailyXpTarget;
+  double get xpProgress => targetXp > 0 ? (currentXp / targetXp).clamp(0.0, 1.0) : 0.0;
+
+  // ----- Quick stats -----
+  int get streakDays => dashboard.value?.dailyStats.currentStreak ?? 0;
+  int get xpToday => dashboard.value?.dailyStats.xpToday ?? 0;
+  int get xpWeek => dashboard.value?.dailyStats.xpWeek ?? 0;
+  int get activeDaysThisWeek => dashboard.value?.dailyStats.activeDaysThisWeek ?? 0;
+
+  // ----- Continue learning -----
+  ContinueLearning? get continueLearning => dashboard.value?.continueLearning;
+
+  // ----- Word of day -----
+  WordOfDayDto? get wordOfDay => dashboard.value?.wordOfDay;
+
+  // ----- Recommendations -----
+  List<HomeRecommendation> get recommendations =>
+      dashboard.value?.recommendations ?? const [];
 
   void _updateGreeting() {
     final hour = DateTime.now().hour;
     if (hour < 12) {
-      greetingLabel.value = 'Chào buổi sáng';
+      greetingLabel.value = T.homeGreetingMorning.tr;
     } else if (hour < 18) {
-      greetingLabel.value = 'Chào buổi chiều';
+      greetingLabel.value = T.homeGreetingAfternoon.tr;
     } else {
-      greetingLabel.value = 'Chào buổi tối';
+      greetingLabel.value = T.homeGreetingEvening.tr;
     }
   }
 
   void onListenWordOfDay() {
-    // TODO: integrate TTS audio playback
+    // TODO: integrate TTS audio playback for wordOfDay?.word
   }
 
   void onAddWordToFlashcard() {
+    final word = wordOfDay?.word;
+    if (word == null) return;
     wordSaved.value = !wordSaved.value;
     Get.snackbar(
-      wordSaved.value ? 'Đã lưu' : 'Đã bỏ lưu',
+      wordSaved.value ? T.homeWordSaved.tr : T.homeWordUnsaved.tr,
       wordSaved.value
-          ? '"${wordOfDay.value}" đã thêm vào Flashcard'
-          : '"${wordOfDay.value}" đã xóa khỏi Flashcard',
+          ? T.homeWordAddedMsg.trParams({'word': word})
+          : T.homeWordRemovedMsg.trParams({'word': word}),
       snackPosition: SnackPosition.BOTTOM,
       duration: const Duration(seconds: 2),
       margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -110,38 +103,35 @@ class HomeController extends GetxController {
   }
 
   void onContinueLearning() {
-    Get.toNamed(AppRoutes.vocabularyList, arguments: {
-      'topicId': 'travel',
-      'topicTitle': 'Travel Vocabulary',
-    });
+    final cl = continueLearning;
+    if (cl == null) {
+      Get.toNamed(AppRoutes.vocabulary);
+      return;
+    }
+    if (cl.type == 'vocabulary' && cl.topicId != null) {
+      Get.toNamed(
+        AppRoutes.vocabularyList,
+        arguments: {'topicId': cl.topicId, 'topicTitle': cl.title ?? ''},
+      );
+      return;
+    }
+    Get.toNamed(AppRoutes.vocabulary);
   }
 
-  void onRecommendTap(RecommendItem item) {
-    switch (item.icon) {
-      case 'psychology':
+  void onRecommendTap(HomeRecommendation item) {
+    switch (item.type) {
+      case 'vocabulary':
         Get.toNamed(AppRoutes.vocabulary);
-      case 'quiz':
+      case 'grammar':
+        Get.toNamed(AppRoutes.grammar);
+      case 'exercise':
         Get.toNamed(AppRoutes.exercise);
-      case 'mic':
+      case 'pronunciation':
         Get.toNamed(AppRoutes.pronunciation);
-      case 'smart_toy':
-        Get.toNamed(AppRoutes.chatAi);
+      case 'flashcard':
+        Get.toNamed(AppRoutes.flashcards);
+      case 'test':
+        Get.toNamed(AppRoutes.test);
     }
   }
-}
-
-class RecommendItem {
-  final String icon;
-  final String title;
-  final String subtitle;
-  final bool isWide;
-  final bool isOrange;
-
-  RecommendItem({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.isWide,
-    required this.isOrange,
-  });
 }

@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import 'package:englishme/data/models/desk_model.dart';
+import 'package:englishme/modules/flashcard/models/desk_model.dart';
 import 'package:englishme/modules/create_desk/controllers/create_desk_controller.dart';
 
 class CreateDeskBinding extends Bindings {

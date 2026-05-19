@@ -1,5 +1,5 @@
 import 'package:englishme/core/network/dio_client.dart';
-import 'package:englishme/data/repositories/placement_test_repository.dart';
+import 'package:englishme/modules/placement_test/repositories/placement_test_repository.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:get/get.dart';
 

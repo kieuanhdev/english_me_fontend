@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
-import 'package:englishme/data/models/placement_test_models.dart';
+import 'package:englishme/modules/placement_test/models/placement_test_models.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:get/get.dart';
@@ -116,7 +116,7 @@ class _QuestionTopBar extends StatelessWidget {
         AppGap.w10,
         Expanded(
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppRadius.pill),
             child: SizedBox(
               height: 12,
               child: LinearProgressIndicator(
@@ -153,7 +153,7 @@ class _SkillChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.primarySoft,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
         skill,
@@ -178,7 +178,7 @@ class _PromptCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.outlineVariant, width: 2),
         boxShadow: [
           BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
@@ -235,13 +235,13 @@ class _AnswerTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppRadius.lg),
       child: Container(
         height: 74,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           border: Border.all(color: border, width: 2.5),
           boxShadow: [
             BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
@@ -254,7 +254,7 @@ class _AnswerTile extends StatelessWidget {
               height: 30,
               decoration: BoxDecoration(
                 color: AppColors.surface,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.sm),
                 border: Border.all(color: border.withValues(alpha: 0.5), width: 2),
               ),
               child: Center(
@@ -317,7 +317,7 @@ class _ResultPanel extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,7 +330,7 @@ class _ResultPanel extends StatelessWidget {
                 decoration: BoxDecoration(color: iconColor, shape: BoxShape.circle),
                 child: Icon(
                   correct ? Icons.check : Icons.close,
-                  color: Colors.white,
+                  color: AppColors.onPrimaryFixed,
                   size: 22,
                 ),
               ),
@@ -388,7 +388,7 @@ class _ContinueButton extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         boxShadow: [
           BoxShadow(color: shadowColor, offset: const Offset(0, 4)),
         ],
@@ -399,13 +399,13 @@ class _ContinueButton extends StatelessWidget {
           elevation: 0,
           shadowColor: Colors.transparent,
           backgroundColor: mainColor,
-          foregroundColor: Colors.white,
+          foregroundColor: AppColors.onPrimaryFixed,
           minimumSize: const Size.fromHeight(56),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
         ),
         child: Text(
           'TIẾP TỤC',
-          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: Colors.white),
+          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: AppColors.onPrimaryFixed),
         ),
       ),
     );

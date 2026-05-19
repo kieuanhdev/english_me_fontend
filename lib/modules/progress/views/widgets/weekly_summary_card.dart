@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/progress/models/progress_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -9,24 +10,18 @@ class WeeklySummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hours = summary.minutesStudied ~/ 60;
-    final mins = summary.minutesStudied % 60;
-    final timeLabel = hours > 0 ? '${hours}h ${mins}m' : '${mins}m';
-    final accuracyPct = (summary.accuracyRate * 100).round();
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Tóm tắt tuần này',
-            style: TextStyle(
-              fontFamily: 'BeVietnamPro',
+            style: AppTypography.headlineMedium.copyWith(
               fontSize: 15,
               fontWeight: FontWeight.w700,
               color: AppColors.onSurface,
@@ -37,44 +32,29 @@ class WeeklySummaryCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _StatCell(
-                  icon: Icons.schedule_rounded,
-                  value: timeLabel,
-                  label: 'Thời gian học',
+                  icon: Icons.bolt_rounded,
+                  value: '${summary.totalXp}',
+                  label: 'XP tuần',
                   color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _StatCell(
-                  icon: Icons.check_circle_outline_rounded,
-                  value: '${summary.exercisesCompleted}',
-                  label: 'Bài hoàn thành',
+                  icon: Icons.calendar_today_rounded,
+                  value: '${summary.activeDays}',
+                  label: 'Ngày học',
                   color: AppColors.success,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: _StatCell(
-                  icon: Icons.bar_chart_rounded,
-                  value: '$accuracyPct%',
-                  label: 'Độ chính xác',
-                  color: AppColors.tertiary,
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: _StatCell(
-                  icon: Icons.style_rounded,
-                  value: '${summary.flashcardsReviewed}',
-                  label: 'Thẻ đã ôn',
-                  color: AppColors.skillVocabulary,
-                ),
-              ),
-            ],
+          _StatCell(
+            icon: Icons.check_circle_outline_rounded,
+            value: '${summary.lessonsCompleted}',
+            label: 'Bài hoàn thành',
+            color: AppColors.tertiary,
           ),
         ],
       ),
@@ -101,7 +81,7 @@ class _StatCell extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
@@ -111,7 +91,7 @@ class _StatCell extends StatelessWidget {
             height: 36,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(icon, color: color, size: 18),
           ),
@@ -122,8 +102,7 @@ class _StatCell extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
                     color: color,
@@ -131,8 +110,7 @@ class _StatCell extends StatelessWidget {
                 ),
                 Text(
                   label,
-                  style: TextStyle(
-                    fontFamily: 'BeVietnamPro',
+                  style: AppTypography.headlineMedium.copyWith(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,

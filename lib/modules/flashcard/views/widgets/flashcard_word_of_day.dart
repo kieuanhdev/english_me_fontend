@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -15,7 +16,7 @@ class FlashcardWordOfDay extends GetView<FlashcardController> {
         padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
         decoration: BoxDecoration(
           color: AppColors.surfaceContainerLow,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
         ),
         child: Stack(
           clipBehavior: Clip.hardEdge,
@@ -80,19 +81,19 @@ class FlashcardWordOfDay extends GetView<FlashcardController> {
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
                       gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.volume_up_rounded, color: Colors.white, size: 16),
+                        Icon(Icons.volume_up_rounded, color: AppColors.onPrimaryFixed, size: 16),
                         const SizedBox(width: 8),
                         Text(
                           'Practice Now',
                           style: AppTypography.bodyLarge.copyWith(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: Colors.white,
+                            color: AppColors.onPrimaryFixed,
                           ),
                         ),
                       ],

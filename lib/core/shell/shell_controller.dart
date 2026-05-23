@@ -16,6 +16,17 @@ class ShellController extends GetxController {
   /// Dung cho sub-screen khi chuyen tab qua bottom nav.
   static void goToTab(int index) {
     ensureRegistered().switchTab(index);
-    Get.offAllNamed(AppRoutes.shell);
+    if (Get.currentRoute == AppRoutes.shell) return;
+
+    var foundShell = false;
+    Get.until((route) {
+      final isShell = route.settings.name == AppRoutes.shell;
+      if (isShell) foundShell = true;
+      return isShell || route.isFirst;
+    });
+
+    if (!foundShell && Get.currentRoute != AppRoutes.shell) {
+      Get.offAllNamed(AppRoutes.shell);
+    }
   }
 }

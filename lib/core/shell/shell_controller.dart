@@ -6,9 +6,16 @@ class ShellController extends GetxController {
 
   void switchTab(int index) => currentTab.value = index;
 
-  /// Dùng cho sub-screen khi chuyển tab qua bottom nav.
+  static ShellController ensureRegistered() {
+    if (Get.isRegistered<ShellController>()) {
+      return Get.find<ShellController>();
+    }
+    return Get.put(ShellController(), permanent: true);
+  }
+
+  /// Dung cho sub-screen khi chuyen tab qua bottom nav.
   static void goToTab(int index) {
-    Get.find<ShellController>().switchTab(index);
+    ensureRegistered().switchTab(index);
     Get.offAllNamed(AppRoutes.shell);
   }
 }

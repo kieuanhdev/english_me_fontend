@@ -67,6 +67,15 @@ class _AppBottomNavState extends State<AppBottomNav> {
     _currentIndex = widget.initialIndex;
   }
 
+  @override
+  void didUpdateWidget(covariant AppBottomNav oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialIndex != oldWidget.initialIndex &&
+        widget.initialIndex != _currentIndex) {
+      _currentIndex = widget.initialIndex;
+    }
+  }
+
   void switchTo(int index) {
     if (index == _currentIndex) return;
     setState(() => _currentIndex = index);
@@ -99,10 +108,10 @@ class _AppBottomNavState extends State<AppBottomNav> {
               active: active,
               onTap: () {
                 if (i == _currentIndex) return;
+                setState(() => _currentIndex = i);
                 if (widget.onTap != null) {
                   widget.onTap!(i, item.route);
                 } else {
-                  setState(() => _currentIndex = i);
                   Get.offAllNamed(item.route);
                 }
               },

@@ -1,4 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:englishme/core/network/api_exception.dart';
 import 'package:englishme/core/services/auth_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/auth/models/user_model.dart';
@@ -25,8 +27,8 @@ class AuthController extends GetxController {
       await _navigateAfterSync(await _repository.syncUserWithBackend(idToken));
     } on FirebaseAuthException catch (e) {
       _showFirebaseError(e);
-    } catch (_) {
-      _showError(T.authLoginFailed.tr);
+    } on DioException catch (e) {
+      _showApiError(e, fallback: T.authLoginFailed.tr);
     } finally {
       isLoading.value = false;
     }
@@ -47,8 +49,8 @@ class AuthController extends GetxController {
       await _navigateAfterSync(await _repository.syncUserWithBackend(idToken));
     } on FirebaseAuthException catch (e) {
       _showFirebaseError(e);
-    } catch (_) {
-      _showError(T.authLoginFailed.tr);
+    } on DioException catch (e) {
+      _showApiError(e, fallback: T.authLoginFailed.tr);
     } finally {
       isLoading.value = false;
     }
@@ -74,8 +76,8 @@ class AuthController extends GetxController {
       await _navigateAfterSync(await _repository.syncUserWithBackend(idToken));
     } on FirebaseAuthException catch (e) {
       _showFirebaseError(e);
-    } catch (_) {
-      _showError(T.authRegisterFailed.tr);
+    } on DioException catch (e) {
+      _showApiError(e, fallback: T.authRegisterFailed.tr);
     } finally {
       isLoading.value = false;
     }
@@ -145,6 +147,15 @@ class AuthController extends GetxController {
       _ => T.authErrorUnknown.tr,
     };
     _showError(message);
+  }
+
+  void _showApiError(DioException e, {required String fallback}) {
+    final error = e.error;
+    if (error is ApiException && error.message.isNotEmpty) {
+      _showError(error.message);
+      return;
+    }
+    _showError(e.message ?? fallback);
   }
 
   void _showError(String message) {

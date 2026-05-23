@@ -6,6 +6,9 @@ abstract class AppRoutes {
   static const register = '/register';
   static const home = '/home';
   static const learn = '/learn';
+  static const learningPathDetail = '/learn/path';
+  static const learningSkillLessons = '/learn/skills';
+  static const learningLessonDetail = '/learn/lesson';
   static const flashcards = '/learn/flashcards';
   static const grammar = '/learn/grammar';
   static const grammarLessonDetail = '/learn/grammar/lesson';

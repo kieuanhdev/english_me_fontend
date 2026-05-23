@@ -30,6 +30,11 @@ import 'package:englishme/modules/grammar/views/grammar_lesson_detail_screen.dar
 import 'package:englishme/modules/grammar/views/grammar_screen.dart';
 import 'package:englishme/modules/home/bindings/home_binding.dart';
 import 'package:englishme/modules/grammar/bindings/grammar_binding.dart';
+import 'package:englishme/modules/learn/bindings/learning_binding.dart';
+import 'package:englishme/modules/learn/views/learning_lesson_detail_screen.dart';
+import 'package:englishme/modules/learn/views/learning_path_detail_screen.dart';
+import 'package:englishme/modules/learn/views/learning_screen.dart';
+import 'package:englishme/modules/learn/views/learning_skill_lessons_screen.dart';
 import 'package:englishme/modules/placement_test/bindings/placement_test_binding.dart';
 import 'package:englishme/modules/placement_test/views/placement_intro_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_question_screen.dart';
@@ -60,6 +65,11 @@ class AppPages {
     return '';
   }
 
+  static Map<String, dynamic> _getMapArg(dynamic arguments) {
+    if (arguments is Map<String, dynamic>) return arguments;
+    return const {};
+  }
+
   static final pages = [
     GetPage(
       name: AppRoutes.splash,
@@ -69,12 +79,14 @@ class AppPages {
     GetPage(
       name: AppRoutes.shell,
       page: () => const MainShellScreen(),
-      bindings: [ShellBinding(), HomeBinding(), FlashcardBinding()],
+      bindings: [
+        ShellBinding(),
+        HomeBinding(),
+        FlashcardBinding(),
+        LearningBinding(),
+      ],
     ),
-    GetPage(
-      name: AppRoutes.welcome,
-      page: () => WelcomeScreen(),
-    ),
+    GetPage(name: AppRoutes.welcome, page: () => WelcomeScreen()),
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginScreen(),
@@ -91,15 +103,47 @@ class AppPages {
       binding: FlashcardBinding(),
     ),
     GetPage(
+      name: AppRoutes.learn,
+      page: () => const LearningScreen(),
+      binding: LearningBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.learningPathDetail,
+      page: () {
+        final args = _getMapArg(Get.arguments);
+        return LearningPathDetailScreen(
+          level: (args['level'] ?? 'A1').toString(),
+          pathId: (args['pathId'] ?? '').toString(),
+        );
+      },
+      binding: LearningBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.learningSkillLessons,
+      page: () {
+        final args = _getMapArg(Get.arguments);
+        return LearningSkillLessonsScreen(
+          level: (args['level'] ?? 'A1').toString(),
+          skill: (args['skill'] ?? 'listening').toString(),
+        );
+      },
+      binding: LearningBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.learningLessonDetail,
+      page: () =>
+          LearningLessonDetailScreen(lessonId: _getLessonIdArg(Get.arguments)),
+      binding: LearningBinding(),
+    ),
+    GetPage(
       name: AppRoutes.grammar,
       page: () => const GrammarScreen(),
       binding: GrammarBinding(),
     ),
     GetPage(
       name: AppRoutes.grammarLessonDetail,
-      page: () => GrammarLessonDetailScreen(
-        lessonId: _getLessonIdArg(Get.arguments),
-      ),
+      page: () =>
+          GrammarLessonDetailScreen(lessonId: _getLessonIdArg(Get.arguments)),
       binding: GrammarBinding(),
     ),
     GetPage(
@@ -158,10 +202,7 @@ class AppPages {
       name: AppRoutes.pronunciationResult,
       page: () => const PronunciationResultScreen(),
     ),
-    GetPage(
-      name: AppRoutes.ipa,
-      page: () => const IpaScreen(),
-    ),
+    GetPage(name: AppRoutes.ipa, page: () => const IpaScreen()),
     GetPage(
       name: AppRoutes.progress,
       page: () => const ProgressScreen(),
@@ -189,10 +230,7 @@ class AppPages {
       name: AppRoutes.testQuestion,
       page: () => const TestQuestionScreen(),
     ),
-    GetPage(
-      name: AppRoutes.testResult,
-      page: () => const TestResultScreen(),
-    ),
+    GetPage(name: AppRoutes.testResult, page: () => const TestResultScreen()),
     GetPage(
       name: AppRoutes.profile,
       page: () => const ProfileScreen(),

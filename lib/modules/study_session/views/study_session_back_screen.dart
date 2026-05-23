@@ -18,7 +18,12 @@ class StudySessionBackScreen extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-          child: _RatingGrid(onRate: controller.rateCard),
+          child: Obx(
+            () => StudySessionRatingGrid(
+              onRate: controller.rateCard,
+              isLoading: controller.isReviewing.value,
+            ),
+          ),
         ),
       ),
       body: SafeArea(
@@ -69,7 +74,7 @@ class StudySessionBackScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                child: Obx(() => _FlashcardBack(
+                child: Obx(() => StudySessionFlashcardBack(
                       card: controller.currentCard,
                       onSpeak: controller.speak,
                     )),
@@ -158,8 +163,13 @@ class _ProgressSection extends StatelessWidget {
 
 // ─── Flashcard Back ───────────────────────────────────────────────────────────
 
-class _FlashcardBack extends StatelessWidget {
-  const _FlashcardBack({required this.card, required this.onSpeak});
+class StudySessionFlashcardBack extends StatelessWidget {
+  const StudySessionFlashcardBack({
+    super.key,
+    required this.card,
+    required this.onSpeak,
+  });
+
   final FlashcardModel card;
   final VoidCallback onSpeak;
 
@@ -359,9 +369,15 @@ class _FlashcardBack extends StatelessWidget {
 
 // ─── Rating Grid ─────────────────────────────────────────────────────────────
 
-class _RatingGrid extends StatelessWidget {
-  const _RatingGrid({required this.onRate});
+class StudySessionRatingGrid extends StatelessWidget {
+  const StudySessionRatingGrid({
+    super.key,
+    required this.onRate,
+    this.isLoading = false,
+  });
+
   final void Function(CardRating) onRate;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -373,7 +389,7 @@ class _RatingGrid extends StatelessWidget {
           score: '(0)',
           bg: AppColors.surfaceContainerHigh,
           fg: AppColors.iconMuted,
-          onTap: () => onRate(CardRating.forget),
+          onTap: isLoading ? null : () => onRate(CardRating.forget),
         ),
         AppGap.w8,
         _RatingBtn(
@@ -382,7 +398,7 @@ class _RatingGrid extends StatelessWidget {
           score: '(2)',
           bg: const Color(0xFFF5EDE4),
           fg: AppColors.accentWarm,
-          onTap: () => onRate(CardRating.vague),
+          onTap: isLoading ? null : () => onRate(CardRating.vague),
         ),
         AppGap.w8,
         _RatingBtn(
@@ -391,7 +407,7 @@ class _RatingGrid extends StatelessWidget {
           score: '(3)',
           bg: const Color(0xFFEEF0FF),
           fg: AppColors.primaryContainer,
-          onTap: () => onRate(CardRating.remember),
+          onTap: isLoading ? null : () => onRate(CardRating.remember),
         ),
         AppGap.w8,
         _RatingBtn(
@@ -401,7 +417,7 @@ class _RatingGrid extends StatelessWidget {
           bg: AppColors.primary,
           fg: AppColors.onPrimaryFixed,
           shadow: true,
-          onTap: () => onRate(CardRating.mastered),
+          onTap: isLoading ? null : () => onRate(CardRating.mastered),
         ),
       ],
     );
@@ -424,7 +440,7 @@ class _RatingBtn extends StatelessWidget {
   final String score;
   final Color bg;
   final Color fg;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool shadow;
 
   @override
@@ -432,23 +448,47 @@ class _RatingBtn extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: bg,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            boxShadow: shadow
-                ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))]
-                : null,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, color: fg, size: 28),
-              const SizedBox(height: 6),
-              Text(label, style: AppTypography.headlineMedium.copyWith(fontSize: 10, fontWeight: FontWeight.w800, color: fg, letterSpacing: 0.5)),
-              Text(score, style: AppTypography.headlineMedium.copyWith(fontSize: 13, fontWeight: FontWeight.w800, color: fg)),
-            ],
+        child: Opacity(
+          opacity: onTap == null ? 0.55 : 1,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              boxShadow: shadow
+                  ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: fg, size: 28),
+                const SizedBox(height: 6),
+                Text(
+                  label,
+                  style: AppTypography.headlineMedium.copyWith(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    color: fg,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Text(
+                  score,
+                  style: AppTypography.headlineMedium.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: fg,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

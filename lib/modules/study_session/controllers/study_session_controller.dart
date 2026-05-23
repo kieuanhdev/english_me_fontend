@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 
+import 'package:englishme/core/network/api_exception.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
@@ -10,7 +12,6 @@ import 'package:englishme/modules/study_session/models/review_response.dart';
 import 'package:englishme/modules/study_session/models/study_session_summary.dart';
 import 'package:englishme/modules/study_session/repositories/study_session_repository.dart';
 import 'package:englishme/modules/study_session/views/session_summary_screen.dart';
-import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
 import 'package:englishme/routes/app_routes.dart';
 
 enum CardRating { forget, vague, remember, mastered }
@@ -43,6 +44,8 @@ class StudySessionController extends GetxController {
 
   final RxList<FlashcardModel> cards = <FlashcardModel>[].obs;
   final RxInt currentIndex = 0.obs;
+  final RxBool isCardFlipped = false.obs;
+  final RxBool isReviewing = false.obs;
 
   // Đếm cục bộ (UI hiển thị live trong khi chờ summary).
   final RxInt masteredCount = 0.obs;
@@ -81,6 +84,8 @@ class StudySessionController extends GetxController {
       _sessionId = session.sessionId;
       cards.value = session.cards;
       currentIndex.value = 0;
+      isCardFlipped.value = false;
+      isReviewing.value = false;
       masteredCount.value = 0;
       rememberCount.value = 0;
       vagueCount.value = 0;
@@ -102,30 +107,24 @@ class StudySessionController extends GetxController {
     tts.speak(card.word);
   }
 
-  void flipCard() => Get.to(
-    () => const StudySessionBackScreen(),
-    preventDuplicates: false,
-  );
+  void flipCard() => isCardFlipped.value = true;
 
   Future<void> rateCard(CardRating rating) async {
-    if (cards.isEmpty || _sessionId.isEmpty) return;
+    if (cards.isEmpty || _sessionId.isEmpty || isReviewing.value) return;
     final card = currentCard;
-
-    // Cộng đếm cục bộ ngay để UI mượt.
-    switch (rating) {
-      case CardRating.mastered:
-        masteredCount.value++;
-      case CardRating.remember:
-        rememberCount.value++;
-      case CardRating.vague:
-        vagueCount.value++;
-      case CardRating.forget:
-        forgetCount.value++;
+    if (card.id.trim().isEmpty) {
+      Get.snackbar(
+        T.errorGeneric.tr,
+        'Thiếu flashcardId cho thẻ "${card.word}". Vui lòng tải lại phiên học.',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
     }
 
     final responseTimeMs =
         DateTime.now().difference(_cardStartedAt).inMilliseconds;
     try {
+      isReviewing.value = true;
       final res = await _repo.reviewCard(
         _sessionId,
         ReviewRequest(
@@ -135,22 +134,53 @@ class StudySessionController extends GetxController {
         ),
       );
       sessionXp.value = res.sessionXp;
-    } catch (_) {
+
+      switch (rating) {
+        case CardRating.mastered:
+          masteredCount.value++;
+        case CardRating.remember:
+          rememberCount.value++;
+        case CardRating.vague:
+          vagueCount.value++;
+        case CardRating.forget:
+          forgetCount.value++;
+      }
+
+      if (currentIndex.value < cards.length - 1) {
+        currentIndex.value++;
+        isCardFlipped.value = false;
+        _cardStartedAt = DateTime.now();
+      } else {
+        await _loadSummary();
+        Get.off(() => const SessionSummaryScreen());
+      }
+    } on DioException catch (e) {
       Get.snackbar(
         T.errorGeneric.tr,
-        T.errorSyncCard.tr,
+        _reviewErrorMessage(e),
         snackPosition: SnackPosition.BOTTOM,
       );
+    } catch (e) {
+      Get.snackbar(
+        T.errorGeneric.tr,
+        e.toString(),
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isReviewing.value = false;
     }
+  }
 
-    if (currentIndex.value < cards.length - 1) {
-      currentIndex.value++;
-      _cardStartedAt = DateTime.now();
-      Get.back();
-    } else {
-      await _loadSummary();
-      Get.off(() => const SessionSummaryScreen());
+  String _reviewErrorMessage(DioException e) {
+    final error = e.error;
+    if (error is ApiException && error.message.isNotEmpty) {
+      return error.message;
     }
+    final data = e.response?.data;
+    if (data is Map && data['message'] != null) {
+      return data['message'].toString();
+    }
+    return e.message ?? T.errorSyncCard.tr;
   }
 
   Future<void> _loadSummary() async {

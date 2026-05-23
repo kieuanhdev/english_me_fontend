@@ -4,6 +4,7 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
+import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class StudySessionFrontScreen extends GetView<StudySessionController> {
@@ -20,6 +21,20 @@ class StudySessionFrontScreen extends GetView<StudySessionController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
+      bottomNavigationBar: Obx(
+        () => controller.isCardFlipped.value
+            ? SafeArea(
+                top: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  child: StudySessionRatingGrid(
+                    onRate: controller.rateCard,
+                    isLoading: controller.isReviewing.value,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ),
       body: SafeArea(
         child: Obx(() {
           return ApiStateView(
@@ -48,17 +63,30 @@ class StudySessionFrontScreen extends GetView<StudySessionController> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Obx(() => _FlashcardFront(
-                          card: controller.currentCard,
-                          onFlip: controller.flipCard,
-                          onSpeak: controller.speak,
-                        )),
+                    child: Obx(
+                      () => controller.isCardFlipped.value
+                          ? SingleChildScrollView(
+                              child: StudySessionFlashcardBack(
+                                card: controller.currentCard,
+                                onSpeak: controller.speak,
+                              ),
+                            )
+                          : _FlashcardFront(
+                              card: controller.currentCard,
+                              onFlip: controller.flipCard,
+                              onSpeak: controller.speak,
+                            ),
+                    ),
                   ),
                 ),
                 AppGap.h16,
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  child: Obx(() => _TopicTip(topic: controller.currentCard.topic)),
+                Obx(
+                  () => controller.isCardFlipped.value
+                      ? const SizedBox.shrink()
+                      : Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                          child: _TopicTip(topic: controller.currentCard.topic),
+                        ),
                 ),
               ],
             ),

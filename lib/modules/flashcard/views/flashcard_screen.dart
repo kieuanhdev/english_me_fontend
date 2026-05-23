@@ -21,7 +21,11 @@ class FlashcardScreen extends GetView<FlashcardController> {
           slivers: [
             SliverToBoxAdapter(child: AppGap.h14),
             const SliverToBoxAdapter(
-              child: AppMainAppBar(title: 'Học', showSearch: true),
+              child: AppMainAppBar(
+                title: 'Học',
+                showSearch: true,
+                horizontalPadding: 0,
+              ),
             ),
             SliverToBoxAdapter(child: AppGap.h24),
             const SliverToBoxAdapter(child: _LearnModules()),

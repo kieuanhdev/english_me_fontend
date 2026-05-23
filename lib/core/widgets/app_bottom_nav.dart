@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/routes/app_routes.dart';
-import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppBottomNav extends StatefulWidget {
@@ -36,16 +35,10 @@ class _AppBottomNavState extends State<AppBottomNav> {
       route: AppRoutes.learn,
     ),
     _NavItemData(
-      icon: Icons.fitness_center_rounded,
-      inactiveIcon: Icons.fitness_center_outlined,
-      label: 'Luyện',
-      route: AppRoutes.exercise,
-    ),
-    _NavItemData(
-      icon: Icons.assignment_turned_in_rounded,
-      inactiveIcon: Icons.assignment_turned_in_outlined,
-      label: 'Kiểm tra',
-      route: AppRoutes.test,
+      icon: Icons.extension_rounded,
+      inactiveIcon: Icons.extension_outlined,
+      label: 'Học bổ trợ',
+      route: AppRoutes.learningSupport,
     ),
     _NavItemData(
       icon: Icons.bar_chart_rounded,

@@ -49,7 +49,7 @@ class ProgressScreen extends GetView<ProgressController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppMainAppBar(title: T.navProgress.tr),
+                  AppMainAppBar(title: T.navProgress.tr, horizontalPadding: 0),
                   AppGap.h6,
                   Text(
                     T.progressSubtitle.tr,
@@ -315,4 +315,3 @@ class _NextLevelCard extends StatelessWidget {
     );
   }
 }
-

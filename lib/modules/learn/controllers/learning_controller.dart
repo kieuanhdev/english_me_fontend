@@ -58,7 +58,7 @@ class LearningController extends GetxController {
   }
 
   void openSupport(LearningSupportTrack track) {
-    if (!track.enabled || track.route.isEmpty) return;
+    if (!track.enabled) return;
     switch (track.type) {
       case 'grammar':
         Get.toNamed(
@@ -78,7 +78,11 @@ class LearningController extends GetxController {
           arguments: {'level': selectedLevel.value},
         );
         return;
+      case 'test':
+        Get.toNamed(AppRoutes.test);
+        return;
     }
+    if (track.route.isEmpty) return;
     Get.toNamed(track.route, arguments: {'level': selectedLevel.value});
   }
 }

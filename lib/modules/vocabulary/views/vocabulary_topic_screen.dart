@@ -36,7 +36,10 @@ class VocabularyTopicScreen extends GetView<VocabularyController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppMainAppBar(title: T.titleVocabulary.tr),
+                  AppMainAppBar(
+                    title: T.titleVocabulary.tr,
+                    horizontalPadding: 0,
+                  ),
                   AppGap.h6,
                   Text(
                     T.descVocabByTopic.tr,
@@ -192,4 +195,3 @@ class _Chip extends StatelessWidget {
     );
   }
 }
-

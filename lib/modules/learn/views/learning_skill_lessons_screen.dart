@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
+import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/learn/models/learning_models.dart';
 import 'package:englishme/modules/learn/repositories/learning_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -50,31 +50,14 @@ class LearningSkillLessonsScreen extends StatelessWidget {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          AppBackButton(onPressed: Get.back),
-                          AppGap.w12,
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data.title,
-                                  style: AppTypography.displayLarge.copyWith(
-                                    fontSize: 23,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                                Text(
-                                  data.description,
-                                  style: AppTypography.bodySmall,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      AppMainAppBar(
+                        title: data.title,
+                        subtitle: data.description,
+                        showBack: true,
+                        showSettings: false,
+                        showNotification: false,
+                        horizontalPadding: 0,
+                        onBack: Get.back,
                       ),
                       AppGap.h20,
                       Expanded(

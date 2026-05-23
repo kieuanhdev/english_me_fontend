@@ -125,13 +125,13 @@ class HomeController extends GetxController {
       case 'grammar':
         Get.toNamed(AppRoutes.grammar);
       case 'exercise':
-        Get.toNamed(AppRoutes.exercise);
+        Get.toNamed(AppRoutes.learningSupport);
       case 'pronunciation':
         Get.toNamed(AppRoutes.pronunciation);
       case 'flashcard':
         Get.toNamed(AppRoutes.flashcards);
       case 'test':
-        Get.toNamed(AppRoutes.test);
+        Get.toNamed(AppRoutes.learningSupport);
     }
   }
 }

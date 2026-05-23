@@ -19,7 +19,7 @@ class ExerciseScreen extends GetView<ExerciseController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AppMainAppBar(title: 'Luyện tập'),
+              const AppMainAppBar(title: 'Luyện tập', horizontalPadding: 0),
               AppGap.h8,
               Text(
                 'Chọn loại bài tập',

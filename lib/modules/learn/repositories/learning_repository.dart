@@ -176,11 +176,60 @@ LearningHub _withDemoPaths(LearningHub hub) {
     levels: hub.levels,
     skillTracks: hub.skillTracks,
     units: hub.units,
-    supportTracks: hub.supportTracks,
+    supportTracks: _supportTracksWithTest(hub.supportTracks),
     paths: [...hub.paths, ...demoPaths],
     nextRecommendedSkill: hub.nextRecommendedSkill,
     dailyGoal: hub.dailyGoal,
     currentPathId: hub.currentPathId,
+  );
+}
+
+List<LearningSupportTrack> _supportTracksWithTest(
+  List<LearningSupportTrack> tracks,
+) {
+  final base = tracks.isEmpty ? _demoSupportTracks() : tracks;
+  if (base.any((track) => track.type == 'test')) return base;
+  return [...base, _testSupportTrack()];
+}
+
+List<LearningSupportTrack> _demoSupportTracks() {
+  return [
+    const LearningSupportTrack(
+      type: 'grammar',
+      title: 'Ngữ pháp',
+      description: 'Ôn cấu trúc câu, thì và mẫu ngữ pháp quan trọng.',
+      route: '/learn/grammar',
+      progress: 0,
+      enabled: true,
+    ),
+    const LearningSupportTrack(
+      type: 'vocabulary',
+      title: 'Từ vựng',
+      description: 'Học từ theo chủ đề và lưu lại các từ cần ôn.',
+      route: '/vocabulary',
+      progress: 0,
+      enabled: true,
+    ),
+    const LearningSupportTrack(
+      type: 'flashcard',
+      title: 'Flashcard',
+      description: 'Ôn nhanh các bộ thẻ và củng cố từ đã học.',
+      route: '/learn/flashcards',
+      progress: 0,
+      enabled: true,
+    ),
+    _testSupportTrack(),
+  ];
+}
+
+LearningSupportTrack _testSupportTrack() {
+  return const LearningSupportTrack(
+    type: 'test',
+    title: 'Kiểm tra',
+    description: 'Làm bài kiểm tra theo chủ đề và cấp độ CEFR.',
+    route: '/test',
+    progress: 0,
+    enabled: true,
   );
 }
 

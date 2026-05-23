@@ -23,7 +23,10 @@ class TestHomeScreen extends GetView<TestController> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const AppMainAppBar(title: 'Kiểm tra'),
+                    const AppMainAppBar(
+                      title: 'Kiểm tra',
+                      horizontalPadding: 0,
+                    ),
                     AppGap.h6,
                     Text(
                       'Kiểm tra kiến thức của bạn theo chủ đề và cấp độ',

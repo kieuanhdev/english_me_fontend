@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Để chỉnh System UI
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/theme/app_theme.dart';
-import 'app_text.dart'; // Sử dụng AppText bạn đã xây dựng
+import 'app_text.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final String title;
-  final List<Widget>? actions;
-  final Widget? leading;
-  final VoidCallback? onBackPressed;
-  final bool showBackButton;
-  final bool isTranslate;
-  final Color? backgroundColor;
-
   const CommonAppBar({
     super.key,
     required this.title,
@@ -24,41 +18,46 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.backgroundColor,
   });
 
+  final String title;
+  final List<Widget>? actions;
+  final Widget? leading;
+  final VoidCallback? onBackPressed;
+  final bool showBackButton;
+  final bool isTranslate;
+  final Color? backgroundColor;
+
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      // 1. Chống đổi màu nền khi cuộn danh sách (Lấy từ BaseAppBar)
       surfaceTintColor: Colors.transparent,
-
-      // 2. Cấu hình thanh trạng thái hệ thống cho chuyên nghiệp
-      systemOverlayStyle: SystemUiOverlayStyle(
+      systemOverlayStyle: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark, // Icon pin, wifi màu đen
+        statusBarIconBrightness: Brightness.dark,
         systemNavigationBarColor: Colors.white,
         systemNavigationBarIconBrightness: Brightness.dark,
       ),
-
-      // 3. Sử dụng AppText để tự động hóa dịch thuật và thống nhất Style
-      title: AppText(
-        title,
-        style: AppTypography.displayLarge.copyWith(fontSize: 18),
-        isTranslate: isTranslate,
-      ),
-      centerTitle: true,
-
-      // 4. Nút quay lại tùy chỉnh hoặc mặc định
-      leading: showBackButton
-          ? (leading ??
-                IconButton(
-                  icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-                  onPressed: onBackPressed ?? () => Get.back(),
-                  color: AppColors.onSurface,
-                ))
-          : null,
-
-      actions: actions,
       backgroundColor: backgroundColor ?? AppColors.surface,
       elevation: 0,
+      centerTitle: false,
+      titleSpacing: showBackButton ? 4 : 20,
+      leadingWidth: showBackButton ? 64 : 0,
+      leading: showBackButton
+          ? (leading ??
+                Center(
+                  child: AppBackButton(
+                    onPressed: onBackPressed ?? () => Get.back(),
+                  ),
+                ))
+          : null,
+      title: AppText(
+        title,
+        style: AppTypography.displayLarge.copyWith(
+          fontSize: 20,
+          color: AppColors.primary,
+        ),
+        isTranslate: isTranslate,
+      ),
+      actions: actions,
     );
   }
 

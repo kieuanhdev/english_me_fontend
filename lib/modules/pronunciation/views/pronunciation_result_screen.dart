@@ -1,5 +1,5 @@
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
+import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/controllers/pronunciation_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -49,20 +49,13 @@ class PronunciationResultScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  AppBackButton(onPressed: () => Get.back()),
-                  AppGap.w12,
-                  Expanded(
-                    child: Text(
-                      'Kết quả phát âm',
-                      style: AppTypography.displayLarge.copyWith(
-                        fontSize: 24,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
+              AppMainAppBar(
+                title: 'Kết quả phát âm',
+                showBack: true,
+                showSettings: false,
+                showNotification: false,
+                horizontalPadding: 0,
+                onBack: Get.back,
               ),
               AppGap.h24,
               Expanded(

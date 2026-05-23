@@ -42,7 +42,7 @@ class GrammarScreen extends GetView<GrammarController> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppMainAppBar(title: T.titleGrammar.tr),
+              AppMainAppBar(title: T.titleGrammar.tr, horizontalPadding: 0),
               AppGap.h20,
               Text(
                 T.descGrammarTopics.tr,

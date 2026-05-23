@@ -47,7 +47,10 @@ class LearningScreen extends GetView<LearningController> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const AppMainAppBar(title: 'Học tập'),
+                      const AppMainAppBar(
+                        title: 'Học tập',
+                        horizontalPadding: 0,
+                      ),
                       AppGap.h18,
                       if (level != null) ...[
                         _LevelOverview(level: level, dailyGoal: hub.dailyGoal),

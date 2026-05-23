@@ -1,5 +1,6 @@
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/widgets/common_app_bar.dart';
 import 'package:englishme/modules/grammar/models/grammar_models.dart';
 import 'package:englishme/modules/grammar/repositories/grammar_repository.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -17,9 +18,9 @@ class GrammarLessonDetailScreen extends StatelessWidget {
     if (lessonId.isEmpty) {
       return Scaffold(
         backgroundColor: AppColors.surface,
-        appBar: AppBar(
-          backgroundColor: AppColors.surface,
-          title: const Text('Chi tiết bài học'),
+        appBar: const CommonAppBar(
+          title: 'Chi tiết bài học',
+          isTranslate: false,
         ),
         body: Center(
           child: Text(
@@ -39,9 +40,9 @@ class GrammarLessonDetailScreen extends StatelessWidget {
     );
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: AppBar(
-        backgroundColor: AppColors.surface,
-        title: const Text('Chi tiết bài học'),
+      appBar: const CommonAppBar(
+        title: 'Chi tiết bài học',
+        isTranslate: false,
       ),
       body: FutureBuilder<GrammarLessonDetail>(
         future: future,

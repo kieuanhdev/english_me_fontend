@@ -82,7 +82,7 @@ class _LearningPathDetailScreenState extends State<LearningPathDetailScreen> {
                                 Text(
                                   path.title,
                                   style: AppTypography.displayLarge.copyWith(
-                                    fontSize: 22,
+                                    fontSize: 20,
                                     color: AppColors.primary,
                                   ),
                                 ),

@@ -3,8 +3,7 @@ import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
-import 'package:englishme/core/widgets/app_settings_icon_button.dart';
+import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/controllers/pronunciation_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -38,21 +37,12 @@ class PronunciationScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  AppBackButton(onPressed: _onBack),
-                  AppGap.w12,
-                  Expanded(
-                    child: Text(
-                      T.pronunTitle.tr,
-                      style: AppTypography.displayLarge.copyWith(
-                        fontSize: 24,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  const AppSettingsIconButton(),
-                ],
+              AppMainAppBar(
+                title: T.pronunTitle.tr,
+                showBack: true,
+                showNotification: false,
+                horizontalPadding: 0,
+                onBack: _onBack,
               ),
               AppGap.h24,
               Expanded(child: _buildBody()),

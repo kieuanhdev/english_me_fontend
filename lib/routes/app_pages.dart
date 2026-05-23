@@ -35,6 +35,7 @@ import 'package:englishme/modules/learn/views/learning_lesson_detail_screen.dart
 import 'package:englishme/modules/learn/views/learning_path_detail_screen.dart';
 import 'package:englishme/modules/learn/views/learning_screen.dart';
 import 'package:englishme/modules/learn/views/learning_skill_lessons_screen.dart';
+import 'package:englishme/modules/learn/views/learning_support_screen.dart';
 import 'package:englishme/modules/placement_test/bindings/placement_test_binding.dart';
 import 'package:englishme/modules/placement_test/views/placement_intro_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_question_screen.dart';
@@ -105,6 +106,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.learn,
       page: () => const LearningScreen(),
+      binding: LearningBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.learningSupport,
+      page: () => const LearningSupportScreen(),
       binding: LearningBinding(),
     ),
     GetPage(

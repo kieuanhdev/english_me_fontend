@@ -5,7 +5,7 @@ import 'package:englishme/theme/app_theme.dart';
 class AppBackButton extends StatelessWidget {
   const AppBackButton({
     required this.onPressed,
-    this.size = 32,
+    this.size = 40,
     super.key,
   });
 
@@ -16,19 +16,22 @@ class AppBackButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onPressed,
-      borderRadius: BorderRadius.circular(AppRadius.md),
+      borderRadius: BorderRadius.circular(AppRadius.pill),
       child: Ink(
         width: size,
         height: size,
         decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.outlineVariant, width: 2),
-          boxShadow: const [
-            BoxShadow(color: Color(0xFFCBD5DD), offset: Offset(0, 3)),
+          color: AppColors.surfaceContainerLowest,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.neutralShadow,
+              offset: const Offset(0, 2),
+            ),
           ],
         ),
-        child: Icon(Icons.chevron_left, color: AppColors.textSecondary),
+        child: Icon(Icons.chevron_left_rounded, color: AppColors.primary),
       ),
     );
   }

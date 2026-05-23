@@ -2,7 +2,7 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
+import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -32,20 +32,13 @@ class IpaScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: [
-                  AppBackButton(onPressed: _onBack),
-                  AppGap.w12,
-                  Expanded(
-                    child: Text(
-                      'Bảng IPA',
-                      style: AppTypography.displayLarge.copyWith(
-                        fontSize: 24,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ],
+              AppMainAppBar(
+                title: 'Bảng IPA',
+                showBack: true,
+                showSettings: false,
+                showNotification: false,
+                horizontalPadding: 0,
+                onBack: _onBack,
               ),
               AppGap.h20,
               Expanded(

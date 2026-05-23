@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/home/models/home_dashboard_model.dart';
 import 'package:englishme/modules/home/repositories/home_repository.dart';
+import 'package:englishme/modules/learn/controllers/learning_controller.dart';
+import 'package:englishme/modules/learn/models/learning_models.dart';
 import 'package:englishme/routes/app_routes.dart';
 
 enum HomeLoadState { idle, loading, success, error }
@@ -60,6 +62,26 @@ class HomeController extends GetxController {
   // ----- Continue learning -----
   ContinueLearning? get continueLearning => dashboard.value?.continueLearning;
 
+  LearningPath? get currentLearningPath {
+    if (!Get.isRegistered<LearningController>()) return null;
+    final learningHub = Get.find<LearningController>().hub.value;
+    if (learningHub == null || learningHub.paths.isEmpty) return null;
+
+    final currentPathId = learningHub.currentPathId;
+    if (currentPathId != null && currentPathId.trim().isNotEmpty) {
+      final matching = learningHub.paths.where((path) => path.id == currentPathId);
+      if (matching.isNotEmpty) return matching.first;
+    }
+
+    final inProgress = learningHub.paths.where(
+      (path) => path.status == 'in_progress' || path.progress > 0,
+    );
+    if (inProgress.isNotEmpty) return inProgress.first;
+
+    final available = learningHub.paths.where((path) => !path.isLocked);
+    return available.isNotEmpty ? available.first : learningHub.paths.first;
+  }
+
   // ----- Word of day -----
   WordOfDayDto? get wordOfDay => dashboard.value?.wordOfDay;
 
@@ -99,13 +121,29 @@ class HomeController extends GetxController {
   }
 
   void onSeeAllLessons() {
-    Get.toNamed(AppRoutes.vocabulary);
+    Get.toNamed(AppRoutes.learn);
   }
 
   void onContinueLearning() {
+    final path = currentLearningPath;
+    if (path != null) {
+      Get.toNamed(
+        AppRoutes.learningPathDetail,
+        arguments: {'level': path.level, 'pathId': path.id},
+      );
+      return;
+    }
+
     final cl = continueLearning;
     if (cl == null) {
-      Get.toNamed(AppRoutes.vocabulary);
+      Get.toNamed(AppRoutes.learn);
+      return;
+    }
+    if (cl.pathId != null && cl.pathId!.trim().isNotEmpty) {
+      Get.toNamed(
+        AppRoutes.learningPathDetail,
+        arguments: {'level': cl.level ?? userLevel, 'pathId': cl.pathId},
+      );
       return;
     }
     if (cl.type == 'vocabulary' && cl.topicId != null) {

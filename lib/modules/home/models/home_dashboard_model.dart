@@ -122,24 +122,41 @@ class WordOfDayDto {
 class ContinueLearning {
   final String? type;
   final String? topicId;
+  final String? pathId;
   final String? title;
+  final String? description;
   final String? level;
   final String? slug;
+  final double progress;
+  final int activityCount;
+  final int completedActivityCount;
 
   const ContinueLearning({
     this.type,
     this.topicId,
+    this.pathId,
     this.title,
+    this.description,
     this.level,
     this.slug,
+    this.progress = 0,
+    this.activityCount = 0,
+    this.completedActivityCount = 0,
   });
 
   factory ContinueLearning.fromJson(Map<String, dynamic> json) => ContinueLearning(
     type: json['type'] as String?,
     topicId: json['topicId']?.toString(),
+    pathId: (json['pathId'] ?? json['currentPathId'] ?? json['id'])?.toString(),
     title: json['title'] as String?,
+    description: (json['description'] ?? json['subtitle'])?.toString(),
     level: json['level'] as String?,
     slug: json['slug'] as String?,
+    progress: _asDouble(json['progress']).clamp(0, 1).toDouble(),
+    activityCount: _asInt(json['activityCount'] ?? json['lessonCount']),
+    completedActivityCount: _asInt(
+      json['completedActivityCount'] ?? json['completedLessonCount'],
+    ),
   );
 }
 
@@ -162,4 +179,16 @@ class HomeRecommendation {
     description: (json['description'] ?? '').toString(),
     actionUrl: json['actionUrl'] as String?,
   );
+}
+
+int _asInt(dynamic value) {
+  if (value is int) return value;
+  if (value is num) return value.round();
+  return int.tryParse(value?.toString() ?? '') ?? 0;
+}
+
+double _asDouble(dynamic value) {
+  if (value is double) return value;
+  if (value is num) return value.toDouble();
+  return double.tryParse(value?.toString() ?? '') ?? 0;
 }

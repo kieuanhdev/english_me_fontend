@@ -1,10 +1,9 @@
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
+import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
 import 'package:englishme/modules/exercise/repositories/exercise_repository.dart';
-import 'package:englishme/modules/profile/controllers/profile_controller.dart';
-import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 
 enum ExerciseState { idle, loading, playing, submitting, finished, error }
@@ -112,11 +111,16 @@ class ExerciseController extends GetxController {
         final label = question?.labelFor(r.selectedAnswer) ?? r.selectedAnswer;
         answers.add({'questionId': r.questionId, 'selectedAnswer': label});
       }
-      completion.value = await _repo.completeSession(
+      final result = await _repo.completeSession(
         sessionId: sessionId,
         answers: answers,
       );
-      _refreshProfileAndProgress();
+      completion.value = result;
+      XpGrantHandler.apply(
+        totalXp: result.totalXp,
+        xpEarned: result.xpEarned,
+        streakUpdated: result.streakUpdated,
+      );
       state.value = ExerciseState.finished;
       Get.offNamed(AppRoutes.exerciseResult);
     } catch (_) {
@@ -135,15 +139,6 @@ class ExerciseController extends GetxController {
   void closeExercise() {
     Get.until((route) => route.settings.name == AppRoutes.shell || route.isFirst);
     state.value = ExerciseState.idle;
-  }
-
-  void _refreshProfileAndProgress() {
-    if (Get.isRegistered<ProfileController>()) {
-      Get.find<ProfileController>().loadProfile();
-    }
-    if (Get.isRegistered<ProgressController>()) {
-      Get.find<ProgressController>().loadProgress();
-    }
   }
 
   void _reset(ExerciseCategory category) {

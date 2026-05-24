@@ -24,8 +24,6 @@ class LearningHub {
   final List<LearningSupportTrack> supportTracks;
 
   factory LearningHub.fromJson(Map<String, dynamic> json) {
-    final units = _listOf(json['units'], LearningUnit.fromJson);
-    final rawPaths = _listOf(json['paths'], LearningPath.fromJson);
     return LearningHub(
       currentLevel: (json['currentLevel'] ?? 'A1').toString(),
       selectedLevel: (json['selectedLevel'] ?? json['currentLevel'] ?? 'A1')
@@ -39,10 +37,8 @@ class LearningHub {
           : null,
       levels: _listOf(json['levels'], LearningLevel.fromJson),
       skillTracks: _listOf(json['skillTracks'], LearningSkillTrack.fromJson),
-      units: units,
-      paths: rawPaths.isNotEmpty
-          ? rawPaths
-          : units.map(LearningPath.fromUnit).toList(growable: false),
+      units: _listOf(json['units'], LearningUnit.fromJson),
+      paths: _listOf(json['paths'], LearningPath.fromJson),
       supportTracks: _listOf(
         json['supportTracks'],
         LearningSupportTrack.fromJson,
@@ -109,23 +105,6 @@ class LearningPath {
     );
   }
 
-  factory LearningPath.fromUnit(LearningUnit unit) {
-    final progress = unit.lessonCount <= 0
-        ? 0.0
-        : unit.completedLessonCount / unit.lessonCount;
-    return LearningPath(
-      id: unit.id,
-      level: unit.level,
-      title: unit.title,
-      description: unit.subtitle,
-      order: 0,
-      status: unit.status,
-      progress: progress.clamp(0, 1).toDouble(),
-      activityCount: unit.lessonCount,
-      completedActivityCount: unit.completedLessonCount,
-      skillsCoverage: unit.skillCoverage,
-    );
-  }
 }
 
 class LearningPathDetail {
@@ -206,23 +185,6 @@ class LearningPathActivity {
     );
   }
 
-  factory LearningPathActivity.fromLesson({
-    required LearningLessonListItem lesson,
-    required String skill,
-  }) {
-    return LearningPathActivity(
-      id: lesson.id,
-      pathId: lesson.unitId,
-      title: lesson.title,
-      subtitle: lesson.subtitle,
-      skill: skill,
-      type: lesson.activityType,
-      status: lesson.status,
-      order: lesson.order,
-      durationMinutes: lesson.durationMinutes,
-      xpReward: lesson.xpReward,
-    );
-  }
 }
 
 class LearningDailyGoal {
@@ -551,9 +513,12 @@ class LearningCompleteResponse {
     required this.completed,
     required this.score,
     required this.xpEarned,
+    required this.totalXp,
+    required this.dailyEarnedXp,
     required this.levelProgress,
     required this.skillProgress,
     required this.streakUpdated,
+    required this.bonuses,
     this.nextLessonId,
   });
 
@@ -561,10 +526,13 @@ class LearningCompleteResponse {
   final bool completed;
   final int score;
   final int xpEarned;
+  final int totalXp;
+  final int dailyEarnedXp;
   final double levelProgress;
   final double skillProgress;
   final String? nextLessonId;
   final bool streakUpdated;
+  final List<XpBonus> bonuses;
 
   factory LearningCompleteResponse.fromJson(Map<String, dynamic> json) {
     return LearningCompleteResponse(
@@ -572,10 +540,31 @@ class LearningCompleteResponse {
       completed: json['completed'] == true,
       score: _asInt(json['score']),
       xpEarned: _asInt(json['xpEarned']),
+      totalXp: _asInt(json['totalXp']),
+      dailyEarnedXp: _asInt(json['dailyEarnedXp']),
       levelProgress: _asDouble(json['levelProgress']).clamp(0, 1).toDouble(),
       skillProgress: _asDouble(json['skillProgress']).clamp(0, 1).toDouble(),
       nextLessonId: json['nextLessonId']?.toString(),
       streakUpdated: json['streakUpdated'] == true,
+      bonuses: _listOf(json['bonuses'], XpBonus.fromJson),
+    );
+  }
+}
+
+/// Bonus đính kèm trong response cộng XP (vd: daily_goal_bonus +5).
+/// Spec §9.4.1 — BE trả `bonuses: Array<{type, amount, label}>`.
+class XpBonus {
+  const XpBonus({required this.type, required this.amount, required this.label});
+
+  final String type;
+  final int amount;
+  final String label;
+
+  factory XpBonus.fromJson(Map<String, dynamic> json) {
+    return XpBonus(
+      type: (json['type'] ?? '').toString(),
+      amount: _asInt(json['amount']),
+      label: (json['label'] ?? '').toString(),
     );
   }
 }

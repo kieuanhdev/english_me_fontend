@@ -60,9 +60,7 @@ class _LoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: CircularProgressIndicator(color: AppColors.primary),
-    );
+    return Center(child: CircularProgressIndicator(color: AppColors.primary));
   }
 }
 
@@ -89,9 +87,7 @@ class _ErrorView extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'BeVietnamPro',
-                fontSize: 14,
+              style: AppTypography.bodyRegular.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
               ),
@@ -141,9 +137,7 @@ class _EmptyView extends StatelessWidget {
             Text(
               message,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'BeVietnamPro',
-                fontSize: 14,
+              style: AppTypography.bodyRegular.copyWith(
                 fontWeight: FontWeight.w600,
                 color: AppColors.textSecondary,
               ),

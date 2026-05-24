@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/gen/fonts.gen.dart';
 import 'package:englishme/theme/theme_controller.dart';
 
 @immutable
@@ -320,15 +321,19 @@ class AppColors {
   static Color get accentWarm => _effective.accentWarm;
 
   /// Nền cam nhẹ cho ô gợi ý — giữ tông ấm, đủ contrast trên dark
-  static Color get recommendationOrangeBg => _effective.brightness == Brightness.dark
+  static Color get recommendationOrangeBg =>
+      _effective.brightness == Brightness.dark
       ? _effective.tertiaryBgSoft
       : const Color(0xFFFFF3E0);
 }
 
 class AppTypography {
-  // Headlines: Be Vietnam Pro (Modern Authority)
+  static const String _displayFont = FontFamily.baloo2;
+  static const String _bodyFont = FontFamily.nunito;
+
+  // Headlines
   static TextStyle get displayLarge => TextStyle(
-    fontFamily: 'BeVietnamPro',
+    fontFamily: _displayFont,
     fontSize: 32,
     fontWeight: FontWeight.w700,
     color: AppColors.onSurface,
@@ -336,7 +341,7 @@ class AppTypography {
   );
 
   static TextStyle get headlineMedium => TextStyle(
-    fontFamily: 'BeVietnamPro',
+    fontFamily: _displayFont,
     fontSize: 24,
     fontWeight: FontWeight.w600,
     color: AppColors.onSurface,
@@ -344,15 +349,15 @@ class AppTypography {
 
   // Word of the Day: Editorial Intent
   static TextStyle get titleLargeTertiary => TextStyle(
-    fontFamily: 'BeVietnamPro',
+    fontFamily: _displayFont,
     fontSize: 20,
     fontWeight: FontWeight.w600,
     color: AppColors.tertiary,
   );
 
-  // Body: Plus Jakarta Sans (Friendly apertures)
+  // Body
   static TextStyle get bodyLarge => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 16,
     fontWeight: FontWeight.w500,
     height: 1.5,
@@ -360,14 +365,14 @@ class AppTypography {
   );
 
   static TextStyle get bodyMedium => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 18,
     fontWeight: FontWeight.w400,
     color: AppColors.textSecondary, // Vietnamese translations
   );
 
   static TextStyle get labelMedium => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 20,
     fontWeight: FontWeight.w700,
     letterSpacing: 1.2,
@@ -381,7 +386,7 @@ class AppTypography {
 
   /// 10pt — micro caption, tag siêu nhỏ trong card (vd. home_continue_learning)
   static TextStyle get labelXSmall => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 10,
     fontWeight: FontWeight.w600,
     letterSpacing: 0.8,
@@ -390,7 +395,7 @@ class AppTypography {
 
   /// 12pt — caption, meta info (timestamp, count)
   static TextStyle get labelSmall => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 12,
     fontWeight: FontWeight.w600,
     color: AppColors.textSecondary,
@@ -398,7 +403,7 @@ class AppTypography {
 
   /// 13pt — body phụ, mô tả ngắn
   static TextStyle get bodySmall => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 13,
     fontWeight: FontWeight.w500,
     height: 1.45,
@@ -407,7 +412,7 @@ class AppTypography {
 
   /// 14pt — body chính kích thước nhỏ (list item, definition)
   static TextStyle get bodyRegular => TextStyle(
-    fontFamily: 'PlusJakartaSans',
+    fontFamily: _bodyFont,
     fontSize: 14,
     fontWeight: FontWeight.w500,
     height: 1.45,
@@ -421,16 +426,20 @@ class AppTypography {
 
   // Brand wordmark style
   static TextStyle get brand => TextStyle(
-    fontFamily: 'BeVietnamPro',
+    fontFamily: _displayFont,
     fontSize: 22,
     fontWeight: FontWeight.w800,
-    color: (_effectiveBrightness() == Brightness.dark ? kDarkPalette : kLightPalette).brandHue,
+    color:
+        (_effectiveBrightness() == Brightness.dark
+                ? kDarkPalette
+                : kLightPalette)
+            .brandHue,
     letterSpacing: -0.3,
   );
 
   // Accent display (orange)
   static TextStyle get displayAccent => TextStyle(
-    fontFamily: 'BeVietnamPro',
+    fontFamily: _displayFont,
     fontSize: 32,
     fontWeight: FontWeight.w700,
     color: AppColors.tertiary,
@@ -476,10 +485,18 @@ ThemeData _buildTheme(AppPaletteColors p) {
   );
 
   return base.copyWith(
-    dividerTheme: const DividerThemeData(
-      color: Colors.transparent,
-      space: 32,
+    textTheme: base.textTheme.apply(
+      fontFamily: FontFamily.nunito,
+      bodyColor: p.onSurface,
+      displayColor: p.onSurface,
     ),
+    primaryTextTheme: base.primaryTextTheme.apply(
+      fontFamily: FontFamily.nunito,
+      bodyColor: p.onSurface,
+      displayColor: p.onSurface,
+    ),
+
+    dividerTheme: const DividerThemeData(color: Colors.transparent, space: 32),
 
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.transparent,
@@ -489,7 +506,7 @@ ThemeData _buildTheme(AppPaletteColors p) {
       foregroundColor: p.onSurface,
       iconTheme: IconThemeData(color: p.onSurface),
       titleTextStyle: TextStyle(
-        fontFamily: 'BeVietnamPro',
+        fontFamily: FontFamily.baloo2,
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: p.onSurface,
@@ -499,19 +516,21 @@ ThemeData _buildTheme(AppPaletteColors p) {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
-        foregroundColor:
-            p.brightness == Brightness.dark ? const Color(0xFF151620) : Colors.white,
+        foregroundColor: p.brightness == Brightness.dark
+            ? const Color(0xFF151620)
+            : Colors.white,
         backgroundColor: p.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.xxl),
         ),
         textStyle: TextStyle(
-          fontFamily: 'PlusJakartaSans',
+          fontFamily: FontFamily.nunito,
           fontSize: 20,
           fontWeight: FontWeight.w700,
           letterSpacing: 1.2,
-          color:
-              p.brightness == Brightness.dark ? const Color(0xFF151620) : Colors.white,
+          color: p.brightness == Brightness.dark
+              ? const Color(0xFF151620)
+              : Colors.white,
         ),
       ),
     ),
@@ -526,7 +545,9 @@ ThemeData _buildTheme(AppPaletteColors p) {
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),
         borderSide: BorderSide(
-          color: p.primary.withValues(alpha: p.brightness == Brightness.dark ? 0.5 : 0.2),
+          color: p.primary.withValues(
+            alpha: p.brightness == Brightness.dark ? 0.5 : 0.2,
+          ),
           width: 2,
         ),
       ),
@@ -535,7 +556,9 @@ ThemeData _buildTheme(AppPaletteColors p) {
     cardTheme: CardThemeData(
       elevation: 0,
       color: p.surfaceContainerLowest,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xxl)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+      ),
     ),
 
     splashFactory: InkRipple.splashFactory,

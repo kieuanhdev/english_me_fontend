@@ -162,6 +162,9 @@ class TestSubmitResponse {
   final int incorrect;
   final double accuracyPercent;
   final int xpEarned;
+  final int totalXp;
+  final int dailyEarnedXp;
+  final bool streakUpdated;
   final String? cefrSuggestion;
   final int timeTakenSeconds;
 
@@ -172,6 +175,9 @@ class TestSubmitResponse {
     required this.incorrect,
     required this.accuracyPercent,
     required this.xpEarned,
+    required this.totalXp,
+    required this.dailyEarnedXp,
+    required this.streakUpdated,
     this.cefrSuggestion,
     required this.timeTakenSeconds,
   });
@@ -184,6 +190,9 @@ class TestSubmitResponse {
       incorrect: (json['incorrect'] as num?)?.toInt() ?? 0,
       accuracyPercent: (json['accuracyPercent'] as num?)?.toDouble() ?? 0.0,
       xpEarned: (json['xpEarned'] as num?)?.toInt() ?? 0,
+      totalXp: (json['totalXp'] as num?)?.toInt() ?? 0,
+      dailyEarnedXp: (json['dailyEarnedXp'] as num?)?.toInt() ?? 0,
+      streakUpdated: json['streakUpdated'] == true,
       cefrSuggestion: json['cefrSuggestion'] as String?,
       timeTakenSeconds: (json['timeTakenSeconds'] as num?)?.toInt() ?? 0,
     );

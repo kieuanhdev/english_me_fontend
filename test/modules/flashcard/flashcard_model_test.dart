@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 
 void main() {
-  group('FlashcardModel.fromJson', () {
+  group('VocabWord.fromFlashcardJson', () {
     test('uses safe defaults for nullable optional backend fields', () {
-      final card = FlashcardModel.fromJson({
+      final card = VocabWord.fromFlashcardJson({
         'id': 'card-1',
         'deskId': 'desk-1',
         'word': 'hello',
@@ -24,11 +24,11 @@ void main() {
       expect(card.id, 'card-1');
       expect(card.pos, isEmpty);
       expect(card.ipa, isEmpty);
-      expect(card.vietnamese, isEmpty);
+      expect(card.definitionVi, isEmpty);
     });
 
     test('parses non-list pos as a single item', () {
-      final card = FlashcardModel.fromJson({
+      final card = VocabWord.fromFlashcardJson({
         'id': 'card-1',
         'deskId': 'desk-1',
         'word': 'run',
@@ -40,7 +40,7 @@ void main() {
     });
 
     test('uses flashcardId fallback when session cards omit id', () {
-      final card = FlashcardModel.fromJson({
+      final card = VocabWord.fromFlashcardJson({
         'flashcardId': 'card-from-session',
         'desk_id': 'desk-1',
         'word': 'remember',
@@ -52,9 +52,9 @@ void main() {
     });
   });
 
-  group('FlashcardPage.fromJson', () {
+  group('VocabWordPage.fromJson', () {
     test('uses safe defaults for missing pagination fields', () {
-      final page = FlashcardPage.fromJson({
+      final page = VocabWordPage.fromJson({
         'content': [
           {
             'id': 'card-1',

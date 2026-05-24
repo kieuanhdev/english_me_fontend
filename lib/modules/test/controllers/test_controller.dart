@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
+import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/profile/controllers/profile_controller.dart';
-import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
 import 'package:englishme/modules/test/repositories/test_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -155,12 +154,17 @@ class TestController extends GetxController {
         answers.add({'questionId': r.questionId, 'selectedAnswer': label});
       }
       final timeTaken = _initialDuration - secondsRemaining.value;
-      submission.value = await _repo.submitTest(
+      final result = await _repo.submitTest(
         sessionId: sessionId,
         answers: answers,
         timeTakenSeconds: timeTaken < 0 ? 0 : timeTaken,
       );
-      _refreshProfileAndProgress();
+      submission.value = result;
+      XpGrantHandler.apply(
+        totalXp: result.totalXp,
+        xpEarned: result.xpEarned,
+        streakUpdated: result.streakUpdated,
+      );
       state.value = TestState.finished;
       Get.offNamed(AppRoutes.testResult);
       _loadHistory();
@@ -189,15 +193,6 @@ class TestController extends GetxController {
     _timer?.cancel();
     Get.until((route) => route.settings.name == AppRoutes.shell || route.isFirst);
     state.value = TestState.idle;
-  }
-
-  void _refreshProfileAndProgress() {
-    if (Get.isRegistered<ProfileController>()) {
-      Get.find<ProfileController>().loadProfile();
-    }
-    if (Get.isRegistered<ProgressController>()) {
-      Get.find<ProgressController>().loadProgress();
-    }
   }
 
   Future<void> _loadHistory() async {

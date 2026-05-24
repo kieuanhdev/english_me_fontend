@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:englishme/core/config/app_config.dart';
 import 'package:englishme/core/network/api_exception.dart';
@@ -43,9 +44,84 @@ class DioClient {
             },
           ),
         )
-        ..interceptors.add(
-          LogInterceptor(responseBody: true, requestBody: true),
-        );
+        ..interceptors.add(_AppLogInterceptor());
 
   static Dio get instance => _instance;
+}
+
+class _AppLogInterceptor extends Interceptor {
+  static const _maxBodyLength = 1200;
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    _log('*** API Request ***');
+    _log('${options.method} ${options.uri}');
+    _log('headers: ${_redactHeaders(options.headers)}');
+    if (options.queryParameters.isNotEmpty) {
+      _log('query: ${options.queryParameters}');
+    }
+    if (options.data != null) {
+      _log('body: ${_preview(options.data)}');
+    }
+    handler.next(options);
+  }
+
+  @override
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
+    final options = response.requestOptions;
+    _log('*** API Response ***');
+    _log('${options.method} ${options.uri}');
+    _log(
+      'status: ${response.statusCode} ${response.statusMessage ?? ''}'.trim(),
+    );
+    _log('dataType: ${response.data.runtimeType}');
+    _log('body: ${_preview(response.data)}');
+    handler.next(response);
+  }
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    final options = err.requestOptions;
+    _log('*** API Error ***');
+    _log('${options.method} ${options.uri}');
+    _log('type: ${err.type}');
+    _log('message: ${err.message}');
+    _log(
+      'status: ${err.response?.statusCode} ${err.response?.statusMessage ?? ''}'
+          .trim(),
+    );
+    _log('dataType: ${err.response?.data.runtimeType}');
+    _log('body: ${_preview(err.response?.data)}');
+    handler.next(err);
+  }
+
+  Map<String, dynamic> _redactHeaders(Map<String, dynamic> headers) {
+    return headers.map((key, value) {
+      if (key.toLowerCase() == 'authorization') {
+        return MapEntry(key, _redactToken(value));
+      }
+      return MapEntry(key, value);
+    });
+  }
+
+  String _redactToken(Object? value) {
+    final text = value?.toString() ?? '';
+    if (text.length <= 18) return '***';
+    return '${text.substring(0, 14)}...${text.substring(text.length - 6)}';
+  }
+
+  String _preview(Object? data) {
+    final text = data?.toString() ?? 'null';
+    if (text.length <= _maxBodyLength) return text;
+    return '${text.substring(0, _maxBodyLength)}...<truncated ${text.length - _maxBodyLength} chars>';
+  }
+
+  void _log(String message) {
+    if (kDebugMode) {
+      debugPrint(message);
+    }
+  }
 }

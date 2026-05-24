@@ -26,6 +26,9 @@ class ProfileUser {
   ProfileUser copyWith({
     String? displayName,
     String? photoUrl,
+    int? totalXp,
+    int? currentStreak,
+    int? longestStreak,
   }) {
     return ProfileUser(
       uid: uid,
@@ -33,9 +36,9 @@ class ProfileUser {
       email: email,
       photoUrl: photoUrl ?? this.photoUrl,
       cefrLevel: cefrLevel,
-      totalXp: totalXp,
-      currentStreak: currentStreak,
-      longestStreak: longestStreak,
+      totalXp: totalXp ?? this.totalXp,
+      currentStreak: currentStreak ?? this.currentStreak,
+      longestStreak: longestStreak ?? this.longestStreak,
       badges: badges,
       joinedAt: joinedAt,
     );

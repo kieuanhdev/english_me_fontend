@@ -4,10 +4,9 @@ import 'package:get/get.dart';
 import 'package:englishme/core/network/api_exception.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
+import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
-import 'package:englishme/modules/profile/controllers/profile_controller.dart';
-import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/modules/study_session/models/review_response.dart';
 import 'package:englishme/modules/study_session/models/study_session_summary.dart';
 import 'package:englishme/modules/study_session/repositories/study_session_repository.dart';
@@ -134,6 +133,13 @@ class StudySessionController extends GetxController {
         ),
       );
       sessionXp.value = res.sessionXp;
+      // Per-card grant: BE đảm bảo 1 card/ngày chỉ cộng XP 1 lần (spec §9.3).
+      // Khi retry trong ngày → xpEarned=0, totalXp không đổi → applyXpGrant tự bỏ qua.
+      XpGrantHandler.apply(
+        totalXp: res.totalXp,
+        xpEarned: res.xpEarned,
+        streakUpdated: res.streakUpdated,
+      );
 
       switch (rating) {
         case CardRating.mastered:
@@ -193,13 +199,8 @@ class StudySessionController extends GetxController {
   }
 
   void closeSession() {
-    // Refresh Profile + Progress để XP/streak mới hiển thị ngay khi user chuyển tab.
-    if (Get.isRegistered<ProfileController>()) {
-      Get.find<ProfileController>().loadProfile();
-    }
-    if (Get.isRegistered<ProgressController>()) {
-      Get.find<ProgressController>().loadProgress();
-    }
+    // XP/streak đã được update inline qua XpGrantHandler trong rateCard,
+    // không cần refetch Profile/Progress khi đóng session.
     Get.until(
       (route) => route.settings.name == AppRoutes.flashcards || route.isFirst,
     );

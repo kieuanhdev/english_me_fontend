@@ -102,6 +102,31 @@ class ProfileController extends GetxController {
     Get.toNamed(AppRoutes.placementTest);
   }
 
+  /// Cập nhật `totalXp` (và streak nếu vừa được tăng) từ response của 4 endpoint
+  /// cộng XP — tránh round-trip GET /profile.
+  /// Spec §9.5: FE đọc `response.totalXp` và set thẳng vào ProfileController.
+  ///
+  /// Bỏ qua nếu profile chưa load (sẽ tự refetch khi user mở Profile).
+  void applyXpGrant({
+    required int totalXp,
+    bool streakUpdated = false,
+  }) {
+    final current = user.value;
+    if (current == null) return;
+    if (totalXp <= 0 && !streakUpdated) return;
+    user.value = current.copyWith(
+      totalXp: totalXp > 0 ? totalXp : current.totalXp,
+      currentStreak: streakUpdated
+          ? current.currentStreak + 1
+          : current.currentStreak,
+      longestStreak: streakUpdated
+          ? (current.currentStreak + 1 > current.longestStreak
+                ? current.currentStreak + 1
+                : current.longestStreak)
+          : current.longestStreak,
+    );
+  }
+
   String get cefrLabel {
     const map = {
       'A1': 'Beginner',

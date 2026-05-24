@@ -27,6 +27,9 @@ class ReviewResponse {
   final int sessionXp;
   final int reviewedCount;
   final int totalCards;
+  final int totalXp;
+  final int dailyEarnedXp;
+  final bool streakUpdated;
 
   const ReviewResponse({
     required this.repetitions,
@@ -37,6 +40,9 @@ class ReviewResponse {
     required this.sessionXp,
     required this.reviewedCount,
     required this.totalCards,
+    required this.totalXp,
+    required this.dailyEarnedXp,
+    required this.streakUpdated,
   });
 
   factory ReviewResponse.fromJson(Map<String, dynamic> json) {
@@ -50,6 +56,9 @@ class ReviewResponse {
       sessionXp: (json['sessionXp'] as num?)?.toInt() ?? 0,
       reviewedCount: (json['reviewedCount'] as num?)?.toInt() ?? 0,
       totalCards: (json['totalCards'] as num?)?.toInt() ?? 0,
+      totalXp: (json['totalXp'] as num?)?.toInt() ?? 0,
+      dailyEarnedXp: (json['dailyEarnedXp'] as num?)?.toInt() ?? 0,
+      streakUpdated: json['streakUpdated'] == true,
     );
   }
 }

@@ -131,6 +131,9 @@ class ExerciseCompleteResponse {
   final int incorrect;
   final double accuracyPercent;
   final int xpEarned;
+  final int totalXp;
+  final int dailyEarnedXp;
+  final bool streakUpdated;
 
   const ExerciseCompleteResponse({
     required this.totalQuestions,
@@ -138,6 +141,9 @@ class ExerciseCompleteResponse {
     required this.incorrect,
     required this.accuracyPercent,
     required this.xpEarned,
+    required this.totalXp,
+    required this.dailyEarnedXp,
+    required this.streakUpdated,
   });
 
   factory ExerciseCompleteResponse.fromJson(Map<String, dynamic> json) {
@@ -147,6 +153,9 @@ class ExerciseCompleteResponse {
       incorrect: (json['incorrect'] as num?)?.toInt() ?? 0,
       accuracyPercent: (json['accuracyPercent'] as num?)?.toDouble() ?? 0.0,
       xpEarned: (json['xpEarned'] as num?)?.toInt() ?? 0,
+      totalXp: (json['totalXp'] as num?)?.toInt() ?? 0,
+      dailyEarnedXp: (json['dailyEarnedXp'] as num?)?.toInt() ?? 0,
+      streakUpdated: json['streakUpdated'] == true,
     );
   }
 }

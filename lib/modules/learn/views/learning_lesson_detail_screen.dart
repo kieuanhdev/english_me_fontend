@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
@@ -71,8 +72,8 @@ class _LearningLessonDetailScreenState
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
               child: ApiStateView(
                 state: state,
-                errorMessage: 'KhÃ´ng táº£i Ä‘Æ°á»£c bÃ i há»c.',
-                emptyMessage: 'KhÃ´ng tÃ¬m tháº¥y bÃ i há»c.',
+                errorMessage: 'Không tải được bài học.',
+                emptyMessage: 'Không tìm thấy bài học.',
                 onRetry: () => setState(() {
                   _lesson = null;
                   _future = _repo.getLessonDetail(_lessonId);
@@ -211,6 +212,13 @@ class _LearningLessonDetailScreenState
         title: 'Question completed',
         message: '+${result.xpEarned} XP - ${result.score} points',
       );
+      // Spec §9.5: set thẳng totalXp vào ProfileController; show bonuses toast.
+      XpGrantHandler.apply(
+        totalXp: result.totalXp,
+        xpEarned: result.xpEarned,
+        streakUpdated: result.streakUpdated,
+        bonuses: result.bonuses,
+      );
       if (mounted) {
         setState(() => _completion = result);
         if (result.completed && result.levelProgress >= 1) {
@@ -309,10 +317,10 @@ class _LessonBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _skillColor(lesson.skill);
     final completionButtonLabel = loadingNext
-        ? 'Äang táº£i cÃ¢u tiáº¿p theo...'
+        ? 'Đang tải câu tiếp theo...'
         : completion?.nextLessonId?.trim().isNotEmpty == true
-        ? 'CÃ¢u tiáº¿p theo'
-        : 'HoÃ n thÃ nh path';
+        ? 'Câu tiếp theo'
+        : 'Hoàn thành path';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -364,7 +372,7 @@ class _LessonBody extends StatelessWidget {
           )
         else
           AppButton(
-            label: submitting ? 'Äang lÆ°u...' : 'HoÃ n thÃ nh',
+            label: submitting ? 'Đang lưu...' : 'Hoàn thành',
             onPressed: submitting
                 ? null
                 : completion != null
@@ -400,7 +408,7 @@ class _LessonHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '${lesson.level} â€¢ ${_skillLabel(lesson.skill)}',
+                  '${lesson.level} • ${_skillLabel(lesson.skill)}',
                   style: AppTypography.labelSmall.copyWith(
                     color: color,
                     fontWeight: FontWeight.w900,
@@ -445,27 +453,21 @@ class _ContentCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ContentLine(
-            title: 'HÆ°á»›ng dáº«n',
+            title: 'Hướng dẫn',
             value: content['instruction']?.toString(),
           ),
+          _ContentLine(title: 'Bài đọc', value: content['passage']?.toString()),
           _ContentLine(
-            title: 'BÃ i Ä‘á»c',
-            value: content['passage']?.toString(),
-          ),
-          _ContentLine(
-            title: 'CÃ¢u máº«u',
+            title: 'Câu mẫu',
             value: content['sampleText']?.toString(),
           ),
           _ContentLine(
-            title: 'PhiÃªn Ã¢m',
+            title: 'Phiên âm',
             value: content['phonetic']?.toString(),
           ),
+          _ContentLine(title: 'Đề bài', value: content['prompt']?.toString()),
           _ContentLine(
-            title: 'Äá» bÃ i',
-            value: content['prompt']?.toString(),
-          ),
-          _ContentLine(
-            title: 'BÃ i máº«u',
+            title: 'Bài mẫu',
             value: content['exampleAnswer']?.toString(),
           ),
           _ContentLine(
@@ -473,7 +475,7 @@ class _ContentCard extends StatelessWidget {
             value: content['transcript']?.toString(),
           ),
           _ContentLine(
-            title: 'NghÄ©a tiáº¿ng Viá»‡t',
+            title: 'Nghĩa tiếng Việt',
             value: content['translationVi']?.toString(),
           ),
           if (content['audioUrl'] != null) ...[
@@ -565,7 +567,7 @@ class _ActivityRenderer extends StatelessWidget {
         ),
         'pronunciation' => _PronunciationActivity(activity: activity),
         _ => Text(
-          'Loáº¡i bÃ i táº­p: ${activity.type}',
+          'Loại bài tập: ${activity.type}',
           style: AppTypography.bodyRegular,
         ),
       },
@@ -687,7 +689,7 @@ class _CompletionCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'ÄÃ£ lÆ°u káº¿t quáº£',
+                  'Đã lưu kết quả',
                   style: AppTypography.bodyRegular.copyWith(
                     fontWeight: FontWeight.w900,
                     color: AppColors.success,
@@ -695,7 +697,7 @@ class _CompletionCard extends StatelessWidget {
                 ),
                 AppGap.h2,
                 Text(
-                  '${result.score} Ä‘iá»ƒm â€¢ +${result.xpEarned} XP',
+                  '${result.score} điểm • +${result.xpEarned} XP',
                   style: AppTypography.bodySmall,
                 ),
               ],
@@ -724,9 +726,7 @@ class _WritingActivity extends StatelessWidget {
           controller: controller,
           minLines: 4,
           maxLines: 6,
-          decoration: const InputDecoration(
-            hintText: 'Nháº­p cÃ¢u tráº£ lá»i...',
-          ),
+          decoration: const InputDecoration(hintText: 'Nhập câu trả lời...'),
         ),
         if (activity.rubric.isNotEmpty) ...[
           AppGap.h12,
@@ -769,7 +769,7 @@ class _PronunciationActivity extends StatelessWidget {
         ),
         AppGap.h8,
         Text(
-          'Má»¥c tiÃªu tá»‘i thiá»ƒu: ${activity.minScoreToPass} Ä‘iá»ƒm. Pháº§n ghi Ã¢m/cháº¥m phÃ¡t Ã¢m sáº½ ná»‘i vá»›i module pronunciation hiá»‡n cÃ³.',
+          'Mục tiêu tối thiểu: ${activity.minScoreToPass} điểm. Phần ghi âm/chấm phát âm sẽ nối với module pronunciation hiện có.',
           style: AppTypography.bodySmall,
         ),
         AppGap.h12,
@@ -786,7 +786,7 @@ class _PronunciationActivity extends StatelessWidget {
               AppGap.w10,
               Expanded(
                 child: Text(
-                  'Ghi Ã¢m sáº½ Ä‘Æ°á»£c triá»ƒn khai á»Ÿ bÆ°á»›c ná»‘i flow pronunciation.',
+                  'Ghi âm sẽ được triển khai ở bước nối flow pronunciation.',
                   style: AppTypography.bodySmall,
                 ),
               ),
@@ -811,9 +811,9 @@ IconData _skillIcon(String skill) {
 String _skillLabel(String skill) {
   return switch (skill) {
     'listening' => 'Nghe',
-    'speaking' => 'NÃ³i',
-    'reading' => 'Äá»c',
-    'writing' => 'Viáº¿t',
+    'speaking' => 'Nói',
+    'reading' => 'Đọc',
+    'writing' => 'Viết',
     _ => skill,
   };
 }

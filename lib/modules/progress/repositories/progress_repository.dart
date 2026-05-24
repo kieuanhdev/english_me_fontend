@@ -4,10 +4,26 @@ import 'package:englishme/modules/progress/models/progress_model.dart';
 import 'package:englishme/modules/progress/models/progress_response.dart';
 import 'package:englishme/modules/progress/models/streak_calendar_response.dart';
 import 'package:englishme/modules/progress/models/xp_history_item.dart';
+import 'package:englishme/modules/progress/models/xp_ledger.dart';
 
 class ProgressRepository {
   final Dio _dio;
   ProgressRepository(this._dio);
+
+  /// Lấy 1 trang ledger XP (cursor-based). Spec §9.4.2.
+  ///
+  /// `cursor`: bỏ trống cho trang đầu, dùng `nextCursor` từ trang trước cho
+  /// các trang tiếp theo.
+  Future<XpLedgerPage> getXpLedger({String? cursor, int limit = 20}) async {
+    final clampedLimit = limit < 1 ? 1 : (limit > 100 ? 100 : limit);
+    final params = <String, dynamic>{'limit': clampedLimit};
+    if (cursor != null && cursor.isNotEmpty) params['cursor'] = cursor;
+    final response = await _dio.get(
+      '/users/me/xp/ledger',
+      queryParameters: params,
+    );
+    return XpLedgerPage.fromJson(response.data as Map<String, dynamic>);
+  }
 
   Future<ProgressData> getProgressData() async {
     final now = DateTime.now();

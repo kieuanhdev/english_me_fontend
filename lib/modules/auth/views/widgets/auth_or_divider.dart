@@ -8,15 +8,22 @@ class AuthOrDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: AppColors.secondaryContainer, thickness: 2)),
+        Expanded(
+          child: Divider(color: AppColors.secondaryContainer, thickness: 2),
+        ),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Text(
             'HOẶC',
-            style: AppTypography.labelMedium.copyWith(fontSize: 13),
+            style: AppTypography.labelSmall.copyWith(
+              fontWeight: FontWeight.w800,
+              color: AppColors.textSecondary,
+            ),
           ),
         ),
-        Expanded(child: Divider(color: AppColors.secondaryContainer, thickness: 2)),
+        Expanded(
+          child: Divider(color: AppColors.secondaryContainer, thickness: 2),
+        ),
       ],
     );
   }

@@ -5,6 +5,7 @@ import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
 import 'package:englishme/gen/assets.gen.dart';
 import 'package:englishme/modules/auth/controllers/auth_controller.dart';
+import 'package:englishme/modules/auth/views/widgets/auth_form_panel.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -49,91 +50,98 @@ class _RegisterViewState extends State<_RegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: CommonAppBar(title: T.authRegister),
+      appBar: const CommonAppBar(title: T.authRegister),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(26, 16, 26, 20),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Assets.images.iconAppEnglishMe.svg(
-                width: 80,
-                height: 80,
-                semanticsLabel: T.appName,
-              ),
-              AppGap.h26,
-              Text(
-                T.registerWelcomeTitle.tr,
-                style: AppTypography.displayLarge.copyWith(fontSize: 26),
-              ),
-              Text(
-                T.registerWelcomeSubtitle.tr,
-                style: AppTypography.bodyLarge.copyWith(fontSize: 14),
+              Center(
+                child: Assets.images.iconAppEnglishMe.svg(
+                  width: 76,
+                  height: 76,
+                  semanticsLabel: T.appName,
+                ),
               ),
               AppGap.h20,
-              AppTextField(
-                label: T.labelFullName,
-                controller: _fullNameController,
-              ),
-              AppGap.h14,
-              AppTextField(
-                label: T.labelEmail,
-                keyboardType: TextInputType.emailAddress,
-                controller: _emailController,
-              ),
-              AppGap.h14,
-              AppTextField(
-                label: T.labelPassword,
-                obscureText: true,
-                controller: _passwordController,
-              ),
-              AppGap.h14,
-              AppTextField(
-                label: T.labelConfirmPassword,
-                obscureText: true,
-                controller: _confirmPasswordController,
-              ),
-              AppGap.h18,
-              Obx(
-                () => AppButton(
-                  label: T.buttonCreateAccount,
-                  onPressed: _controller.isLoading.value
-                      ? null
-                      : () => _controller.signUpWithEmail(
-                            _fullNameController.text,
-                            _emailController.text,
-                            _passwordController.text,
-                            _confirmPasswordController.text,
-                          ),
-                  variant: AppButtonVariant.primary,
+              Text(
+                T.registerWelcomeTitle.tr,
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 26,
+                  color: AppColors.primary,
                 ),
               ),
-              AppGap.h24,
-              const AuthOrDivider(),
-              AppGap.h22,
-              Obx(
-                () => AppButton(
-                  label: T.buttonContinueWithGoogle,
-                  onPressed: _controller.isLoading.value
-                      ? null
-                      : _controller.signInWithGoogle,
-                  variant: AppButtonVariant.secondary,
-                  leading: Text(
-                    'G',
-                    style: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.googleBrand,
+              AppGap.h6,
+              Text(
+                T.registerWelcomeSubtitle.tr,
+                style: AppTypography.bodyRegular.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              AppGap.h20,
+              AuthFormPanel(
+                child: Column(
+                  children: [
+                    AppTextField(
+                      label: T.labelFullName,
+                      controller: _fullNameController,
                     ),
-                  ),
-                  textStyle: AppTypography.bodyLarge.copyWith(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                  ),
+                    AppGap.h14,
+                    AppTextField(
+                      label: T.labelEmail,
+                      keyboardType: TextInputType.emailAddress,
+                      controller: _emailController,
+                    ),
+                    AppGap.h14,
+                    AppTextField(
+                      label: T.labelPassword,
+                      obscureText: true,
+                      controller: _passwordController,
+                    ),
+                    AppGap.h14,
+                    AppTextField(
+                      label: T.labelConfirmPassword,
+                      obscureText: true,
+                      controller: _confirmPasswordController,
+                    ),
+                    AppGap.h18,
+                    Obx(
+                      () => AppButton(
+                        label: T.buttonCreateAccount,
+                        onPressed: _controller.isLoading.value
+                            ? null
+                            : () => _controller.signUpWithEmail(
+                                _fullNameController.text,
+                                _emailController.text,
+                                _passwordController.text,
+                                _confirmPasswordController.text,
+                              ),
+                        isLoading: _controller.isLoading.value,
+                      ),
+                    ),
+                    AppGap.h24,
+                    const AuthOrDivider(),
+                    AppGap.h22,
+                    Obx(
+                      () => AppButton(
+                        label: T.buttonContinueWithGoogle,
+                        onPressed: _controller.isLoading.value
+                            ? null
+                            : _controller.signInWithGoogle,
+                        variant: AppButtonVariant.secondary,
+                        leading: const GoogleMark(),
+                        isLoading: _controller.isLoading.value,
+                        textStyle: AppTypography.bodyRegular.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              AppGap.h18,
+              AppGap.h20,
               AuthNavigationText(
                 promptText: T.alreadyHaveAccount.tr,
                 buttonText: T.loginNow.tr,

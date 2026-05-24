@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/test/controllers/test_controller.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
@@ -36,15 +37,15 @@ class TestHomeScreen extends GetView<TestController> {
                       ),
                     ),
                     AppGap.h24,
-                    _SectionLabel(label: 'Chọn chủ đề'),
+                    const _SectionLabel(label: 'Chọn chủ đề'),
                     AppGap.h12,
                     _TopicSelector(controller: controller),
                     AppGap.h24,
-                    _SectionLabel(label: 'Chọn cấp độ CEFR'),
+                    const _SectionLabel(label: 'Chọn cấp độ CEFR'),
                     AppGap.h12,
                     _LevelSelector(controller: controller),
                     AppGap.h28,
-                    _TestInfoCard(),
+                    const _TestInfoCard(),
                     AppGap.h20,
                     _HistorySection(controller: controller),
                   ],
@@ -90,49 +91,57 @@ class _TopicSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Row(
-          children: _topics.asMap().entries.map((entry) {
-            final index = entry.key;
-            final (topic, icon, color) = entry.value;
-            final isSelected = controller.selectedTopic.value == topic;
-            final isLast = index == _topics.length - 1;
-            return Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(right: isLast ? 0 : 10),
-                child: GestureDetector(
-                  onTap: () => controller.selectTopic(topic),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: isSelected ? color.withValues(alpha: 0.12) : AppColors.surfaceContainerLowest,
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      border: Border.all(
-                        color: isSelected ? color : AppColors.outlineVariant,
-                        width: isSelected ? 2 : 1,
+    return Obx(
+      () => Row(
+        children: _topics.asMap().entries.map((entry) {
+          final index = entry.key;
+          final (topic, icon, color) = entry.value;
+          final isSelected = controller.selectedTopic.value == topic;
+          final isLast = index == _topics.length - 1;
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(right: isLast ? 0 : 10),
+              child: GestureDetector(
+                onTap: () => controller.selectTopic(topic),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? color.withValues(alpha: 0.12)
+                        : AppColors.surfaceContainerLowest,
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    border: Border.all(
+                      color: isSelected ? color : AppColors.outlineVariant,
+                      width: isSelected ? 2 : 1,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Icon(
+                        icon,
+                        color: isSelected ? color : AppColors.iconMuted,
+                        size: 24,
                       ),
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(icon, color: isSelected ? color : AppColors.iconMuted, size: 24),
-                        const SizedBox(height: 6),
-                        Text(
-                          topic.label,
-                          style: AppTypography.headlineMedium.copyWith(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: isSelected ? color : AppColors.textSecondary,
-                          ),
-                          textAlign: TextAlign.center,
+                      const SizedBox(height: 6),
+                      Text(
+                        topic.label,
+                        style: AppTypography.headlineMedium.copyWith(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: isSelected ? color : AppColors.textSecondary,
                         ),
-                      ],
-                    ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
               ),
-            );
-          }).toList(),
-        ));
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
 
@@ -145,53 +154,59 @@ class _LevelSelector extends StatelessWidget {
   static const _levels = TestLevel.values;
 
   static Color _levelColor(TestLevel l) => switch (l) {
-        TestLevel.a1 => const Color(0xFF4CAF50),
-        TestLevel.a2 => const Color(0xFF8BC34A),
-        TestLevel.b1 => const Color(0xFFFFB74D),
-        TestLevel.b2 => const Color(0xFFFF7043),
-        TestLevel.c1 => const Color(0xFFE53935),
-        TestLevel.c2 => const Color(0xFF9C27B0),
-      };
+    TestLevel.a1 => const Color(0xFF4CAF50),
+    TestLevel.a2 => const Color(0xFF8BC34A),
+    TestLevel.b1 => const Color(0xFFFFB74D),
+    TestLevel.b2 => const Color(0xFFFF7043),
+    TestLevel.c1 => const Color(0xFFE53935),
+    TestLevel.c2 => const Color(0xFF9C27B0),
+  };
 
   @override
   Widget build(BuildContext context) {
-    return Obx(() => Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: _levels.map((level) {
-            final isSelected = controller.selectedLevel.value == level;
-            final color = _levelColor(level);
-            return GestureDetector(
-              onTap: () => controller.selectLevel(level),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: isSelected ? color.withValues(alpha: 0.12) : AppColors.surfaceContainerLowest,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(
-                    color: isSelected ? color : AppColors.outlineVariant,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Text(
-                  level.label,
-                  style: AppTypography.headlineMedium.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,
-                    color: isSelected ? color : AppColors.textSecondary,
-                  ),
+    return Obx(
+      () => Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: _levels.map((level) {
+          final isSelected = controller.selectedLevel.value == level;
+          final color = _levelColor(level);
+          return GestureDetector(
+            onTap: () => controller.selectLevel(level),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? color.withValues(alpha: 0.12)
+                    : AppColors.surfaceContainerLowest,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(
+                  color: isSelected ? color : AppColors.outlineVariant,
+                  width: isSelected ? 2 : 1,
                 ),
               ),
-            );
-          }).toList(),
-        ));
+              child: Text(
+                level.label,
+                style: AppTypography.headlineMedium.copyWith(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  color: isSelected ? color : AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
   }
 }
 
 // ─── Test Info Card ───────────────────────────────────────────────────────────
 
 class _TestInfoCard extends StatelessWidget {
+  const _TestInfoCard();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -205,7 +220,11 @@ class _TestInfoCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.info_outline_rounded, size: 16, color: AppColors.primary),
+              Icon(
+                Icons.info_outline_rounded,
+                size: 16,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 6),
               Text(
                 'Thông tin bài kiểm tra',
@@ -218,13 +237,16 @@ class _TestInfoCard extends StatelessWidget {
             ],
           ),
           AppGap.h12,
-          Row(
+          const Row(
             children: [
               _InfoChip(icon: Icons.quiz_rounded, label: '10 câu hỏi'),
               AppGap.w12,
               _InfoChip(icon: Icons.timer_outlined, label: '15 phút'),
               AppGap.w12,
-              _InfoChip(icon: Icons.check_circle_outline_rounded, label: 'Trắc nghiệm'),
+              _InfoChip(
+                icon: Icons.check_circle_outline_rounded,
+                label: 'Trắc nghiệm',
+              ),
             ],
           ),
           AppGap.h10,
@@ -283,10 +305,14 @@ class _HistorySection extends StatelessWidget {
         children: [
           const _SectionLabel(label: 'Lịch sử kiểm tra'),
           AppGap.h12,
-          ...controller.history.take(3).map((entry) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: _HistoryTile(entry: entry),
-              )),
+          ...controller.history
+              .take(3)
+              .map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: _HistoryTile(entry: entry),
+                ),
+              ),
         ],
       );
     });
@@ -300,7 +326,9 @@ class _HistoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pct = entry.accuracy;
-    final color = pct >= 0.7 ? AppColors.success : (pct >= 0.5 ? AppColors.skillVocabulary : AppColors.danger);
+    final color = pct >= 0.7
+        ? AppColors.success
+        : (pct >= 0.5 ? AppColors.skillVocabulary : AppColors.danger);
     final score = (pct * 100).round();
     final daysAgo = DateTime.now().difference(entry.completedAt).inDays;
     final timeText = daysAgo == 0 ? 'Hôm nay' : '$daysAgo ngày trước';
@@ -373,36 +401,18 @@ class _StartButton extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Obx(() {
-          final canStart = controller.selectedTopic.value != null && controller.selectedLevel.value != null;
-          return GestureDetector(
-            onTap: canStart ? controller.startTest : null,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              height: 56,
-              decoration: BoxDecoration(
-                gradient: canStart ? AppColors.primaryGradient : null,
-                color: canStart ? null : AppColors.surfaceContainerHigh,
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Bắt đầu kiểm tra',
-                    style: AppTypography.headlineMedium.copyWith(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: canStart ? AppColors.onPrimaryFixed : AppColors.iconMuted,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    Icons.play_arrow_rounded,
-                    color: canStart ? AppColors.onPrimaryFixed : AppColors.iconMuted,
-                    size: 20,
-                  ),
-                ],
-              ),
+          final canStart =
+              controller.selectedTopic.value != null &&
+              controller.selectedLevel.value != null;
+          return AppButton(
+            label: 'Bắt đầu kiểm tra',
+            isTranslate: false,
+            onPressed: canStart ? controller.startTest : null,
+            leading: const Icon(Icons.play_arrow_rounded, size: 20),
+            textStyle: AppTypography.headlineMedium.copyWith(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: AppColors.onPrimaryFixed,
             ),
           );
         }),

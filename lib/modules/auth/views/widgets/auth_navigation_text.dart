@@ -21,8 +21,7 @@ class AuthNavigationText extends StatelessWidget {
         children: [
           Text(
             '$promptText ',
-            style: AppTypography.bodyLarge.copyWith(
-              fontSize: 13,
+            style: AppTypography.bodySmall.copyWith(
               fontWeight: FontWeight.w600,
               color: AppColors.textSecondary,
             ),
@@ -31,8 +30,7 @@ class AuthNavigationText extends StatelessWidget {
             onTap: onTap,
             child: Text(
               buttonText,
-              style: AppTypography.bodyLarge.copyWith(
-                fontSize: 13,
+              style: AppTypography.bodySmall.copyWith(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w800,
               ),

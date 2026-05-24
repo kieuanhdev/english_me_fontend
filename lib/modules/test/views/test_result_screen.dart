@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/test/controllers/test_controller.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -22,46 +23,31 @@ class TestResultScreen extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: controller.retryTest,
-                  child: Container(
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Làm lại',
-                      style: AppTypography.headlineMedium.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
-                      ),
-                    ),
+                child: AppButton(
+                  label: 'Làm lại',
+                  isTranslate: false,
+                  onPressed: controller.retryTest,
+                  variant: AppButtonVariant.secondary,
+                  height: 54,
+                  textStyle: AppTypography.headlineMedium.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
               AppGap.w12,
               Expanded(
                 flex: 2,
-                child: GestureDetector(
-                  onTap: controller.closeTest,
-                  child: Container(
-                    height: 54,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Hoàn thành',
-                      style: AppTypography.headlineMedium.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onPrimaryFixed,
-                      ),
-                    ),
+                child: AppButton(
+                  label: 'Hoàn thành',
+                  isTranslate: false,
+                  onPressed: controller.closeTest,
+                  height: 54,
+                  textStyle: AppTypography.headlineMedium.copyWith(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.onPrimaryFixed,
                   ),
                 ),
               ),
@@ -96,29 +82,32 @@ class TestResultScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                child: Obx(() => Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _ResultHeader(
-                          correct: controller.correctCount,
-                          total: controller.totalAnswered,
-                        ),
-                        AppGap.h20,
-                        _ScoreCard(
-                          correct: controller.correctCount,
-                          total: controller.totalAnswered,
-                          topic: controller.selectedTopic.value,
-                          level: controller.selectedLevel.value,
-                        ),
-                        AppGap.h16,
-                        _StatsRow(
-                          correct: controller.correctCount,
-                          incorrect: controller.totalAnswered - controller.correctCount,
-                        ),
-                        AppGap.h24,
-                        _ReviewSection(results: controller.results),
-                      ],
-                    )),
+                child: Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _ResultHeader(
+                        correct: controller.correctCount,
+                        total: controller.totalAnswered,
+                      ),
+                      AppGap.h20,
+                      _ScoreCard(
+                        correct: controller.correctCount,
+                        total: controller.totalAnswered,
+                        topic: controller.selectedTopic.value,
+                        level: controller.selectedLevel.value,
+                      ),
+                      AppGap.h16,
+                      _StatsRow(
+                        correct: controller.correctCount,
+                        incorrect:
+                            controller.totalAnswered - controller.correctCount,
+                      ),
+                      AppGap.h24,
+                      _ReviewSection(results: controller.results),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -139,10 +128,26 @@ class _ResultHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final pct = total > 0 ? correct / total : 0.0;
     final (icon, title, subtitle) = switch (pct) {
-      >= 0.9 => (Icons.emoji_events_rounded, 'Xuất sắc!', 'Bạn nắm vững kiến thức này rồi!'),
-      >= 0.7 => (Icons.thumb_up_rounded, 'Tốt lắm!', 'Kết quả rất khả quan, tiếp tục phát huy!'),
-      >= 0.5 => (Icons.trending_up_rounded, 'Cố lên!', 'Ôn thêm để nâng cao điểm số nhé.'),
-      _ => (Icons.refresh_rounded, 'Thử lại nhé!', 'Hãy ôn luyện thêm phần này.'),
+      >= 0.9 => (
+        Icons.emoji_events_rounded,
+        'Xuất sắc!',
+        'Bạn nắm vững kiến thức này rồi!',
+      ),
+      >= 0.7 => (
+        Icons.thumb_up_rounded,
+        'Tốt lắm!',
+        'Kết quả rất khả quan, tiếp tục phát huy!',
+      ),
+      >= 0.5 => (
+        Icons.trending_up_rounded,
+        'Cố lên!',
+        'Ôn thêm để nâng cao điểm số nhé.',
+      ),
+      _ => (
+        Icons.refresh_rounded,
+        'Thử lại nhé!',
+        'Hãy ôn luyện thêm phần này.',
+      ),
     };
 
     return Column(
@@ -326,7 +331,12 @@ class _ArcPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final stroke = size.width * 0.12;
-    final rect = Rect.fromLTWH(stroke / 2, stroke / 2, size.width - stroke, size.height - stroke);
+    final rect = Rect.fromLTWH(
+      stroke / 2,
+      stroke / 2,
+      size.width - stroke,
+      size.height - stroke,
+    );
     final trackPaint = Paint()
       ..color = AppColors.surfaceContainerHigh
       ..style = PaintingStyle.stroke
@@ -455,10 +465,12 @@ class _ReviewSection extends StatelessWidget {
           ),
         ),
         AppGap.h12,
-        ...results.asMap().entries.map((entry) => Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: _ReviewTile(index: entry.key + 1, result: entry.value),
-            )),
+        ...results.asMap().entries.map(
+          (entry) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _ReviewTile(index: entry.key + 1, result: entry.value),
+          ),
+        ),
       ],
     );
   }
@@ -516,7 +528,9 @@ class _ReviewTileState extends State<_ReviewTile> {
                 ),
                 AppGap.w10,
                 Icon(
-                  r.isCorrect ? Icons.check_circle_rounded : Icons.cancel_rounded,
+                  r.isCorrect
+                      ? Icons.check_circle_rounded
+                      : Icons.cancel_rounded,
                   color: color,
                   size: 18,
                 ),
@@ -532,7 +546,9 @@ class _ReviewTileState extends State<_ReviewTile> {
                   ),
                 ),
                 Icon(
-                  _expanded ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                  _expanded
+                      ? Icons.expand_less_rounded
+                      : Icons.expand_more_rounded,
                   size: 18,
                   color: AppColors.iconMuted,
                 ),
@@ -541,22 +557,36 @@ class _ReviewTileState extends State<_ReviewTile> {
             if (_expanded) ...[
               AppGap.h10,
               if (!r.isCorrect) ...[
-                _ReviewRow(label: 'Bạn chọn', value: r.selectedAnswer, color: AppColors.danger),
+                _ReviewRow(
+                  label: 'Bạn chọn',
+                  value: r.selectedAnswer,
+                  color: AppColors.danger,
+                ),
                 AppGap.h6,
               ],
-              _ReviewRow(label: 'Đáp án đúng', value: r.correctAnswer, color: AppColors.success),
+              _ReviewRow(
+                label: 'Đáp án đúng',
+                value: r.correctAnswer,
+                color: AppColors.success,
+              ),
               if (r.explanation != null) ...[
                 AppGap.h8,
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: AppColors.surfaceContainerLowest.withValues(alpha: 0.7),
+                    color: AppColors.surfaceContainerLowest.withValues(
+                      alpha: 0.7,
+                    ),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.lightbulb_outline_rounded, size: 14, color: AppColors.primary),
+                      Icon(
+                        Icons.lightbulb_outline_rounded,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
@@ -580,7 +610,11 @@ class _ReviewTileState extends State<_ReviewTile> {
 }
 
 class _ReviewRow extends StatelessWidget {
-  const _ReviewRow({required this.label, required this.value, required this.color});
+  const _ReviewRow({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
   final String label;
   final String value;
   final Color color;

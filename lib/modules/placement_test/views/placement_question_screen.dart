@@ -50,33 +50,42 @@ class PlacementQuestionScreen extends GetView<PlacementTestController> {
                 ...question.optionList.map(
                   (option) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: Obx(() => _AnswerTile(
-                      option: option,
-                      selected: controller.selectedAnswer.value == option.id,
-                      submitted: controller.isAnswered,
-                      isCorrect: controller.answerResponse.value?.correctAnswer == option.id,
-                      onTap: () => controller.selectAnswer(option.id),
-                    )),
+                    child: Obx(
+                      () => _AnswerTile(
+                        option: option,
+                        selected: controller.selectedAnswer.value == option.id,
+                        submitted: controller.isAnswered,
+                        isCorrect:
+                            controller.answerResponse.value?.correctAnswer ==
+                            option.id,
+                        onTap: () => controller.selectAnswer(option.id),
+                      ),
+                    ),
                   ),
                 ),
                 AppGap.h14,
                 Obx(() {
                   if (!controller.isAnswered) {
                     return AppButton(
-                      label: state == PlacementTestState.submitting ? 'ĐANG GỬI...' : 'KIỂM TRA',
-                      onPressed: (controller.selectedAnswer.value == null ||
+                      label: state == PlacementTestState.submitting
+                          ? 'ĐANG GỬI...'
+                          : 'KIỂM TRA',
+                      onPressed:
+                          (controller.selectedAnswer.value == null ||
                               state == PlacementTestState.submitting)
                           ? null
                           : controller.submitAnswer,
-                      variant: AppButtonVariant.primary,
-                      textStyle: AppTypography.labelMedium.copyWith(fontSize: 18),
+                      textStyle: AppTypography.labelMedium.copyWith(
+                        fontSize: 18,
+                      ),
                     );
                   }
                   final response = controller.answerResponse.value!;
                   return _ResultPanel(
                     correct: response.isCorrect,
                     correctAnswer: response.correctAnswer,
-                    correctAnswerText: question.options[response.correctAnswer] ?? '',
+                    correctAnswerText:
+                        question.options[response.correctAnswer] ?? '',
                     explanation: response.explanation,
                     onContinue: controller.nextQuestion,
                   );
@@ -177,11 +186,15 @@ class _PromptCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.outlineVariant, width: 2),
+        border: Border.all(color: AppColors.outlineVariant),
         boxShadow: [
-          BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
+          BoxShadow(
+            color: AppColors.shadowSoft,
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
         ],
       ),
       child: Text(
@@ -214,7 +227,7 @@ class _AnswerTile extends StatelessWidget {
     final bool correctState = submitted && isCorrect;
 
     Color border = AppColors.outlineVariant;
-    Color bg = AppColors.surface;
+    Color bg = AppColors.surfaceContainerLowest;
     Color textColor = AppColors.onSurface;
 
     if (!submitted && selected) {
@@ -242,10 +255,10 @@ class _AnswerTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: bg,
           borderRadius: BorderRadius.circular(AppRadius.lg),
-          border: Border.all(color: border, width: 2.5),
-          boxShadow: [
-            BoxShadow(color: AppColors.neutralShadow, offset: const Offset(0, 3)),
-          ],
+          border: Border.all(
+            color: border,
+            width: selected || submitted ? 2 : 1,
+          ),
         ),
         child: Row(
           children: [
@@ -253,9 +266,12 @@ class _AnswerTile extends StatelessWidget {
               width: 30,
               height: 30,
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(AppRadius.sm),
-                border: Border.all(color: border.withValues(alpha: 0.5), width: 2),
+                border: Border.all(
+                  color: border.withValues(alpha: 0.5),
+                  width: 2,
+                ),
               ),
               child: Center(
                 child: Text(
@@ -310,7 +326,9 @@ class _ResultPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final Color bg = correct ? AppColors.successPanel : AppColors.dangerPanel;
     final Color iconColor = correct ? AppColors.success : AppColors.danger;
-    final Color titleColor = correct ? AppColors.successDark : AppColors.dangerDark;
+    final Color titleColor = correct
+        ? AppColors.successDark
+        : AppColors.dangerDark;
 
     return Container(
       width: double.infinity,
@@ -327,7 +345,10 @@ class _ResultPanel extends StatelessWidget {
               Container(
                 width: 34,
                 height: 34,
-                decoration: BoxDecoration(color: iconColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: iconColor,
+                  shape: BoxShape.circle,
+                ),
                 child: Icon(
                   correct ? Icons.check : Icons.close,
                   color: AppColors.onPrimaryFixed,
@@ -367,7 +388,7 @@ class _ResultPanel extends StatelessWidget {
             ),
           ],
           AppGap.h12,
-          _ContinueButton(correct: correct, onPressed: onContinue),
+          _ContinueButton(onPressed: onContinue),
         ],
       ),
     );
@@ -375,38 +396,24 @@ class _ResultPanel extends StatelessWidget {
 }
 
 class _ContinueButton extends StatelessWidget {
-  const _ContinueButton({required this.correct, required this.onPressed});
+  const _ContinueButton({required this.onPressed});
 
-  final bool correct;
   final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    final Color mainColor = correct ? AppColors.success : AppColors.danger;
-    final Color shadowColor = correct ? AppColors.successShadow : AppColors.dangerDark;
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        boxShadow: [
-          BoxShadow(color: shadowColor, offset: const Offset(0, 4)),
-        ],
+    return AppButton(
+      label: 'TIẾP TỤC',
+      isTranslate: false,
+      onPressed: onPressed,
+      textStyle: AppTypography.labelMedium.copyWith(
+        fontSize: 18,
+        color: AppColors.onPrimaryFixed,
       ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          backgroundColor: mainColor,
-          foregroundColor: AppColors.onPrimaryFixed,
-          minimumSize: const Size.fromHeight(56),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-        ),
-        child: Text(
-          'TIẾP TỤC',
-          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: AppColors.onPrimaryFixed),
-        ),
+      leading: Icon(
+        Icons.arrow_forward_rounded,
+        size: 20,
+        color: AppColors.onPrimaryFixed,
       ),
     );
   }

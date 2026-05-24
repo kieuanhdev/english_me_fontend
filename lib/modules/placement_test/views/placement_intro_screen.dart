@@ -27,7 +27,10 @@ class PlacementIntroScreen extends StatelessWidget {
               AppGap.h16,
               Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primarySoft,
                     borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -95,11 +98,11 @@ class PlacementIntroScreen extends StatelessWidget {
                 onPressed: () async {
                   final controller = Get.find<PlacementTestController>();
                   await controller.startTest();
-                  if (controller.state.value == PlacementTestState.questioning) {
+                  if (controller.state.value ==
+                      PlacementTestState.questioning) {
                     Get.toNamed(AppRoutes.placementTestQuestion);
                   }
                 },
-                variant: AppButtonVariant.primary,
               ),
               AppGap.h18,
               Center(
@@ -146,7 +149,6 @@ class _PlacementMascot extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Align(
-            alignment: Alignment.center,
             child: Container(
               width: 138,
               height: 138,
@@ -207,13 +209,14 @@ class _SkillCard extends StatelessWidget {
       height: 104,
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.outlineVariant, width: 2),
+        border: Border.all(color: AppColors.outlineVariant),
         boxShadow: [
           BoxShadow(
-            color: AppColors.neutralShadow,
-            offset: Offset(0, 3),
+            color: AppColors.shadowSoft,
+            blurRadius: 14,
+            offset: const Offset(0, 4),
           ),
         ],
       ),

@@ -36,7 +36,12 @@ class ThemeController extends GetxController {
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
+    final shouldRefresh = themeModeRx.value != mode;
     themeModeRx.value = mode;
+    Get.changeThemeMode(mode);
+    if (shouldRefresh) {
+      await Get.forceAppUpdate();
+    }
     _prefs ??= await SharedPreferences.getInstance();
     final int stored = switch (mode) {
       ThemeMode.light => 0,
@@ -44,5 +49,11 @@ class ThemeController extends GetxController {
       ThemeMode.system => 2,
     };
     await _prefs!.setInt(_prefKey, stored);
+  }
+
+  Future<void> refreshSystemTheme() async {
+    if (themeModeRx.value != ThemeMode.system) return;
+    Get.changeThemeMode(ThemeMode.system);
+    await Get.forceAppUpdate();
   }
 }

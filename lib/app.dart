@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:englishme/core/locale_controller.dart';
 import 'package:englishme/core/services/localization_service.dart';
 import 'package:englishme/routes/app_pages.dart';
@@ -30,7 +32,7 @@ class _EnglishMeAppState extends State<EnglishMeApp> with WidgetsBindingObserver
   void didChangePlatformBrightness() {
     final ThemeController c = Get.find<ThemeController>();
     if (c.themeModeRx.value == ThemeMode.system) {
-      setState(() {});
+      unawaited(c.refreshSystemTheme());
     }
   }
 

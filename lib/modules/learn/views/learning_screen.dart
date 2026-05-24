@@ -68,14 +68,10 @@ class LearningScreen extends GetView<LearningController> {
                             'Mỗi path tập trung vào một chủ đề và trộn bài tập của nhiều kỹ năng.',
                       ),
                       AppGap.h12,
-                      ...hub.paths.map(
-                        (path) => Padding(
-                          padding: const EdgeInsets.only(bottom: 10),
-                          child: _PathTile(
-                            path: path,
-                            onTap: () => controller.openPath(path),
-                          ),
-                        ),
+                      _PathWindow(
+                        paths: hub.paths,
+                        currentPathId: hub.currentPathId,
+                        onOpenPath: controller.openPath,
                       ),
                       AppGap.h24,
                       if (hub.paths.isEmpty) ...[
@@ -510,6 +506,157 @@ class _PathTile extends StatelessWidget {
                       .toList(growable: false),
                 ),
               ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _PathWindow extends StatefulWidget {
+  const _PathWindow({
+    required this.paths,
+    required this.currentPathId,
+    required this.onOpenPath,
+  });
+
+  final List<LearningPath> paths;
+  final String? currentPathId;
+  final ValueChanged<LearningPath> onOpenPath;
+
+  @override
+  State<_PathWindow> createState() => _PathWindowState();
+}
+
+class _PathWindowState extends State<_PathWindow> {
+  static const int _visibleCount = 5;
+  late int _startIndex;
+  late int _endIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetVisibleRange();
+  }
+
+  @override
+  void didUpdateWidget(covariant _PathWindow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.paths != widget.paths ||
+        oldWidget.currentPathId != widget.currentPathId) {
+      _resetVisibleRange();
+    }
+  }
+
+  void _resetVisibleRange() {
+    _startIndex = _initialStartIndex();
+    _endIndex = (_startIndex + _visibleCount).clamp(0, widget.paths.length);
+  }
+
+  int _initialStartIndex() {
+    if (widget.paths.length <= _visibleCount) return 0;
+    final currentIndex = _currentPathIndex();
+    final maxStart = widget.paths.length - _visibleCount;
+    return (currentIndex - 2).clamp(0, maxStart);
+  }
+
+  int _currentPathIndex() {
+    final currentPathId = widget.currentPathId;
+    if (currentPathId != null && currentPathId.trim().isNotEmpty) {
+      final byId = widget.paths.indexWhere((path) => path.id == currentPathId);
+      if (byId >= 0) return byId;
+    }
+
+    final inProgress = widget.paths.indexWhere(
+      (path) => path.status == 'in_progress' || path.progress > 0,
+    );
+    if (inProgress >= 0) return inProgress;
+
+    final available = widget.paths.indexWhere((path) => !path.isLocked);
+    return available >= 0 ? available : 0;
+  }
+
+  void _showPrevious() {
+    setState(() => _startIndex = (_startIndex - _visibleCount).clamp(0, _startIndex));
+  }
+
+  void _showNext() {
+    setState(() => _endIndex = (_endIndex + _visibleCount).clamp(0, widget.paths.length));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.paths.isEmpty) return const SizedBox.shrink();
+
+    final visiblePaths = widget.paths.sublist(_startIndex, _endIndex);
+    final hasPrevious = _startIndex > 0;
+    final hasNext = _endIndex < widget.paths.length;
+
+    return Column(
+      children: [
+        if (hasPrevious) ...[
+          _PathWindowButton(
+            icon: Icons.keyboard_arrow_up_rounded,
+            label: 'Xem lại path trước',
+            onTap: _showPrevious,
+          ),
+          AppGap.h10,
+        ],
+        ...visiblePaths.map(
+          (path) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _PathTile(
+              path: path,
+              onTap: () => widget.onOpenPath(path),
+            ),
+          ),
+        ),
+        if (hasNext)
+          _PathWindowButton(
+            icon: Icons.keyboard_arrow_down_rounded,
+            label: 'Xem thêm path sau',
+            onTap: _showNext,
+          ),
+      ],
+    );
+  }
+}
+
+class _PathWindowButton extends StatelessWidget {
+  const _PathWindowButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.primarySoft,
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: AppColors.primary, size: 20),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: AppTypography.labelSmall.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ],
           ),
         ),

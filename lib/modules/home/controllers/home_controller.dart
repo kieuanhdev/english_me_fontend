@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:audioplayers/audioplayers.dart';
 
+import 'package:englishme/core/config/app_config.dart';
+import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/home/models/home_dashboard_model.dart';
 import 'package:englishme/modules/home/repositories/home_repository.dart';
@@ -9,15 +12,21 @@ import 'package:englishme/modules/learn/models/learning_models.dart';
 import 'package:englishme/routes/app_routes.dart';
 
 enum HomeLoadState { idle, loading, success, error }
+enum WordOfDayState { idle, loading, loaded, empty, error }
 
 class HomeController extends GetxController {
   final HomeRepository _repo;
   HomeController(this._repo);
 
+  final AudioPlayer _wordAudioPlayer = AudioPlayer();
+
   final loadState = HomeLoadState.idle.obs;
   final Rxn<HomeDashboardResponse> dashboard = Rxn();
+  final Rxn<WordOfDayDto> dailyWord = Rxn();
   final RxString greetingLabel = T.homeGreeting.tr.obs;
   final RxBool wordSaved = false.obs;
+  final wordOfDayState = WordOfDayState.idle.obs;
+  final wordOfDayMessage = ''.obs;
 
   static const int dailyXpTarget = 50;
 
@@ -26,6 +35,13 @@ class HomeController extends GetxController {
     super.onInit();
     _updateGreeting();
     loadDashboard();
+    loadWordOfDay();
+  }
+
+  @override
+  void onClose() {
+    _wordAudioPlayer.dispose();
+    super.onClose();
   }
 
   Future<void> loadDashboard() async {
@@ -38,7 +54,32 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> reloadDashboard() => loadDashboard();
+  Future<void> reloadDashboard() async {
+    await Future.wait([
+      loadDashboard(),
+      loadWordOfDay(forceRefresh: true),
+    ]);
+  }
+
+  Future<void> loadWordOfDay({bool forceRefresh = false}) async {
+    try {
+      wordOfDayState.value = WordOfDayState.loading;
+      wordOfDayMessage.value = '';
+      final result = await _repo.getWordOfDay(forceRefresh: forceRefresh);
+      dailyWord.value = result;
+      wordSaved.value = false;
+      wordOfDayState.value =
+          result == null ? WordOfDayState.empty : WordOfDayState.loaded;
+      if (result == null) {
+        wordOfDayMessage.value =
+            'Làm placement test để nhận từ vựng mỗi ngày theo level của bạn.';
+      }
+    } catch (_) {
+      wordOfDayState.value = WordOfDayState.error;
+      wordOfDayMessage.value =
+          'Không tải được từ vựng mỗi ngày. Vui lòng thử lại.';
+    }
+  }
 
   // ----- User -----
   String get userName {
@@ -83,7 +124,7 @@ class HomeController extends GetxController {
   }
 
   // ----- Word of day -----
-  WordOfDayDto? get wordOfDay => dashboard.value?.wordOfDay;
+  WordOfDayDto? get wordOfDay => dailyWord.value;
 
   // ----- Recommendations -----
   List<HomeRecommendation> get recommendations =>
@@ -100,8 +141,31 @@ class HomeController extends GetxController {
     }
   }
 
-  void onListenWordOfDay() {
-    // TODO: integrate TTS audio playback for wordOfDay?.word
+  Future<void> onListenWordOfDay() async {
+    final audioUrl = _resolveAudioUrl(wordOfDay?.audioUrl);
+    if (audioUrl != null) {
+      try {
+        await _wordAudioPlayer.stop();
+        await _wordAudioPlayer.play(UrlSource(audioUrl));
+        return;
+      } catch (_) {
+        // Fall back to TTS when the audio file is unavailable.
+      }
+    }
+    final word = wordOfDay?.word;
+    if (word == null || word.trim().isEmpty) return;
+    await Get.find<TtsService>().speak(word);
+  }
+
+  String? _resolveAudioUrl(String? raw) {
+    final value = raw?.trim();
+    if (value == null || value.isEmpty) return null;
+    if (value.startsWith('http://') || value.startsWith('https://')) {
+      return value;
+    }
+    final base = AppConfig.apiBaseUrl.replaceFirst(RegExp(r'/+$'), '');
+    final path = value.replaceFirst(RegExp(r'^/+'), '');
+    return '$base/$path';
   }
 
   void onAddWordToFlashcard() {
@@ -122,6 +186,10 @@ class HomeController extends GetxController {
 
   void onSeeAllLessons() {
     Get.toNamed(AppRoutes.learn);
+  }
+
+  void onStartPlacementTest() {
+    Get.toNamed(AppRoutes.placementTest);
   }
 
   void onContinueLearning() {

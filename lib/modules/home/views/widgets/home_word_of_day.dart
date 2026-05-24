@@ -16,7 +16,27 @@ class HomeWordOfDay extends GetView<HomeController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final word = controller.wordOfDay;
-      if (word == null) return const SizedBox.shrink();
+      final state = controller.wordOfDayState.value;
+      if (state == WordOfDayState.loading) {
+        return const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: _WordOfDayLoadingCard(),
+        );
+      }
+      if (word == null) {
+        if (state == WordOfDayState.empty || state == WordOfDayState.error) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _WordOfDayMessageCard(
+              message: controller.wordOfDayMessage.value,
+              isError: state == WordOfDayState.error,
+              onRetry: () => controller.loadWordOfDay(forceRefresh: true),
+              onPlacement: controller.onStartPlacementTest,
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      }
 
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -188,5 +208,118 @@ class HomeWordOfDay extends GetView<HomeController> {
         ),
       );
     });
+  }
+}
+
+class _WordOfDayLoadingCard extends StatelessWidget {
+  const _WordOfDayLoadingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: HomeWordOfDay._bgColor,
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: CircularProgressIndicator(
+              strokeWidth: 2.5,
+              color: HomeWordOfDay._wordColor,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            'Đang tải từ vựng mỗi ngày...',
+            style: AppTypography.bodyLarge.copyWith(
+              color: HomeWordOfDay._ipaColor,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WordOfDayMessageCard extends StatelessWidget {
+  const _WordOfDayMessageCard({
+    required this.message,
+    required this.isError,
+    required this.onRetry,
+    required this.onPlacement,
+  });
+
+  final String message;
+  final bool isError;
+  final VoidCallback onRetry;
+  final VoidCallback onPlacement;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+      decoration: BoxDecoration(
+        color: HomeWordOfDay._bgColor,
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                isError
+                    ? Icons.error_outline_rounded
+                    : Icons.assignment_turned_in_rounded,
+                color: HomeWordOfDay._wordColor,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Từ vựng mỗi ngày',
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 18,
+                  color: HomeWordOfDay._wordColor,
+                ),
+              ),
+            ],
+          ),
+          AppGap.h8,
+          Text(
+            message.isEmpty ? 'Chưa có từ vựng mỗi ngày.' : message,
+            style: AppTypography.bodyLarge.copyWith(
+              fontSize: 13,
+              color: HomeWordOfDay._ipaColor,
+              height: 1.4,
+            ),
+          ),
+          AppGap.h14,
+          GestureDetector(
+            onTap: isError ? onRetry : onPlacement,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(AppRadius.xl),
+              ),
+              child: Text(
+                isError ? 'Thử lại' : 'Làm placement test',
+                style: AppTypography.bodyLarge.copyWith(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.onPrimaryFixed,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -93,6 +93,7 @@ class WordOfDayDto {
   final String? exampleSentence;
   final String? exampleTranslation;
   final String? level;
+  final String? audioUrl;
 
   const WordOfDayDto({
     required this.id,
@@ -104,6 +105,7 @@ class WordOfDayDto {
     this.exampleSentence,
     this.exampleTranslation,
     this.level,
+    this.audioUrl,
   });
 
   factory WordOfDayDto.fromJson(Map<String, dynamic> json) => WordOfDayDto(
@@ -116,6 +118,7 @@ class WordOfDayDto {
     exampleSentence: json['exampleSentence'] as String?,
     exampleTranslation: json['exampleTranslation'] as String?,
     level: json['level'] as String?,
+    audioUrl: json['audioUrl'] as String?,
   );
 }
 

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/deck_prep/controllers/deck_prep_controller.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -408,13 +408,13 @@ class _InventoryWordCard extends StatelessWidget {
     required this.onEdit,
   });
 
-  final FlashcardModel card;
+  final VocabWord card;
   final VoidCallback onSpeak;
   final VoidCallback onEdit;
 
   @override
   Widget build(BuildContext context) {
-    final vi = card.viDefinition.isNotEmpty ? card.viDefinition : card.vietnamese;
+    final vi = card.definitionVi;
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,

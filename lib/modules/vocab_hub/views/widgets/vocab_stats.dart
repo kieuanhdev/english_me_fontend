@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_desk_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class FlashcardStats extends GetView<FlashcardController> {
-  const FlashcardStats({super.key});
+class VocabStats extends GetView<VocabDeskController> {
+  const VocabStats({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Obx(() => Row(
-        children: [
-          Expanded(
-            child: _StatCard(
-              iconBg: AppColors.secondaryContainer,
-              iconColor: AppColors.primary,
-              icon: Icons.bolt_rounded,
-              value: '${controller.dayStreak.value}',
-              label: 'Day Streak',
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: _StatCard(
-              iconBg: AppColors.levelCBg,
-              iconColor: AppColors.tertiary,
-              icon: Icons.psychology_rounded,
-              value: '${controller.avgMastery.value}%',
-              label: 'Avg. Mastery',
-            ),
-          ),
-        ],
-      )),
+            children: [
+              Expanded(
+                child: _StatCard(
+                  iconBg: AppColors.secondaryContainer,
+                  iconColor: AppColors.primary,
+                  icon: Icons.bolt_rounded,
+                  value: '${controller.dayStreak.value}',
+                  label: 'Day Streak',
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: _StatCard(
+                  iconBg: AppColors.levelCBg,
+                  iconColor: AppColors.tertiary,
+                  icon: Icons.psychology_rounded,
+                  value: '${controller.avgMastery.value}%',
+                  label: 'Avg. Mastery',
+                ),
+              ),
+            ],
+          )),
     );
   }
 }
@@ -79,18 +79,12 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 16),
           Text(
             value,
-            style: AppTypography.displayLarge.copyWith(
-              fontSize: 28,
-              color: AppColors.onSurface,
-            ),
+            style: AppTypography.displayLarge.copyWith(fontSize: 28, color: AppColors.onSurface),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: AppTypography.bodyLarge.copyWith(
-              fontSize: 13,
-              color: AppColors.textSecondary,
-            ),
+            style: AppTypography.bodyLarge.copyWith(fontSize: 13, color: AppColors.textSecondary),
           ),
         ],
       ),

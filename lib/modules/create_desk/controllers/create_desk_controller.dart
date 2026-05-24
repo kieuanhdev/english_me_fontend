@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/flashcard/models/desk_model.dart';
-import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
-import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_desk_model.dart';
+import 'package:englishme/modules/vocab_hub/repositories/vocab_desk_repository.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_desk_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -13,7 +13,7 @@ class CreateDeskController extends GetxController {
   CreateDeskController({this.editingDesk});
 
   /// Khi khác `null` — chế độ sửa bộ thẻ (API `PUT /desks/{id}`).
-  final DeskModel? editingDesk;
+  final VocabDesk? editingDesk;
 
   bool get isEditMode => editingDesk != null;
 
@@ -22,7 +22,7 @@ class CreateDeskController extends GetxController {
   final titleCtrl = TextEditingController();
   final descCtrl = TextEditingController();
 
-  late final FlashcardRepository _repo;
+  late final VocabDeskRepository _repo;
 
   final RxBool isSubmitting = false.obs;
   final RxString selectedCefr = 'A1'.obs;
@@ -52,7 +52,7 @@ class CreateDeskController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = FlashcardRepository(DioClient.instance);
+    _repo = VocabDeskRepository(DioClient.instance);
     _applyEditingDeskIfAny();
   }
 
@@ -72,8 +72,8 @@ class CreateDeskController extends GetxController {
   }
 
   Future<void> _reloadFlashcardListIfAny() async {
-    if (Get.isRegistered<FlashcardController>()) {
-      await Get.find<FlashcardController>().loadDesks();
+    if (Get.isRegistered<VocabDeskController>()) {
+      await Get.find<VocabDeskController>().loadDesks();
     }
   }
 

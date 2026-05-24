@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -170,7 +170,7 @@ class StudySessionFlashcardBack extends StatelessWidget {
     required this.onSpeak,
   });
 
-  final FlashcardModel card;
+  final VocabWord card;
   final VoidCallback onSpeak;
 
   @override
@@ -268,9 +268,9 @@ class StudySessionFlashcardBack extends StatelessWidget {
                 Container(height: 1.5, color: AppColors.surfaceContainerLow),
                 AppGap.h20,
                 // Vietnamese meaning
-                if (card.vietnamese.isNotEmpty)
+                if (card.definitionVi.isNotEmpty)
                   Text(
-                    card.vietnamese,
+                    card.definitionVi,
                     style: AppTypography.displayLarge.copyWith(
                       fontSize: 24,
                       fontWeight: FontWeight.w700,
@@ -279,7 +279,7 @@ class StudySessionFlashcardBack extends StatelessWidget {
                   ),
                 AppGap.h10,
                 // Definition
-                if (card.viDefinition.isNotEmpty || card.definition.isNotEmpty)
+                if (card.definitionVi.isNotEmpty || card.definitionEn.isNotEmpty)
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -290,7 +290,7 @@ class StudySessionFlashcardBack extends StatelessWidget {
                       AppGap.w8,
                       Expanded(
                         child: Text(
-                          card.viDefinition.isNotEmpty ? card.viDefinition : card.definition,
+                          card.definitionVi.isNotEmpty ? card.definitionVi : card.definitionEn,
                           style: AppTypography.bodyLarge.copyWith(
                             fontSize: 15,
                             height: 1.55,
@@ -301,7 +301,7 @@ class StudySessionFlashcardBack extends StatelessWidget {
                     ],
                   ),
                 // Example box
-                if (card.example.isNotEmpty) ...[
+                if (card.exampleSentence.isNotEmpty) ...[
                   AppGap.h20,
                   Container(
                     padding: const EdgeInsets.all(18),
@@ -323,13 +323,13 @@ class StudySessionFlashcardBack extends StatelessWidget {
                               height: 1.6,
                               color: AppColors.onSurface,
                             ),
-                            children: _buildSpans(card.example, card.word),
+                            children: _buildSpans(card.exampleSentence, card.word),
                           ),
                         ),
-                        if (card.viExample.isNotEmpty) ...[
+                        if (card.exampleTranslation.isNotEmpty) ...[
                           AppGap.h10,
                           Text(
-                            card.viExample,
+                            card.exampleTranslation,
                             style: AppTypography.bodyLarge.copyWith(
                               fontSize: 13,
                               color: AppColors.textSecondary,

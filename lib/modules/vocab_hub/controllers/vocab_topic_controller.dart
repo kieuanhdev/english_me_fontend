@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:englishme/modules/vocabulary/models/vocabulary_model.dart';
-import 'package:englishme/modules/vocabulary/repositories/vocabulary_repository.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_topic_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
+import 'package:englishme/modules/vocab_hub/repositories/vocab_topic_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
 
-enum VocabScreenState { idle, loading, loaded, error }
+enum VocabLoadState { idle, loading, loaded, error }
 
-class VocabularyController extends GetxController {
-  final VocabularyRepository _repo;
-
-  VocabularyController(this._repo);
+class VocabTopicController extends GetxController {
+  final VocabTopicRepository _repo;
+  VocabTopicController(this._repo);
 
   // ── Topics ──────────────────────────────────────────────────────────────────
-  final topicsState = VocabScreenState.idle.obs;
-  final topics = <VocabularyTopic>[].obs;
+  final topicsState = VocabLoadState.idle.obs;
+  final topics = <VocabTopic>[].obs;
 
   // ── Word list ────────────────────────────────────────────────────────────────
-  final wordsState = VocabScreenState.idle.obs;
-  final words = <VocabularyWord>[].obs;
-  final currentTopic = Rxn<VocabularyTopic>();
+  final wordsState = VocabLoadState.idle.obs;
+  final words = <VocabWord>[].obs;
+  final currentTopic = Rxn<VocabTopic>();
   final flippedCards = <String>{}.obs;
   final savedWords = <String>{}.obs;
 
   // ── Spelling practice ────────────────────────────────────────────────────────
-  final spellingWords = <VocabularyWord>[].obs;
+  final spellingWords = <VocabWord>[].obs;
   final spellingIndex = 0.obs;
   final spellingInput = ''.obs;
   final spellingState = SpellingState.idle.obs;
@@ -42,30 +42,28 @@ class VocabularyController extends GetxController {
     super.onClose();
   }
 
-  // ── Topic loading ─────────────────────────────────────────────────────────────
+  // ── Topics ────────────────────────────────────────────────────────────────────
   Future<void> loadTopics() async {
-    topicsState.value = VocabScreenState.loading;
+    topicsState.value = VocabLoadState.loading;
     try {
-      final result = await _repo.getTopics();
-      topics.assignAll(result);
-      topicsState.value = VocabScreenState.loaded;
+      topics.assignAll(await _repo.getTopics());
+      topicsState.value = VocabLoadState.loaded;
     } catch (_) {
-      topicsState.value = VocabScreenState.error;
+      topicsState.value = VocabLoadState.error;
     }
   }
 
   // ── Word list ─────────────────────────────────────────────────────────────────
-  Future<void> openTopic(VocabularyTopic topic) async {
+  Future<void> openTopic(VocabTopic topic) async {
     currentTopic.value = topic;
     flippedCards.clear();
-    wordsState.value = VocabScreenState.loading;
-    Get.toNamed(AppRoutes.vocabularyList);
+    wordsState.value = VocabLoadState.loading;
+    Get.toNamed(AppRoutes.vocabWordList);
     try {
-      final result = await _repo.getWordsByTopic(topic.id);
-      words.assignAll(result);
-      wordsState.value = VocabScreenState.loaded;
+      words.assignAll(await _repo.getWordsByTopic(topic.id));
+      wordsState.value = VocabLoadState.loaded;
     } catch (_) {
-      wordsState.value = VocabScreenState.error;
+      wordsState.value = VocabLoadState.error;
     }
   }
 
@@ -97,18 +95,15 @@ class VocabularyController extends GetxController {
     spellingResults.clear();
     spellingState.value = SpellingState.typing;
     spellingController.clear();
-    Get.toNamed(AppRoutes.spellingPractice);
+    Get.toNamed(AppRoutes.vocabSpelling);
   }
 
-  void onSpellingInputChange(String value) {
-    spellingInput.value = value;
-  }
+  void onSpellingInputChange(String value) => spellingInput.value = value;
 
   void submitSpelling() {
     if (spellingState.value != SpellingState.typing) return;
     final word = currentSpellingWord;
     if (word == null) return;
-
     final input = spellingInput.value.trim();
     final correct = input.toLowerCase() == word.word.toLowerCase();
     spellingState.value = correct ? SpellingState.correct : SpellingState.wrong;
@@ -122,7 +117,7 @@ class VocabularyController extends GetxController {
 
   void nextSpellingWord() {
     if (spellingIndex.value >= spellingWords.length - 1) {
-      Get.offNamed(AppRoutes.spellingResult);
+      Get.offNamed(AppRoutes.vocabSpellingResult);
       return;
     }
     spellingIndex.value++;
@@ -131,33 +126,10 @@ class VocabularyController extends GetxController {
     spellingController.clear();
   }
 
-  VocabularyWord? get currentSpellingWord {
+  VocabWord? get currentSpellingWord {
     if (spellingWords.isEmpty || spellingIndex.value >= spellingWords.length) return null;
     return spellingWords[spellingIndex.value];
   }
 
   int get spellingCorrectCount => spellingResults.where((r) => r.isCorrect).length;
-
-  // ── Helpers ──────────────────────────────────────────────────────────────────
-  String levelLabel(VocabularyLevel level) {
-    switch (level) {
-      case VocabularyLevel.a1: return 'A1';
-      case VocabularyLevel.a2: return 'A2';
-      case VocabularyLevel.b1: return 'B1';
-      case VocabularyLevel.b2: return 'B2';
-      case VocabularyLevel.c1: return 'C1';
-      case VocabularyLevel.c2: return 'C2';
-    }
-  }
-
-  Color levelColor(VocabularyLevel level) {
-    switch (level) {
-      case VocabularyLevel.a1: return const Color(0xFF4CAF50);
-      case VocabularyLevel.a2: return const Color(0xFF8BC34A);
-      case VocabularyLevel.b1: return const Color(0xFF2196F3);
-      case VocabularyLevel.b2: return const Color(0xFF9C27B0);
-      case VocabularyLevel.c1: return const Color(0xFFFF9800);
-      case VocabularyLevel.c2: return const Color(0xFFF44336);
-    }
-  }
 }

@@ -38,4 +38,10 @@ abstract class AppRoutes {
   static const vocabularyList = '/vocabulary/list';
   static const spellingPractice = '/vocabulary/spelling';
   static const spellingResult = '/vocabulary/spelling/result';
+
+  // VocabHub (unified vocabulary + flashcard)
+  static const vocabHub = '/vocab';
+  static const vocabWordList = '/vocab/words';
+  static const vocabSpelling = '/vocab/spelling';
+  static const vocabSpellingResult = '/vocab/spelling/result';
 }

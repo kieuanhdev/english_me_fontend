@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/flashcard/models/desk_model.dart';
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
-import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_desk_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
+import 'package:englishme/modules/vocab_hub/repositories/vocab_desk_repository.dart';
 
 class AddFlashcardArgs {
   const AddFlashcardArgs({
@@ -13,8 +13,8 @@ class AddFlashcardArgs {
     this.editCard,
   });
 
-  final DeskModel desk;
-  final FlashcardModel? editCard;
+  final VocabDesk desk;
+  final VocabWord? editCard;
 }
 
 class AddFlashcardController extends GetxController {
@@ -23,8 +23,8 @@ class AddFlashcardController extends GetxController {
     this.editCard,
   });
 
-  final DeskModel desk;
-  final FlashcardModel? editCard;
+  final VocabDesk desk;
+  final VocabWord? editCard;
 
   final formKey = GlobalKey<FormState>();
   final wordCtrl = TextEditingController();
@@ -32,7 +32,7 @@ class AddFlashcardController extends GetxController {
   final meaningCtrl = TextEditingController();
   final exampleCtrl = TextEditingController();
 
-  late final FlashcardRepository _repo;
+  late final VocabDeskRepository _repo;
 
   final RxString selectedPosKey = 'NOUN'.obs;
   final RxBool isSubmitting = false.obs;
@@ -50,7 +50,7 @@ class AddFlashcardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = FlashcardRepository(DioClient.instance);
+    _repo = VocabDeskRepository(DioClient.instance);
     _bindInitialValues();
   }
 
@@ -105,8 +105,8 @@ class AddFlashcardController extends GetxController {
     final card = editCard!;
     wordCtrl.text = card.word;
     ipaCtrl.text = card.ipa;
-    meaningCtrl.text = card.viDefinition.isNotEmpty ? card.viDefinition : card.vietnamese;
-    exampleCtrl.text = card.example;
+    meaningCtrl.text = card.definitionVi;
+    exampleCtrl.text = card.exampleSentence;
     selectedPosKey.value = _normalizePos(card.pos);
   }
 

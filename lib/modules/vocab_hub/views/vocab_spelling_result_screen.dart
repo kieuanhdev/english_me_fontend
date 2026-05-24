@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/modules/vocabulary/controllers/vocabulary_controller.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_topic_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class SpellingResultScreen extends GetView<VocabularyController> {
-  const SpellingResultScreen({super.key});
+class VocabSpellingResultScreen extends GetView<VocabTopicController> {
+  const VocabSpellingResultScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,6 @@ class SpellingResultScreen extends GetView<VocabularyController> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
               child: Row(
@@ -37,12 +36,8 @@ class SpellingResultScreen extends GetView<VocabularyController> {
               ),
             ),
             AppGap.h28,
-
-            // Score circle
             _ScoreCircle(correct: correct, total: total, pct: pct),
             AppGap.h28,
-
-            // Review list
             Expanded(
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
@@ -127,8 +122,8 @@ class SpellingResultScreen extends GetView<VocabularyController> {
               Expanded(
                 child: OutlinedButton.icon(
                   onPressed: () => Get.offNamedUntil(
-                    AppRoutes.vocabularyList,
-                    (r) => r.settings.name == AppRoutes.vocabularyList,
+                    AppRoutes.vocabWordList,
+                    (r) => r.settings.name == AppRoutes.vocabWordList,
                   ),
                   icon: const Icon(Icons.arrow_back_rounded, size: 18),
                   label: Text(
@@ -144,9 +139,7 @@ class SpellingResultScreen extends GetView<VocabularyController> {
                   icon: const Icon(Icons.replay_rounded, size: 18),
                   label: Text(
                     'Luyện lại',
-                    style: AppTypography.headlineMedium.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTypography.headlineMedium.copyWith(fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
@@ -218,10 +211,7 @@ class _ScoreCircle extends StatelessWidget {
         AppGap.h16,
         Text(
           _message,
-          style: AppTypography.displayLarge.copyWith(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
+          style: AppTypography.displayLarge.copyWith(fontSize: 20, fontWeight: FontWeight.w700),
         ),
       ],
     );

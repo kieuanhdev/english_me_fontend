@@ -1,8 +1,9 @@
-import 'package:englishme/modules/vocabulary/bindings/vocabulary_binding.dart';
-import 'package:englishme/modules/vocabulary/views/vocabulary_topic_screen.dart';
-import 'package:englishme/modules/vocabulary/views/vocabulary_list_screen.dart';
-import 'package:englishme/modules/vocabulary/views/spelling_practice_screen.dart';
-import 'package:englishme/modules/vocabulary/views/spelling_result_screen.dart';
+import 'package:englishme/modules/vocab_hub/bindings/vocab_hub_binding.dart';
+import 'package:englishme/modules/vocab_hub/views/vocab_hub_screen.dart';
+import 'package:englishme/modules/vocab_hub/views/vocab_topic_list_screen.dart';
+import 'package:englishme/modules/vocab_hub/views/vocab_word_list_screen.dart';
+import 'package:englishme/modules/vocab_hub/views/vocab_spelling_screen.dart';
+import 'package:englishme/modules/vocab_hub/views/vocab_spelling_result_screen.dart';
 import 'package:englishme/modules/test/bindings/test_binding.dart';
 import 'package:englishme/modules/test/views/test_home_screen.dart';
 import 'package:englishme/modules/test/views/test_question_screen.dart';
@@ -23,8 +24,6 @@ import 'package:englishme/modules/create_desk/bindings/create_desk_binding.dart'
 import 'package:englishme/modules/create_desk/views/create_desk_screen.dart';
 import 'package:englishme/modules/deck_prep/bindings/deck_prep_binding.dart';
 import 'package:englishme/modules/deck_prep/views/deck_prep_screen.dart';
-import 'package:englishme/modules/flashcard/bindings/flashcard_binding.dart';
-import 'package:englishme/modules/flashcard/views/flashcard_screen.dart';
 
 import 'package:englishme/modules/grammar/views/grammar_lesson_detail_screen.dart';
 import 'package:englishme/modules/grammar/views/grammar_screen.dart';
@@ -83,7 +82,7 @@ class AppPages {
       bindings: [
         ShellBinding(),
         HomeBinding(),
-        FlashcardBinding(),
+        VocabHubBinding(),
         LearningBinding(),
       ],
     ),
@@ -100,8 +99,13 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.flashcards,
-      page: () => const FlashcardScreen(),
-      binding: FlashcardBinding(),
+      page: () => const VocabHubScreen(),
+      binding: VocabHubBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.vocabHub,
+      page: () => const VocabHubScreen(),
+      binding: VocabHubBinding(),
     ),
     GetPage(
       name: AppRoutes.learn,
@@ -242,22 +246,36 @@ class AppPages {
       page: () => const ProfileScreen(),
       binding: ProfileBinding(),
     ),
+    // Legacy aliases → redirect to VocabHub
     GetPage(
       name: AppRoutes.vocabulary,
-      page: () => const VocabularyTopicScreen(),
-      binding: VocabularyBinding(),
+      page: () => const VocabTopicListScreen(),
+      binding: VocabHubBinding(),
     ),
     GetPage(
       name: AppRoutes.vocabularyList,
-      page: () => const VocabularyListScreen(),
+      page: () => const VocabWordListScreen(),
     ),
     GetPage(
       name: AppRoutes.spellingPractice,
-      page: () => const SpellingPracticeScreen(),
+      page: () => const VocabSpellingScreen(),
     ),
     GetPage(
       name: AppRoutes.spellingResult,
-      page: () => const SpellingResultScreen(),
+      page: () => const VocabSpellingResultScreen(),
+    ),
+    // New VocabHub routes
+    GetPage(
+      name: AppRoutes.vocabWordList,
+      page: () => const VocabWordListScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.vocabSpelling,
+      page: () => const VocabSpellingScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.vocabSpellingResult,
+      page: () => const VocabSpellingResultScreen(),
     ),
   ];
 }

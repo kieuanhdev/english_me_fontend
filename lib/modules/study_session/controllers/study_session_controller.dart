@@ -5,7 +5,7 @@ import 'package:englishme/core/network/api_exception.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/profile/controllers/profile_controller.dart';
 import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:englishme/modules/study_session/models/review_response.dart';
@@ -42,7 +42,7 @@ class StudySessionController extends GetxController {
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
 
-  final RxList<FlashcardModel> cards = <FlashcardModel>[].obs;
+  final RxList<VocabWord> cards = <VocabWord>[].obs;
   final RxInt currentIndex = 0.obs;
   final RxBool isCardFlipped = false.obs;
   final RxBool isReviewing = false.obs;
@@ -62,7 +62,7 @@ class StudySessionController extends GetxController {
   String _sessionId = '';
   DateTime _cardStartedAt = DateTime.now();
 
-  FlashcardModel get currentCard => cards[currentIndex.value];
+  VocabWord get currentCard => cards[currentIndex.value];
   int get totalCards => cards.length;
   int get totalReviewed =>
       masteredCount.value + rememberCount.value + vagueCount.value + forgetCount.value;

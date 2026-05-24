@@ -1,32 +1,31 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/flashcard/models/desk_model.dart';
-import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_desk_model.dart';
+import 'package:englishme/modules/vocab_hub/repositories/vocab_desk_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class FlashcardController extends GetxController {
-  late final FlashcardRepository _repo;
+class VocabDeskController extends GetxController {
+  late final VocabDeskRepository _repo;
 
-  final RxList<DeskModel> desks = <DeskModel>[].obs;
-  final RxBool isLoading = true.obs;
-  final RxString errorMessage = ''.obs;
+  final desks = <VocabDesk>[].obs;
+  final isLoading = true.obs;
+  final errorMessage = ''.obs;
 
   // Stats (mock — sẽ lấy từ user profile sau)
-  final RxInt dayStreak = 12.obs;
-  final RxInt avgMastery = 85.obs;
+  final dayStreak = 12.obs;
+  final avgMastery = 85.obs;
 
   // Word of the day (mock)
-  final RxString wordOfDay = 'Eloquent'.obs;
-  final RxString wordDefinition = 'Fluent or persuasive in speaking or writing.'.obs;
+  final wordOfDay = 'Eloquent'.obs;
+  final wordDefinition = 'Fluent or persuasive in speaking or writing.'.obs;
 
   @override
   void onInit() {
     super.onInit();
-    _repo = FlashcardRepository(DioClient.instance);
+    _repo = VocabDeskRepository(Get.find());
     loadDesks();
   }
 
@@ -42,21 +41,15 @@ class FlashcardController extends GetxController {
     }
   }
 
-  void onStartStudy(DeskModel desk) {
-    Get.toNamed(AppRoutes.deckPrep, arguments: desk);
-  }
+  void onStartStudy(VocabDesk desk) => Get.toNamed(AppRoutes.deckPrep, arguments: desk);
 
   void onPracticeWordOfDay() {}
 
-  void onCreateDeck() {
-    Get.toNamed(AppRoutes.createDesk);
-  }
+  void onCreateDeck() => Get.toNamed(AppRoutes.createDesk);
 
-  void onEditDeck(DeskModel desk) {
-    Get.toNamed(AppRoutes.createDesk, arguments: desk);
-  }
+  void onEditDeck(VocabDesk desk) => Get.toNamed(AppRoutes.createDesk, arguments: desk);
 
-  Future<void> onDeleteDeck(DeskModel desk) async {
+  Future<void> onDeleteDeck(VocabDesk desk) async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
         title: Text(T.errorDeleteDeskTitle.tr),

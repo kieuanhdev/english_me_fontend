@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/modules/flashcard/models/desk_model.dart';
-import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
 import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_desk_controller.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_desk_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class FlashcardDeckList extends GetView<FlashcardController> {
-  const FlashcardDeckList({super.key});
+class VocabDeckList extends GetView<VocabDeskController> {
+  const VocabDeckList({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -114,12 +114,11 @@ class _DeckCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  final DeskModel desk;
+  final VocabDesk desk;
   final VoidCallback onStartStudy;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
-  // Map CEFR → màu sắc
   static Color _bgColor(String cefr) => switch (cefr.toUpperCase()) {
         'A1' || 'A2' => AppColors.levelABg,
         'B1' || 'B2' => AppColors.levelBBg,
@@ -158,7 +157,6 @@ class _DeckCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon + CEFR badge
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -206,19 +204,13 @@ class _DeckCard extends StatelessWidget {
               ],
             ),
             AppGap.h14,
-            // Title
             Text(desk.title, style: AppTypography.displayLarge.copyWith(fontSize: 18)),
             const SizedBox(height: 4),
-            // Card count
             Text(
               T.labelVocabCount.tr.replaceAll('{count}', '${desk.flashcardCount}'),
-              style: AppTypography.bodyLarge.copyWith(
-                fontSize: 13,
-                color: AppColors.textSecondary,
-              ),
+              style: AppTypography.bodyLarge.copyWith(fontSize: 13, color: AppColors.textSecondary),
             ),
             AppGap.h16,
-            // Start Study button
             GestureDetector(
               onTap: onStartStudy,
               child: Container(
@@ -292,10 +284,7 @@ class _CreateDeckTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               T.flashcardAddCustom.tr,
-              style: AppTypography.bodyLarge.copyWith(
-                fontSize: 12,
-                color: AppColors.textSecondary,
-              ),
+              style: AppTypography.bodyLarge.copyWith(fontSize: 12, color: AppColors.textSecondary),
             ),
           ],
         ),

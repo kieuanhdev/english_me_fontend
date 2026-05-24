@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/modules/vocabulary/controllers/vocabulary_controller.dart';
-import 'package:englishme/modules/vocabulary/models/vocabulary_model.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_topic_controller.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class SpellingPracticeScreen extends GetView<VocabularyController> {
-  const SpellingPracticeScreen({super.key});
+class VocabSpellingScreen extends GetView<VocabTopicController> {
+  const VocabSpellingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class SpellingPracticeScreen extends GetView<VocabularyController> {
 
 // ─── Progress Header ──────────────────────────────────────────────────────────
 
-class _ProgressHeader extends GetView<VocabularyController> {
+class _ProgressHeader extends GetView<VocabTopicController> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -121,7 +121,7 @@ class _ProgressHeader extends GetView<VocabularyController> {
 
 class _WordPromptCard extends StatelessWidget {
   const _WordPromptCard({required this.word, required this.state});
-  final VocabularyWord word;
+  final VocabWord word;
   final SpellingState state;
 
   @override
@@ -148,24 +148,18 @@ class _WordPromptCard extends StatelessWidget {
           AppGap.h16,
           Text(
             'Nghe và gõ từ bạn nghe được',
-            style: AppTypography.bodyLarge.copyWith(
-              fontSize: 14,
-              color: AppColors.textSecondary,
-            ),
+            style: AppTypography.bodyLarge.copyWith(fontSize: 14, color: AppColors.textSecondary),
             textAlign: TextAlign.center,
           ),
           AppGap.h12,
           Text(
             word.definitionVi,
-            style: AppTypography.displayLarge.copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTypography.displayLarge.copyWith(fontSize: 20, fontWeight: FontWeight.w700),
             textAlign: TextAlign.center,
           ),
           AppGap.h8,
           Text(
-            word.pronunciation,
+            word.ipa,
             style: AppTypography.bodyLarge.copyWith(
               fontSize: 14,
               color: AppColors.textSecondary,
@@ -186,9 +180,7 @@ class _WordPromptCard extends StatelessWidget {
                 style: AppTypography.displayLarge.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w800,
-                  color: state == SpellingState.correct
-                      ? AppColors.success
-                      : AppColors.danger,
+                  color: state == SpellingState.correct ? AppColors.success : AppColors.danger,
                   letterSpacing: 2,
                 ),
               ),
@@ -202,7 +194,7 @@ class _WordPromptCard extends StatelessWidget {
 
 // ─── Input Section ────────────────────────────────────────────────────────────
 
-class _InputSection extends GetView<VocabularyController> {
+class _InputSection extends GetView<VocabTopicController> {
   const _InputSection({required this.state});
   final SpellingState state;
 
@@ -230,9 +222,7 @@ class _InputSection extends GetView<VocabularyController> {
           controller: controller.spellingController,
           enabled: _enabled,
           onChanged: controller.onSpellingInputChange,
-          onSubmitted: (_) {
-            if (_enabled) controller.submitSpelling();
-          },
+          onSubmitted: (_) { if (_enabled) controller.submitSpelling(); },
           textCapitalization: TextCapitalization.none,
           style: AppTypography.headlineMedium.copyWith(
             fontSize: 18,
@@ -304,7 +294,7 @@ class _InputSection extends GetView<VocabularyController> {
 
 class _FeedbackSection extends StatelessWidget {
   const _FeedbackSection({required this.word, required this.state});
-  final VocabularyWord word;
+  final VocabWord word;
   final SpellingState state;
 
   @override
@@ -343,22 +333,20 @@ class _FeedbackSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            word.exampleSentence,
-            style: AppTypography.bodyLarge.copyWith(
-              fontSize: 13,
-              fontStyle: FontStyle.italic,
+          if (word.exampleSentence.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              word.exampleSentence,
+              style: AppTypography.bodyLarge.copyWith(fontSize: 13, fontStyle: FontStyle.italic),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            word.exampleTranslation,
-            style: AppTypography.bodyLarge.copyWith(
-              fontSize: 12,
-              color: AppColors.textSecondary,
-            ),
-          ),
+            if (word.exampleTranslation.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                word.exampleTranslation,
+                style: AppTypography.bodyLarge.copyWith(fontSize: 12, color: AppColors.textSecondary),
+              ),
+            ],
+          ],
         ],
       ),
     );
@@ -367,7 +355,7 @@ class _FeedbackSection extends StatelessWidget {
 
 // ─── Bottom Bar ───────────────────────────────────────────────────────────────
 
-class _BottomBar extends GetView<VocabularyController> {
+class _BottomBar extends GetView<VocabTopicController> {
   @override
   Widget build(BuildContext context) {
     return Obx(() {

@@ -4,11 +4,11 @@ import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/flashcard/models/desk_model.dart';
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
-import 'package:englishme/modules/flashcard/repositories/flashcard_repository.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_desk_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
+import 'package:englishme/modules/vocab_hub/repositories/vocab_desk_repository.dart';
 import 'package:englishme/modules/add_flashcard/controllers/add_flashcard_controller.dart';
-import 'package:englishme/modules/flashcard/controllers/flashcard_controller.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_desk_controller.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/modules/study_session/models/due_cards_response.dart';
 import 'package:englishme/modules/study_session/repositories/study_session_repository.dart';
@@ -19,12 +19,12 @@ import 'package:englishme/theme/app_theme.dart';
 class DeckPrepController extends GetxController {
   DeckPrepController({required this.desk});
 
-  final DeskModel desk;
+  final VocabDesk desk;
 
-  late final FlashcardRepository _repo;
+  late final VocabDeskRepository _repo;
   late final StudySessionRepository _sessionRepo;
 
-  final RxList<FlashcardModel> previewCards = <FlashcardModel>[].obs;
+  final RxList<VocabWord> previewCards = <VocabWord>[].obs;
   final Rxn<DueCardsResponse> dueCards = Rxn();
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
@@ -52,7 +52,7 @@ class DeckPrepController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = FlashcardRepository(DioClient.instance);
+    _repo = VocabDeskRepository(DioClient.instance);
     _sessionRepo = StudySessionRepository(DioClient.instance);
     _loadPreview();
   }
@@ -103,8 +103,8 @@ class DeckPrepController extends GetxController {
     if (created == true) {
       addedSinceOpen.value++;
       await _loadPreview();
-      if (Get.isRegistered<FlashcardController>()) {
-        Get.find<FlashcardController>().loadDesks();
+      if (Get.isRegistered<VocabDeskController>()) {
+        Get.find<VocabDeskController>().loadDesks();
       }
     }
   }
@@ -133,8 +133,8 @@ class DeckPrepController extends GetxController {
     if (confirmed != true) return;
     try {
       await _repo.deleteDesk(desk.id);
-      if (Get.isRegistered<FlashcardController>()) {
-        await Get.find<FlashcardController>().loadDesks();
+      if (Get.isRegistered<VocabDeskController>()) {
+        await Get.find<VocabDeskController>().loadDesks();
       }
       Get.until((route) => route.settings.name == AppRoutes.flashcards || route.isFirst);
       Get.snackbar(T.deckDeleted.tr, desk.title);
@@ -144,15 +144,15 @@ class DeckPrepController extends GetxController {
     }
   }
 
-  Future<void> onEditCard(FlashcardModel card) async {
+  Future<void> onEditCard(VocabWord card) async {
     final updated = await Get.toNamed<dynamic>(
       AppRoutes.addFlashcard,
       arguments: AddFlashcardArgs(desk: desk, editCard: card),
     );
     if (updated == true) {
       await _loadPreview();
-      if (Get.isRegistered<FlashcardController>()) {
-        Get.find<FlashcardController>().loadDesks();
+      if (Get.isRegistered<VocabDeskController>()) {
+        Get.find<VocabDeskController>().loadDesks();
       }
     }
   }

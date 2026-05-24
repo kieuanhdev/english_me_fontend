@@ -1,10 +1,10 @@
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 
 /// Response từ `GET /api/study-sessions/due-cards`.
 /// Tách 2 nhóm: thẻ đã đến hạn ôn (SM-2 nextReviewAt <= now) + thẻ mới chưa thấy.
 class DueCardsResponse {
-  final List<FlashcardModel> dueCards;
-  final List<FlashcardModel> newCards;
+  final List<VocabWord> dueCards;
+  final List<VocabWord> newCards;
   final int totalDue;
   final int totalNew;
 
@@ -22,13 +22,13 @@ class DueCardsResponse {
       dueCards: due is List
           ? due
                 .whereType<Map<String, dynamic>>()
-                .map(FlashcardModel.fromJson)
+                .map(VocabWord.fromFlashcardJson)
                 .toList()
           : const [],
       newCards: fresh is List
           ? fresh
                 .whereType<Map<String, dynamic>>()
-                .map(FlashcardModel.fromJson)
+                .map(VocabWord.fromFlashcardJson)
                 .toList()
           : const [],
       totalDue: (json['totalDue'] as num?)?.toInt() ?? 0,
@@ -41,7 +41,7 @@ class DueCardsResponse {
 class StudySessionStartResponse {
   final String sessionId;
   final String deskId;
-  final List<FlashcardModel> cards;
+  final List<VocabWord> cards;
   final int totalCards;
 
   const StudySessionStartResponse({
@@ -56,9 +56,9 @@ class StudySessionStartResponse {
     final cards = cardsRaw is List
         ? cardsRaw
               .whereType<Map<String, dynamic>>()
-              .map(FlashcardModel.fromJson)
+              .map(VocabWord.fromFlashcardJson)
               .toList()
-        : <FlashcardModel>[];
+        : <VocabWord>[];
     return StudySessionStartResponse(
       sessionId: (json['sessionId'] ?? '').toString(),
       deskId: (json['deskId'] ?? '').toString(),

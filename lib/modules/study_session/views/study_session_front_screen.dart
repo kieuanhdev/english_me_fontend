@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
-import 'package:englishme/modules/flashcard/models/flashcard_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -85,7 +85,7 @@ class StudySessionFrontScreen extends GetView<StudySessionController> {
                       ? const SizedBox.shrink()
                       : Padding(
                           padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                          child: _TopicTip(topic: controller.currentCard.topic),
+                          child: _TopicTip(topic: controller.currentCard.topicId),
                         ),
                 ),
               ],
@@ -216,7 +216,7 @@ class _FlashcardFront extends StatelessWidget {
     required this.onFlip,
     required this.onSpeak,
   });
-  final FlashcardModel card;
+  final VocabWord card;
   final VoidCallback onFlip;
   final VoidCallback onSpeak;
 

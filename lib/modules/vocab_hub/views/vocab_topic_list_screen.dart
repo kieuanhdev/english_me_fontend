@@ -2,91 +2,63 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
-import 'package:englishme/core/widgets/app_main_app_bar.dart';
-import 'package:englishme/modules/vocabulary/controllers/vocabulary_controller.dart';
-import 'package:englishme/modules/vocabulary/models/vocabulary_model.dart';
-import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/modules/vocab_hub/controllers/vocab_topic_controller.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_level.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_topic_model.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class VocabularyTopicScreen extends GetView<VocabularyController> {
-  const VocabularyTopicScreen({super.key});
+class VocabTopicListScreen extends GetView<VocabTopicController> {
+  const VocabTopicListScreen({super.key, this.embedded = false});
 
-  ApiState _mapState(VocabScreenState s, VocabularyController c) {
-    switch (s) {
-      case VocabScreenState.idle:
-      case VocabScreenState.loading:
+  /// true khi dùng bên trong TabBarView (không cần Scaffold/AppBar riêng)
+  final bool embedded;
+
+  ApiState _mapState() {
+    switch (controller.topicsState.value) {
+      case VocabLoadState.idle:
+      case VocabLoadState.loading:
         return ApiState.loading;
-      case VocabScreenState.error:
+      case VocabLoadState.error:
         return ApiState.error;
-      case VocabScreenState.loaded:
-        return c.topics.isEmpty ? ApiState.empty : ApiState.success;
+      case VocabLoadState.loaded:
+        return controller.topics.isEmpty ? ApiState.empty : ApiState.success;
     }
   }
 
+  Widget _body() => Obx(() {
+        return ApiStateView(
+          state: _mapState(),
+          errorMessage: 'Không tải được danh sách chủ đề',
+          emptyMessage: 'Chưa có chủ đề nào',
+          emptyIcon: Icons.menu_book_outlined,
+          onRetry: controller.loadTopics,
+          builder: (_) => ListView.separated(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+            itemCount: controller.topics.length,
+            separatorBuilder: (_, __) => AppGap.h12,
+            itemBuilder: (_, i) => _TopicCard(topic: controller.topics[i]),
+          ),
+        );
+      });
+
   @override
   Widget build(BuildContext context) {
+    if (embedded) return _body();
     return Scaffold(
       backgroundColor: AppColors.surface,
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  AppMainAppBar(
-                    title: T.titleVocabulary.tr,
-                    horizontalPadding: 0,
-                  ),
-                  AppGap.h6,
-                  Text(
-                    T.descVocabByTopic.tr,
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            AppGap.h16,
-            Expanded(
-              child: Obx(() {
-                return ApiStateView(
-                  state: _mapState(controller.topicsState.value, controller),
-                  errorMessage: T.errorLoadVocabTopics.tr,
-                  emptyMessage: T.emptyVocabTopics.tr,
-                  emptyIcon: Icons.menu_book_outlined,
-                  onRetry: controller.loadTopics,
-                  builder: (_) => ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
-                    itemCount: controller.topics.length,
-                    separatorBuilder: (_, _) => AppGap.h12,
-                    itemBuilder: (_, i) =>
-                        _TopicCard(topic: controller.topics[i]),
-                  ),
-                );
-              }),
-            ),
-          ],
-        ),
-      ),
+      body: SafeArea(child: _body()),
     );
   }
 }
 
 // ─── Topic Card ───────────────────────────────────────────────────────────────
 
-class _TopicCard extends GetView<VocabularyController> {
+class _TopicCard extends GetView<VocabTopicController> {
   const _TopicCard({required this.topic});
-  final VocabularyTopic topic;
+  final VocabTopic topic;
 
-  Color get _color => _hexToColor(topic.colorHex);
-
-  Color _hexToColor(String hex) {
-    final h = hex.replaceAll('#', '');
+  Color get _color {
+    final h = topic.colorHex.replaceAll('#', '');
     return Color(int.parse('FF$h', radix: 16));
   }
 
@@ -113,9 +85,7 @@ class _TopicCard extends GetView<VocabularyController> {
                 color: _color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
-              child: Center(
-                child: Text(topic.icon, style: const TextStyle(fontSize: 26)),
-              ),
+              child: Center(child: Text(topic.icon, style: const TextStyle(fontSize: 26))),
             ),
             AppGap.w12,
             Expanded(
@@ -141,15 +111,15 @@ class _TopicCard extends GetView<VocabularyController> {
                   Row(
                     children: [
                       _Chip(
-                        label: T.labelWordCount.tr.replaceAll('{count}', '${topic.wordCount}'),
+                        label: '${topic.wordCount} từ',
                         icon: Icons.style_rounded,
                         color: _color,
                       ),
                       AppGap.w8,
                       _Chip(
-                        label: controller.levelLabel(topic.level),
+                        label: topic.level.label,
                         icon: Icons.bar_chart_rounded,
-                        color: controller.levelColor(topic.level),
+                        color: _levelColor(topic.level),
                       ),
                     ],
                   ),
@@ -162,6 +132,15 @@ class _TopicCard extends GetView<VocabularyController> {
       ),
     );
   }
+
+  Color _levelColor(VocabLevel level) => switch (level) {
+        VocabLevel.a1 => const Color(0xFF4CAF50),
+        VocabLevel.a2 => const Color(0xFF8BC34A),
+        VocabLevel.b1 => const Color(0xFF2196F3),
+        VocabLevel.b2 => const Color(0xFF9C27B0),
+        VocabLevel.c1 => const Color(0xFFFF9800),
+        VocabLevel.c2 => const Color(0xFFF44336),
+      };
 }
 
 class _Chip extends StatelessWidget {

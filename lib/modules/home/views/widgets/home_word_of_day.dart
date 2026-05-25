@@ -125,38 +125,46 @@ class HomeWordOfDay extends GetView<HomeController> {
                   AppGap.h16,
                   Row(
                     children: [
-                      GestureDetector(
-                        onTap: controller.onListenWordOfDay,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primary.withValues(alpha: 0.35),
-                                offset: const Offset(0, 4),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.volume_up_rounded, color: AppColors.onPrimaryFixed, size: 16),
-                              const SizedBox(width: 6),
-                              Text(
-                                'Nghe phát âm',
-                                style: AppTypography.bodyLarge.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onPrimaryFixed,
+                      Obx(() {
+                        final playing = controller.wordPlaying.value;
+                        return GestureDetector(
+                          onTap: playing ? null : controller.onListenWordOfDay,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: playing
+                                  ? AppColors.primary.withValues(alpha: 0.7)
+                                  : AppColors.primary,
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (playing)
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.onPrimaryFixed,
+                                    ),
+                                  )
+                                else
+                                  Icon(Icons.volume_up_rounded, color: AppColors.onPrimaryFixed, size: 16),
+                                const SizedBox(width: 6),
+                                Text(
+                                  playing ? 'Đang phát...' : 'Nghe phát âm',
+                                  style: AppTypography.bodyLarge.copyWith(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.onPrimaryFixed,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                       const SizedBox(width: 10),
                       Obx(() => GestureDetector(
                         onTap: controller.onAddWordToFlashcard,

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -25,6 +26,7 @@ class HomeController extends GetxController {
   final Rxn<WordOfDayDto> dailyWord = Rxn();
   final RxString greetingLabel = T.homeGreeting.tr.obs;
   final RxBool wordSaved = false.obs;
+  final RxBool wordPlaying = false.obs;
   final wordOfDayState = WordOfDayState.idle.obs;
   final wordOfDayMessage = ''.obs;
 
@@ -142,19 +144,26 @@ class HomeController extends GetxController {
   }
 
   Future<void> onListenWordOfDay() async {
-    final audioUrl = _resolveAudioUrl(wordOfDay?.audioUrl);
-    if (audioUrl != null) {
-      try {
-        await _wordAudioPlayer.stop();
-        await _wordAudioPlayer.play(UrlSource(audioUrl));
-        return;
-      } catch (_) {
-        // Fall back to TTS when the audio file is unavailable.
+    if (wordPlaying.value) return;
+    wordPlaying.value = true;
+    try {
+      final audioUrl = _resolveAudioUrl(wordOfDay?.audioUrl);
+      if (audioUrl != null) {
+        try {
+          await _wordAudioPlayer.stop();
+          await _wordAudioPlayer.play(UrlSource(audioUrl))
+              .timeout(const Duration(seconds: 5));
+          return;
+        } catch (_) {
+          // Fall back to TTS when the audio file is unavailable or times out.
+        }
       }
+      final word = wordOfDay?.word;
+      if (word == null || word.trim().isEmpty) return;
+      await Get.find<TtsService>().speak(word);
+    } finally {
+      wordPlaying.value = false;
     }
-    final word = wordOfDay?.word;
-    if (word == null || word.trim().isEmpty) return;
-    await Get.find<TtsService>().speak(word);
   }
 
   String? _resolveAudioUrl(String? raw) {

@@ -115,11 +115,11 @@ class _LearningPathDetailScreenState extends State<LearningPathDetailScreen> {
                                 itemBuilder: (_, index) => _ActivityTile(
                                   activity: path.activities[index],
                                   onTap: () async {
-                                    final changed = await Get.toNamed(
+                                    await Get.toNamed(
                                       AppRoutes.learningLessonDetail,
                                       arguments: path.activities[index].id,
                                     );
-                                    if (mounted && changed == true) _reload();
+                                    if (mounted) _reload();
                                   },
                                 ),
                               ),

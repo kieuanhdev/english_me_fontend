@@ -9,19 +9,26 @@ class TtsService extends GetxService {
   Future<void> onInit() async {
     super.onInit();
     _tts = FlutterTts();
+    await _configure();
+    // Warm-up: speak empty string để engine khởi động sẵn
+    try {
+      await _tts.speak(' ');
+    } catch (_) {}
+  }
 
-    final langs = await _tts.getLanguages;
-    final hasEnglish = langs.any(
-      (lang) => (lang as String).toLowerCase().startsWith('en'),
-    );
-    if (hasEnglish) {
-      await _tts.setLanguage('en-US');
-    }
+  Future<void> _configure() async {
+    try {
+      final langs = await _tts.getLanguages;
+      final hasEnglish = langs.any(
+        (lang) => (lang as String).toLowerCase().startsWith('en'),
+      );
+      if (hasEnglish) await _tts.setLanguage('en-US');
+    } catch (_) {}
 
     await _tts.setSpeechRate(0.45);
     await _tts.setVolume(1.0);
     await _tts.setPitch(1.0);
-    await _tts.awaitSpeakCompletion(true);
+    await _tts.awaitSpeakCompletion(false);
 
     _tts.setStartHandler(() => isSpeaking.value = true);
     _tts.setCompletionHandler(() => isSpeaking.value = false);
@@ -29,20 +36,11 @@ class TtsService extends GetxService {
   }
 
   Future<void> speak(String text) async {
+    if (text.trim().isEmpty) return;
     try {
       await _tts.stop();
-      final result = await _tts.speak(text);
-      if (result == 0) {
-        // TTS failed silently — retry without awaiting completion
-        await _tts.stop();
-        await _tts.speak(text);
-      }
-    } catch (_) {
-      // fallback: try direct speak
-      try {
-        await _tts.speak(text);
-      } catch (_) {}
-    }
+      await _tts.speak(text);
+    } catch (_) {}
   }
 
   Future<void> stop() async {

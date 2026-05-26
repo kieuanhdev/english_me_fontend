@@ -523,7 +523,7 @@ class _PathWindow extends StatefulWidget {
 
   final List<LearningPath> paths;
   final String? currentPathId;
-  final ValueChanged<LearningPath> onOpenPath;
+  final Future<void> Function(LearningPath) onOpenPath;
 
   @override
   State<_PathWindow> createState() => _PathWindowState();

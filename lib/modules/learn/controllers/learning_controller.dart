@@ -41,20 +41,22 @@ class LearningController extends GetxController {
     await loadHub(level: level);
   }
 
-  void openPath(LearningPath path) {
+  Future<void> openPath(LearningPath path) async {
     if (path.isLocked) return;
-    Get.toNamed(
+    await Get.toNamed(
       AppRoutes.learningPathDetail,
       arguments: {'level': selectedLevel.value, 'pathId': path.id},
     );
+    await loadHub(level: selectedLevel.value);
   }
 
-  void openSkill(LearningSkillTrack skill) {
+  Future<void> openSkill(LearningSkillTrack skill) async {
     if (!skill.enabled) return;
-    Get.toNamed(
+    await Get.toNamed(
       AppRoutes.learningSkillLessons,
       arguments: {'level': selectedLevel.value, 'skill': skill.type},
     );
+    await loadHub(level: selectedLevel.value);
   }
 
   void openSupport(LearningSupportTrack track) {

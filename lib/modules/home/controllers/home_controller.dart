@@ -1,9 +1,6 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:audioplayers/audioplayers.dart';
 
-import 'package:englishme/core/config/app_config.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/home/models/home_dashboard_model.dart';
@@ -18,8 +15,6 @@ enum WordOfDayState { idle, loading, loaded, empty, error }
 class HomeController extends GetxController {
   final HomeRepository _repo;
   HomeController(this._repo);
-
-  final AudioPlayer _wordAudioPlayer = AudioPlayer();
 
   final loadState = HomeLoadState.idle.obs;
   final Rxn<HomeDashboardResponse> dashboard = Rxn();
@@ -38,12 +33,6 @@ class HomeController extends GetxController {
     _updateGreeting();
     loadDashboard();
     loadWordOfDay();
-  }
-
-  @override
-  void onClose() {
-    _wordAudioPlayer.dispose();
-    super.onClose();
   }
 
   Future<void> loadDashboard() async {
@@ -94,7 +83,8 @@ class HomeController extends GetxController {
   // ----- Daily XP -----
   int get currentXp => dashboard.value?.dailyStats.xpToday ?? 0;
   int get targetXp => dailyXpTarget;
-  double get xpProgress => targetXp > 0 ? (currentXp / targetXp).clamp(0.0, 1.0) : 0.0;
+  double get xpProgress =>
+      targetXp > 0 ? (currentXp / targetXp).clamp(0.0, 1.0) : 0.0;
 
   // ----- Quick stats -----
   int get streakDays => dashboard.value?.dailyStats.currentStreak ?? 0;
@@ -112,7 +102,8 @@ class HomeController extends GetxController {
 
     final currentPathId = learningHub.currentPathId;
     if (currentPathId != null && currentPathId.trim().isNotEmpty) {
-      final matching = learningHub.paths.where((path) => path.id == currentPathId);
+      final matching =
+          learningHub.paths.where((path) => path.id == currentPathId);
       if (matching.isNotEmpty) return matching.first;
     }
 
@@ -145,36 +136,14 @@ class HomeController extends GetxController {
 
   Future<void> onListenWordOfDay() async {
     if (wordPlaying.value) return;
+    final word = wordOfDay?.word;
+    if (word == null || word.trim().isEmpty) return;
     wordPlaying.value = true;
     try {
-      final audioUrl = _resolveAudioUrl(wordOfDay?.audioUrl);
-      if (audioUrl != null) {
-        try {
-          await _wordAudioPlayer.stop();
-          await _wordAudioPlayer.play(UrlSource(audioUrl))
-              .timeout(const Duration(seconds: 5));
-          return;
-        } catch (_) {
-          // Fall back to TTS when the audio file is unavailable or times out.
-        }
-      }
-      final word = wordOfDay?.word;
-      if (word == null || word.trim().isEmpty) return;
       await Get.find<TtsService>().speak(word);
     } finally {
       wordPlaying.value = false;
     }
-  }
-
-  String? _resolveAudioUrl(String? raw) {
-    final value = raw?.trim();
-    if (value == null || value.isEmpty) return null;
-    if (value.startsWith('http://') || value.startsWith('https://')) {
-      return value;
-    }
-    final base = AppConfig.apiBaseUrl.replaceFirst(RegExp(r'/+$'), '');
-    final path = value.replaceFirst(RegExp(r'^/+'), '');
-    return '$base/$path';
   }
 
   void onAddWordToFlashcard() {
@@ -193,13 +162,9 @@ class HomeController extends GetxController {
     );
   }
 
-  void onSeeAllLessons() {
-    Get.toNamed(AppRoutes.learn);
-  }
+  void onSeeAllLessons() => Get.toNamed(AppRoutes.learn);
 
-  void onStartPlacementTest() {
-    Get.toNamed(AppRoutes.placementTest);
-  }
+  void onStartPlacementTest() => Get.toNamed(AppRoutes.placementTest);
 
   void onContinueLearning() {
     final path = currentLearningPath;

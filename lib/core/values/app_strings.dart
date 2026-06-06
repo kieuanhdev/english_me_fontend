@@ -67,8 +67,6 @@ abstract class T {
 
   // ── Error / Empty States ──
   static const errorLoadHome = 'error_load_home';
-  static const errorLoadVocab = 'error_load_vocab';
-  static const errorLoadVocabTopics = 'error_load_vocab_topics';
   static const errorLoadProgress = 'error_load_progress';
   static const errorLoadGrammar = 'error_load_grammar';
   static const errorConnection = 'error_connection';
@@ -79,8 +77,8 @@ abstract class T {
   static const errorCreateFailed = 'error_create_failed';
   static const errorUpdateFailed = 'error_update_failed';
   static const errorUpdateName = 'error_update_name';
-  static const emptyVocab = 'empty_vocab';
-  static const emptyVocabTopics = 'empty_vocab_topics';
+  static const emptyExploreDecks = 'empty_explore_decks';
+  static const emptyMyDecks = 'empty_my_decks';
   static const emptyData = 'empty_data';
   static const emptyExercises = 'empty_exercises';
   static const emptyGrammar = 'empty_grammar';
@@ -89,7 +87,6 @@ abstract class T {
 
   // ── Module Titles ──
   static const titleGrammar = 'title_grammar';
-  static const titleVocabulary = 'title_vocabulary';
   static const titlePronunciation = 'title_pronunciation';
   static const titleFlashcard = 'title_flashcard';
   static const descGrammarTopics = 'desc_grammar_topics';
@@ -97,6 +94,10 @@ abstract class T {
   static const emptyGrammarTopics = 'empty_grammar_topics';
   static const emptyGrammarLessons = 'empty_grammar_lessons';
   static const labelLessons = 'label_lessons';
+  static const titleGrammarTheory = 'title_grammar_theory';
+  static const descGrammarTheory = 'desc_grammar_theory';
+  static const grammarTheoryEntry = 'grammar_theory_entry';
+  static const emptyGrammarTheoryLevel = 'empty_grammar_theory_level';
 
   static const titleTest = 'title_test';
   static const titleExercise = 'title_exercise';
@@ -105,7 +106,6 @@ abstract class T {
   static const titleAchievements = 'title_achievements';
 
   // ── Module Descriptions ──
-  static const descVocabByTopic = 'desc_vocab_by_topic';
   static const descTestInfo = 'desc_test_info';
   static const descChooseExercise = 'desc_choose_exercise';
   static const descChoosePronunciation = 'desc_choose_pronunciation';
@@ -122,12 +122,18 @@ abstract class T {
   static const homeWordSaved = 'home_word_saved';
   static const homeWordUnsaved = 'home_word_unsaved';
   static const homeStreakDays = 'home_streak_days';
-  static const homeCategoryVocab = 'home_category_vocab';
   static const homeCategoryGrammar = 'home_category_grammar';
   static const homeCategoryPronunciation = 'home_category_pronunciation';
   static const homeCategoryFlashcard = 'home_category_flashcard';
 
   // ── Flashcard Module ──
+  static const vocabTabExplore = 'vocab_tab_explore';
+  static const vocabTabMyDecks = 'vocab_tab_my_decks';
+  static const vocabDueToday = 'vocab_due_today';
+  static const vocabNoDueToday = 'vocab_no_due_today';
+  static const deckBadgeSystem = 'deck_badge_system';
+  static const deckGroupTitle = 'deck_group_title';
+  static const deckFilterAll = 'deck_filter_all';
   static const flashcardDecks = 'flashcard_decks';
   static const flashcardEditDeck = 'flashcard_edit_deck';
   static const flashcardDeleteDeck = 'flashcard_delete_deck';
@@ -187,6 +193,7 @@ abstract class T {
   static const deckVocabSet = 'deck_vocab_set';
   static const deckNewCardsCount = 'deck_new_cards_count';
   static const deckMasteredCardsCount = 'deck_mastered_cards_count';
+  static const deckDueCount = 'deck_due_count';
   static const deckEmptyCards = 'deck_empty_cards';
   static const deckCardCountLabel = 'deck_card_count_label';
   static const deckEmptyForStudy = 'deck_empty_for_study';
@@ -253,17 +260,7 @@ abstract class T {
   static const exerciseDifficultyMedium = 'exercise_difficulty_medium';
   static const exerciseDifficultyHard = 'exercise_difficulty_hard';
 
-  // ── Vocabulary Module ──
-  static const vocabTapForMeaning = 'vocab_tap_for_meaning';
-  static const vocabExample = 'vocab_example';
-  static const vocabSpelling = 'vocab_spelling';
-  static const vocabSpellingResult = 'vocab_spelling_result';
-  static const vocabCorrect = 'vocab_correct';
-  static const vocabIncorrect = 'vocab_incorrect';
-  static const vocabListenAndType = 'vocab_listen_and_type';
-  static const vocabCheck = 'vocab_check';
-  static const vocabViewResults = 'vocab_view_results';
-  static const vocabNextWord = 'vocab_next_word';
+  // ── Vocabulary / Flashcard labels ──
   static const labelWordCount = 'label_word_count';
   static const labelVocabCount = 'label_vocab_count';
 
@@ -278,6 +275,11 @@ abstract class T {
   static const pronunChooseExercise = 'pronun_choose_exercise';
   static const pronunAnalysis = 'pronun_analysis';
   static const pronunScore = 'pronun_score';
+  static const pronunTapToSpeak = 'pronun_tap_to_speak';
+  static const pronunListening = 'pronun_listening';
+  static const pronunYouSaid = 'pronun_you_said';
+  static const pronunSearchHint = 'pronun_search_hint';
+  static const pronunFilterAll = 'pronun_filter_all';
 
   // ── Placement Test ──
   static const placementGrammar = 'placement_grammar';
@@ -287,6 +289,16 @@ abstract class T {
   static const placementDetail = 'placement_detail';
   static const placementCorrect = 'placement_correct';
   static const placementIncorrect = 'placement_incorrect';
+  // Tự chọn trình độ (không làm bài kiểm tra)
+  static const placementSelfSelectEntry = 'placement_self_select_entry';
+  static const placementSelfSelectTitle = 'placement_self_select_title';
+  static const placementSelfSelectSubtitle = 'placement_self_select_subtitle';
+  static const placementSelfSelectConfirm = 'placement_self_select_confirm';
+  static const placementSelfSelectError = 'placement_self_select_error';
+  static const placementSelfSelectWarnTitle = 'placement_self_select_warn_title';
+  static const placementSelfSelectWarnBody = 'placement_self_select_warn_body';
+  static const placementSelfSelectWarnTakeTest = 'placement_self_select_warn_take_test';
+  static const placementSelfSelectWarnProceed = 'placement_self_select_warn_proceed';
 
   // ── Study Session ──
   static const sessionComplete = 'session_complete';
@@ -309,6 +321,14 @@ abstract class T {
   static const authValidatePasswordShort = 'auth_validate_password_short';
   static const authValidateNameEmpty = 'auth_validate_name_empty';
   static const authValidatePasswordMismatch = 'auth_validate_password_mismatch';
+  static const authValidateTermsRequired = 'auth_validate_terms_required';
+
+  // ── Terms / Điều khoản ──
+  static const registerAgreePrefix = 'register_agree_prefix';
+  static const registerAgreeTerms = 'register_agree_terms';
+  static const registerAgreeConjunction = 'register_agree_conjunction';
+  static const registerAgreePrivacy = 'register_agree_privacy';
+  static const termsOpenFailed = 'terms_open_failed';
   static const authErrorUserNotFound = 'auth_error_user_not_found';
   static const authErrorWrongPassword = 'auth_error_wrong_password';
   static const authErrorEmailInUse = 'auth_error_email_in_use';

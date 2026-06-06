@@ -27,12 +27,12 @@ class IpaScreen extends StatelessWidget {
         onTap: (index, _) => ShellController.goToTab(index),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppMainAppBar(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              child: AppMainAppBar(
                 title: 'Bảng IPA',
                 showBack: true,
                 showSettings: false,
@@ -40,40 +40,78 @@ class IpaScreen extends StatelessWidget {
                 horizontalPadding: 0,
                 onBack: _onBack,
               ),
-              AppGap.h20,
-              Expanded(
-                child: ListView(
-                  children: [
-                    _IpaSection(
-                      title: 'Nguyên âm đơn (Monophthongs)',
-                      items: _monophthongs,
-                    ),
-                    AppGap.h20,
-                    _IpaSection(
-                      title: 'Nguyên âm đôi (Diphthongs)',
-                      items: _diphthongs,
-                    ),
-                    AppGap.h20,
-                    _IpaSection(
-                      title: 'Phụ âm (Consonants)',
-                      items: _consonants,
-                    ),
-                    AppGap.h20,
-                  ],
+            ),
+            AppGap.h8,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 4),
+              child: Text(
+                'Chạm vào mỗi ký hiệu để nghe phát âm qua từ ví dụ.',
+                style: AppTypography.body.copyWith(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
                 ),
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                children: const [
+                  _IpaSection(
+                    title: 'Nguyên âm đơn',
+                    subtitle: 'Monophthongs',
+                    icon: Icons.circle_outlined,
+                    accent: _IpaAccent.vowel,
+                    items: _monophthongs,
+                  ),
+                  AppGap.h22,
+                  _IpaSection(
+                    title: 'Nguyên âm đôi',
+                    subtitle: 'Diphthongs',
+                    icon: Icons.all_inclusive_rounded,
+                    accent: _IpaAccent.diphthong,
+                    items: _diphthongs,
+                  ),
+                  AppGap.h22,
+                  _IpaSection(
+                    title: 'Phụ âm',
+                    subtitle: 'Consonants',
+                    icon: Icons.graphic_eq_rounded,
+                    accent: _IpaAccent.consonant,
+                    items: _consonants,
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
+/// Nhóm âm. Màu dùng chung tông primary toàn màn để đồng nhất với app —
+/// phân biệt nhóm qua title + icon, không qua màu.
+enum _IpaAccent { vowel, diphthong, consonant }
+
+extension _IpaAccentColors on _IpaAccent {
+  Color get bg => AppColors.primarySoft;
+
+  Color get fg => AppColors.primaryContainer;
+}
+
 class _IpaSection extends StatelessWidget {
-  const _IpaSection({required this.title, required this.items});
+  const _IpaSection({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.accent,
+    required this.items,
+  });
 
   final String title;
+  final String subtitle;
+  final IconData icon;
+  final _IpaAccent accent;
   final List<_IpaPhoneme> items;
 
   @override
@@ -81,15 +119,67 @@ class _IpaSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: AppTypography.headlineMedium.copyWith(fontSize: 18),
+        Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: accent.bg,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Icon(icon, size: 20, color: accent.fg),
+            ),
+            AppGap.w12,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.headlineMedium.copyWith(fontSize: 17),
+                  ),
+                  Text(
+                    subtitle,
+                    style: AppTypography.body.copyWith(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: accent.bg,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
+              child: Text(
+                '${items.length} âm',
+                style: AppTypography.body.copyWith(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: accent.fg,
+                ),
+              ),
+            ),
+          ],
         ),
-        AppGap.h12,
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: items.map((item) => _IpaTile(phoneme: item)).toList(),
+        AppGap.h14,
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: items.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 10,
+            childAspectRatio: 0.92,
+          ),
+          itemBuilder: (_, index) =>
+              _IpaTile(phoneme: items[index], accent: accent),
         ),
       ],
     );
@@ -97,58 +187,83 @@ class _IpaSection extends StatelessWidget {
 }
 
 class _IpaTile extends StatelessWidget {
-  const _IpaTile({required this.phoneme});
+  const _IpaTile({required this.phoneme, required this.accent});
 
   final _IpaPhoneme phoneme;
+  final _IpaAccent accent;
 
   @override
   Widget build(BuildContext context) {
     final tts = Get.find<TtsService>();
 
-    return Material(
-      color: AppColors.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(AppRadius.md),
-      child: InkWell(
-        onTap: () => tts.speak(phoneme.soundHint),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        child: Container(
-          width: 110,
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.outlineVariant),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    '/${phoneme.symbol}/',
-                    style: AppTypography.body.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 15,
-                      color: AppColors.primary,
-                    ),
+    return Obx(() {
+      final isPlaying = tts.speakingText.value == phoneme.exampleWord;
+      return Material(
+        color: isPlaying ? accent.bg : AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: InkWell(
+          onTap: () => tts.speak(phoneme.exampleWord),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(
+                color: isPlaying ? accent.fg : AppColors.outlineVariant,
+                width: isPlaying ? 2 : 1,
+              ),
+              boxShadow: isPlaying
+                  ? null
+                  : [
+                      BoxShadow(
+                        color: AppColors.neutralShadow,
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Icon(
+                    isPlaying
+                        ? Icons.volume_up_rounded
+                        : Icons.volume_up_outlined,
+                    size: 15,
+                    color: isPlaying ? accent.fg : AppColors.iconMuted,
                   ),
-                  Icon(Icons.volume_up_rounded, size: 16, color: AppColors.tertiary),
-                ],
-              ),
-              AppGap.h6,
-              Text(
-                phoneme.exampleWord,
-                style: AppTypography.body.copyWith(
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
                 ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                const Spacer(),
+                Text(
+                  '/${phoneme.symbol}/',
+                  style: AppTypography.ipa.copyWith(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: isPlaying ? accent.fg : AppColors.primary,
+                  ),
+                ),
+                AppGap.h4,
+                Text(
+                  phoneme.exampleWord,
+                  style: AppTypography.body.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const Spacer(),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 

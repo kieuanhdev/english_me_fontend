@@ -8,9 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class GrammarLessonDetailScreen extends StatelessWidget {
-  const GrammarLessonDetailScreen({super.key, required this.lessonId});
+  const GrammarLessonDetailScreen({
+    super.key,
+    required this.lessonId,
+    this.showExercises = true,
+  });
 
   final String lessonId;
+
+  /// When false, the lesson renders as a pure theory reference (exercises hidden).
+  final bool showExercises;
   static final Map<String, Future<GrammarLessonDetail>> _futureCache = {};
 
   @override
@@ -40,10 +47,7 @@ class GrammarLessonDetailScreen extends StatelessWidget {
     );
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: const CommonAppBar(
-        title: 'Chi tiết bài học',
-        isTranslate: false,
-      ),
+      appBar: const CommonAppBar(title: 'Chi tiết bài học', isTranslate: false),
       body: FutureBuilder<GrammarLessonDetail>(
         future: future,
         builder: (context, snapshot) {
@@ -79,14 +83,14 @@ class GrammarLessonDetailScreen extends StatelessWidget {
               _Section(title: 'Khi nào dùng', content: lesson.whenToUseVi),
               _Section(title: 'Mẹo ghi nhớ', content: lesson.tipsVi),
               if (lesson.formulas.isNotEmpty) ...[
-                _Header(text: 'Công thức'),
+                const _Header(text: 'Công thức'),
                 ...lesson.formulas.map(
                   (f) => _BulletLine(text: '${f.label}: ${f.structure}'),
                 ),
                 AppGap.h12,
               ],
               if (lesson.keyWords.isNotEmpty) ...[
-                _Header(text: 'Từ khóa'),
+                const _Header(text: 'Từ khóa'),
                 Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -115,17 +119,14 @@ class GrammarLessonDetailScreen extends StatelessWidget {
                 AppGap.h12,
               ],
               if (lesson.examples.isNotEmpty) ...[
-                _Header(text: 'Ví dụ'),
+                const _Header(text: 'Ví dụ'),
                 ...lesson.examples.map(
-                  (e) => _CardLine(
-                    title: e.en,
-                    subtitle: '${e.vi}\n${e.note}',
-                  ),
+                  (e) => _CardLine(title: e.en, subtitle: '${e.vi}\n${e.note}'),
                 ),
                 AppGap.h12,
               ],
               if (lesson.commonMistakes.isNotEmpty) ...[
-                _Header(text: 'Lỗi thường gặp'),
+                const _Header(text: 'Lỗi thường gặp'),
                 ...lesson.commonMistakes.map(
                   (m) => _CardLine(
                     title: 'Sai: ${m.wrong}',
@@ -134,8 +135,8 @@ class GrammarLessonDetailScreen extends StatelessWidget {
                 ),
                 AppGap.h12,
               ],
-              if (lesson.exercises.isNotEmpty) ...[
-                _Header(text: 'Bài tập'),
+              if (showExercises && lesson.exercises.isNotEmpty) ...[
+                const _Header(text: 'Bài tập'),
                 ...lesson.exercises.map((e) => _ExerciseRenderer(exercise: e)),
               ],
             ],
@@ -228,7 +229,9 @@ class _CardLine extends StatelessWidget {
         children: [
           Text(
             title,
-            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700),
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
           ),
           const SizedBox(height: 4),
           Text(
@@ -292,7 +295,8 @@ class _MultipleChoiceExerciseCard extends StatefulWidget {
       _MultipleChoiceExerciseCardState();
 }
 
-class _MultipleChoiceExerciseCardState extends State<_MultipleChoiceExerciseCard> {
+class _MultipleChoiceExerciseCardState
+    extends State<_MultipleChoiceExerciseCard> {
   String? _selected;
   bool _submitted = false;
 
@@ -376,28 +380,29 @@ class _MultipleChoiceExerciseCardState extends State<_MultipleChoiceExerciseCard
             ),
           ),
           AppGap.h12,
-          ..._options.map((opt) => _OptionTile(
-                text: opt,
-                selected: opt == _selected,
-                disabled: _submitted,
-                borderColor: _optionBorderColor(opt),
-                backgroundColor: _optionBgColor(opt),
-                trailing: _submitted && opt == _answer
-                    ? Icons.check_circle_rounded
-                    : (_submitted && opt == _selected && opt != _answer)
-                        ? Icons.cancel_rounded
-                        : null,
-                trailingColor: _submitted && opt == _answer
-                    ? AppColors.success
-                    : AppColors.danger,
-                onTap: () => _select(opt),
-              )),
+          ..._options.map(
+            (opt) => _OptionTile(
+              text: opt,
+              selected: opt == _selected,
+              disabled: _submitted,
+              borderColor: _optionBorderColor(opt),
+              backgroundColor: _optionBgColor(opt),
+              trailing: _submitted && opt == _answer
+                  ? Icons.check_circle_rounded
+                  : (_submitted && opt == _selected && opt != _answer)
+                  ? Icons.cancel_rounded
+                  : null,
+              trailingColor: _submitted && opt == _answer
+                  ? AppColors.success
+                  : AppColors.danger,
+              onTap: () => _select(opt),
+            ),
+          ),
           AppGap.h12,
           if (!_submitted)
             AppButton(
               label: 'Nộp đáp án',
               onPressed: (_selected ?? '').isEmpty ? null : _submit,
-              variant: AppButtonVariant.primary,
               isTranslate: false,
               height: 52,
             )
@@ -406,7 +411,9 @@ class _MultipleChoiceExerciseCardState extends State<_MultipleChoiceExerciseCard
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isCorrect ? AppColors.successSoft : AppColors.dangerSoft,
+                color: _isCorrect
+                    ? AppColors.successSoft
+                    : AppColors.dangerSoft,
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
                   color: (_isCorrect ? AppColors.success : AppColors.danger)
@@ -420,7 +427,9 @@ class _MultipleChoiceExerciseCardState extends State<_MultipleChoiceExerciseCard
                     _isCorrect ? 'Đúng rồi!' : 'Chưa đúng',
                     style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: _isCorrect ? AppColors.successDark : AppColors.dangerDark,
+                      color: _isCorrect
+                          ? AppColors.successDark
+                          : AppColors.dangerDark,
                     ),
                   ),
                   if (_explainVi.trim().isNotEmpty) ...[
@@ -493,7 +502,9 @@ class _OptionTile extends StatelessWidget {
                   text,
                   style: AppTypography.bodyLarge.copyWith(
                     fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
-                    color: disabled ? AppColors.textSecondary : AppColors.onSurface,
+                    color: disabled
+                        ? AppColors.textSecondary
+                        : AppColors.onSurface,
                   ),
                 ),
               ),
@@ -524,7 +535,8 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
   bool _submitted = false;
 
   String get _sentence => (widget.content['sentence'] ?? '').toString();
-  String get _answer => (widget.content['answer'] ?? '').toString().trim().toLowerCase();
+  String get _answer =>
+      (widget.content['answer'] ?? '').toString().trim().toLowerCase();
   String get _explainVi => (widget.content['explain_vi'] ?? '').toString();
   List<String> get _hints {
     final raw = widget.content['hints'];
@@ -532,7 +544,8 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
     return const [];
   }
 
-  bool get _isCorrect => _submitted && _controller.text.trim().toLowerCase() == _answer;
+  bool get _isCorrect =>
+      _submitted && _controller.text.trim().toLowerCase() == _answer;
 
   void _submit() {
     if (_controller.text.trim().isEmpty) return;
@@ -579,7 +592,10 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
             runSpacing: 4,
             children: [
               if (parts.isNotEmpty)
-                Text(parts[0].trimRight(), style: AppTypography.bodyLarge.copyWith(fontSize: 15)),
+                Text(
+                  parts[0].trimRight(),
+                  style: AppTypography.bodyLarge.copyWith(fontSize: 15),
+                ),
               Container(
                 constraints: const BoxConstraints(minWidth: 80, maxWidth: 160),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -599,7 +615,9 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
                         style: AppTypography.bodyLarge.copyWith(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: _isCorrect ? AppColors.success : AppColors.danger,
+                          color: _isCorrect
+                              ? AppColors.success
+                              : AppColors.danger,
                         ),
                       )
                     : TextField(
@@ -617,7 +635,10 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
                       ),
               ),
               if (parts.length > 1)
-                Text(parts[1].trimLeft(), style: AppTypography.bodyLarge.copyWith(fontSize: 15)),
+                Text(
+                  parts[1].trimLeft(),
+                  style: AppTypography.bodyLarge.copyWith(fontSize: 15),
+                ),
             ],
           ),
           if (_hints.isNotEmpty) ...[
@@ -627,13 +648,20 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
               children: _hints
                   .map(
                     (h) => GestureDetector(
-                      onTap: _submitted ? null : () => setState(() => _controller.text = h),
+                      onTap: _submitted
+                          ? null
+                          : () => setState(() => _controller.text = h),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primarySoft,
                           borderRadius: BorderRadius.circular(AppRadius.pill),
-                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.3),
+                          ),
                         ),
                         child: Text(
                           h,
@@ -653,7 +681,6 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
             AppButton(
               label: 'Nộp đáp án',
               onPressed: _submit,
-              variant: AppButtonVariant.primary,
               isTranslate: false,
               height: 52,
             )
@@ -662,10 +689,13 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isCorrect ? AppColors.successSoft : AppColors.dangerSoft,
+                color: _isCorrect
+                    ? AppColors.successSoft
+                    : AppColors.dangerSoft,
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
-                  color: (_isCorrect ? AppColors.success : AppColors.danger).withValues(alpha: 0.45),
+                  color: (_isCorrect ? AppColors.success : AppColors.danger)
+                      .withValues(alpha: 0.45),
                 ),
               ),
               child: Column(
@@ -675,15 +705,19 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
                     _isCorrect ? 'Đúng rồi!' : 'Chưa đúng — Đáp án: $_answer',
                     style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: _isCorrect ? AppColors.successDark : AppColors.dangerDark,
+                      color: _isCorrect
+                          ? AppColors.successDark
+                          : AppColors.dangerDark,
                     ),
                   ),
                   if (_explainVi.trim().isNotEmpty) ...[
                     const SizedBox(height: 6),
                     Text(
                       _explainVi,
-                      style: AppTypography.bodyLarge
-                          .copyWith(color: AppColors.textSecondary, fontSize: 13),
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ],
@@ -707,7 +741,10 @@ class _FillBlankExerciseCardState extends State<_FillBlankExerciseCard> {
 // ─── Error Correction ────────────────────────────────────────────────────────
 
 class _ErrorCorrectionExerciseCard extends StatefulWidget {
-  const _ErrorCorrectionExerciseCard({required this.order, required this.content});
+  const _ErrorCorrectionExerciseCard({
+    required this.order,
+    required this.content,
+  });
 
   final int order;
   final Map<String, dynamic> content;
@@ -717,12 +754,14 @@ class _ErrorCorrectionExerciseCard extends StatefulWidget {
       _ErrorCorrectionExerciseCardState();
 }
 
-class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCard> {
+class _ErrorCorrectionExerciseCardState
+    extends State<_ErrorCorrectionExerciseCard> {
   String? _selected;
   bool _submitted = false;
 
   String get _instruction =>
-      (widget.content['instruction'] ?? 'Tìm phần sai trong câu dưới đây:').toString();
+      (widget.content['instruction'] ?? 'Tìm phần sai trong câu dưới đây:')
+          .toString();
   String get _answer => (widget.content['answer'] ?? '').toString();
   String get _correction => (widget.content['correction'] ?? '').toString();
   String get _explainVi => (widget.content['explain_vi'] ?? '').toString();
@@ -736,7 +775,9 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
   bool get _isCorrect => _submitted && _selected == _answer;
 
   Color _segmentBorder(String seg) {
-    if (!_submitted) return seg == _selected ? AppColors.primary : AppColors.outlineVariant;
+    if (!_submitted) {
+      return seg == _selected ? AppColors.primary : AppColors.outlineVariant;
+    }
     if (seg == _answer) return AppColors.success;
     if (seg == _selected && seg != _answer) return AppColors.danger;
     return AppColors.outlineVariant;
@@ -744,7 +785,9 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
 
   Color _segmentBg(String seg) {
     if (!_submitted) {
-      return seg == _selected ? AppColors.primarySoft : AppColors.surfaceContainerLowest;
+      return seg == _selected
+          ? AppColors.primarySoft
+          : AppColors.surfaceContainerLowest;
     }
     if (seg == _answer) return AppColors.successSoft;
     if (seg == _selected && seg != _answer) return AppColors.dangerSoft;
@@ -752,9 +795,9 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
   }
 
   void _reset() => setState(() {
-        _selected = null;
-        _submitted = false;
-      });
+    _selected = null;
+    _submitted = false;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -778,11 +821,13 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
             ),
           ),
           AppGap.h8,
-          Text(_instruction,
-              style: AppTypography.bodyLarge.copyWith(
-                fontWeight: FontWeight.w700,
-                fontSize: 15,
-              )),
+          Text(
+            _instruction,
+            style: AppTypography.bodyLarge.copyWith(
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
+          ),
           AppGap.h12,
           Wrap(
             spacing: 8,
@@ -790,9 +835,14 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
             children: _segments
                 .map(
                   (seg) => GestureDetector(
-                    onTap: _submitted ? null : () => setState(() => _selected = seg),
+                    onTap: _submitted
+                        ? null
+                        : () => setState(() => _selected = seg),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       decoration: BoxDecoration(
                         color: _segmentBg(seg),
                         borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -805,7 +855,9 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
                         seg,
                         style: AppTypography.bodyLarge.copyWith(
                           fontSize: 14,
-                          fontWeight: _selected == seg ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: _selected == seg
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                         ),
                       ),
                     ),
@@ -820,7 +872,6 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
               onPressed: (_selected ?? '').isEmpty
                   ? null
                   : () => setState(() => _submitted = true),
-              variant: AppButtonVariant.primary,
               isTranslate: false,
               height: 52,
             )
@@ -829,10 +880,13 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: _isCorrect ? AppColors.successSoft : AppColors.dangerSoft,
+                color: _isCorrect
+                    ? AppColors.successSoft
+                    : AppColors.dangerSoft,
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
-                  color: (_isCorrect ? AppColors.success : AppColors.danger).withValues(alpha: 0.45),
+                  color: (_isCorrect ? AppColors.success : AppColors.danger)
+                      .withValues(alpha: 0.45),
                 ),
               ),
               child: Column(
@@ -842,7 +896,9 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
                     _isCorrect ? 'Đúng rồi!' : 'Chưa đúng',
                     style: AppTypography.bodyLarge.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: _isCorrect ? AppColors.successDark : AppColors.dangerDark,
+                      color: _isCorrect
+                          ? AppColors.successDark
+                          : AppColors.dangerDark,
                     ),
                   ),
                   if (_correction.trim().isNotEmpty) ...[
@@ -860,8 +916,10 @@ class _ErrorCorrectionExerciseCardState extends State<_ErrorCorrectionExerciseCa
                     const SizedBox(height: 4),
                     Text(
                       _explainVi,
-                      style: AppTypography.bodyLarge
-                          .copyWith(color: AppColors.textSecondary, fontSize: 13),
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
                 ],

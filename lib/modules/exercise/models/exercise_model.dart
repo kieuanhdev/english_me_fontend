@@ -1,3 +1,5 @@
+import 'package:englishme/modules/learn/models/learning_models.dart' show XpBonus;
+
 enum ExerciseType { multipleChoice, fillBlank }
 
 enum ExerciseDifficulty { easy, medium, hard }
@@ -134,6 +136,7 @@ class ExerciseCompleteResponse {
   final int totalXp;
   final int dailyEarnedXp;
   final bool streakUpdated;
+  final List<XpBonus> bonuses;
 
   const ExerciseCompleteResponse({
     required this.totalQuestions,
@@ -144,9 +147,11 @@ class ExerciseCompleteResponse {
     required this.totalXp,
     required this.dailyEarnedXp,
     required this.streakUpdated,
+    this.bonuses = const [],
   });
 
   factory ExerciseCompleteResponse.fromJson(Map<String, dynamic> json) {
+    final rawBonuses = json['bonuses'];
     return ExerciseCompleteResponse(
       totalQuestions: (json['totalQuestions'] as num?)?.toInt() ?? 0,
       correct: (json['correct'] as num?)?.toInt() ?? 0,
@@ -156,6 +161,12 @@ class ExerciseCompleteResponse {
       totalXp: (json['totalXp'] as num?)?.toInt() ?? 0,
       dailyEarnedXp: (json['dailyEarnedXp'] as num?)?.toInt() ?? 0,
       streakUpdated: json['streakUpdated'] == true,
+      bonuses: rawBonuses is List
+          ? rawBonuses
+              .whereType<Map<String, dynamic>>()
+              .map(XpBonus.fromJson)
+              .toList()
+          : const [],
     );
   }
 }

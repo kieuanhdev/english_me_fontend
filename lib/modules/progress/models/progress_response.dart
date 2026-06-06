@@ -4,6 +4,9 @@ class ProgressResponse {
   final int currentStreak;
   final int longestStreak;
   final String? cefrLevel;
+
+  /// Mục tiêu XP/ngày — backend trả về (user_daily_goals.targetXp, mặc định 30).
+  final int xpGoal;
   final List<SkillScore> skills;
   final WeekSummary weekSummary;
 
@@ -12,6 +15,7 @@ class ProgressResponse {
     required this.currentStreak,
     required this.longestStreak,
     this.cefrLevel,
+    this.xpGoal = 30,
     required this.skills,
     required this.weekSummary,
   });
@@ -23,6 +27,7 @@ class ProgressResponse {
       currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
       longestStreak: (json['longestStreak'] as num?)?.toInt() ?? 0,
       cefrLevel: json['cefrLevel'] as String?,
+      xpGoal: (json['xpGoal'] as num?)?.toInt() ?? 30,
       skills: skillsRaw is List
           ? skillsRaw
                 .whereType<Map<String, dynamic>>()

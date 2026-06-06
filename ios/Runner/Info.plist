@@ -41,6 +41,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Cần quyền truy cập microphone để ghi âm giọng đọc cho tính năng luyện phát âm.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Cần quyền nhận dạng giọng nói để hiển thị văn bản bạn đã đọc khi luyện phát âm.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

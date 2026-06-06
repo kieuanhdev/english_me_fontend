@@ -169,6 +169,7 @@ class LearningPathActivity {
 
   bool get isLocked => status == 'locked';
   bool get isCompleted => status == 'completed';
+  bool get isFailed => status == 'failed';
 
   factory LearningPathActivity.fromJson(Map<String, dynamic> json) {
     return LearningPathActivity(

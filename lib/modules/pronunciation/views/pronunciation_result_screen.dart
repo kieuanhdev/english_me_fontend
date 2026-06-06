@@ -1,4 +1,5 @@
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/controllers/pronunciation_controller.dart';
@@ -30,9 +31,11 @@ class PronunciationResultScreen extends StatelessWidget {
                   style: AppTypography.body.copyWith(color: AppColors.textSecondary),
                 ),
                 AppGap.h16,
-                ElevatedButton(
+                AppButton(
+                  label: 'Quay lại',
+                  isTranslate: false,
                   onPressed: () => Get.back(),
-                  child: const Text('Quay lại'),
+                  expand: false,
                 ),
               ],
             ),

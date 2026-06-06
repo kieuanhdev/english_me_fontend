@@ -101,8 +101,8 @@ class _LessonTile extends StatelessWidget {
         onTap: disabled
             ? null
             : () => Get.toNamed(
-                AppRoutes.learningLessonDetail,
-                arguments: lesson.id,
+                AppRoutes.curriculumLessonPlayer,
+                arguments: {'lessonId': lesson.id},
               ),
         borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Container(

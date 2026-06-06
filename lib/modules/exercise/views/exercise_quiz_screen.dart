@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/exercise/controllers/exercise_controller.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -37,37 +38,43 @@ class ExerciseQuizScreen extends GetView<ExerciseController> {
             emptyMessage: 'Chưa có câu hỏi cho bài tập này.',
             onRetry: controller.retrySession,
             builder: (_) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _QuizAppBar(onClose: controller.closeExercise),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Obx(() => _ProgressHeader(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _QuizAppBar(onClose: controller.closeExercise),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: Obx(
+                    () => _ProgressHeader(
                       current: controller.currentIndex.value + 1,
                       total: controller.questions.length,
                       correctCount: controller.correctCount,
-                    )),
-              ),
-              AppGap.h20,
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Obx(() => _QuizBody(
+                    ),
+                  ),
+                ),
+                AppGap.h20,
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Obx(
+                      () => _QuizBody(
                         question: controller.currentExercise!,
                         selectedAnswer: controller.selectedAnswer.value,
                         isRevealed: controller.isAnswerRevealed.value,
                         onSelectAnswer: controller.selectAnswer,
-                      )),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-              Obx(() => _BottomAction(
+                Obx(
+                  () => _BottomAction(
                     selectedAnswer: controller.selectedAnswer.value,
                     isRevealed: controller.isAnswerRevealed.value,
                     isLast: controller.isLastQuestion,
                     onConfirm: controller.confirmAnswer,
                     onNext: controller.nextQuestion,
-                  )),
-            ],
+                  ),
+                ),
+              ],
             ),
           );
         }),
@@ -149,7 +156,11 @@ class _ProgressHeader extends StatelessWidget {
             ),
             Row(
               children: [
-                Icon(Icons.check_circle_outline_rounded, size: 14, color: AppColors.success),
+                Icon(
+                  Icons.check_circle_outline_rounded,
+                  size: 14,
+                  color: AppColors.success,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '$correctCount đúng',
@@ -174,7 +185,9 @@ class _ProgressHeader extends StatelessWidget {
                 FractionallySizedBox(
                   widthFactor: progress,
                   child: Container(
-                    decoration: BoxDecoration(gradient: AppColors.primaryGradient),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                    ),
                   ),
                 ),
               ],
@@ -224,7 +237,11 @@ class _QuizBody extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(color: AppColors.outlineVariant),
             boxShadow: [
-              BoxShadow(color: AppColors.shadowSoft, blurRadius: 16, offset: Offset(0, 4)),
+              BoxShadow(
+                color: AppColors.shadowSoft,
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
             ],
           ),
           child: Text(
@@ -294,7 +311,9 @@ class _OptionTile extends StatelessWidget {
 
     if (!isRevealed) {
       borderColor = isSelected ? AppColors.primary : AppColors.outlineVariant;
-      bgColor = isSelected ? AppColors.chipHighlightBg : AppColors.surfaceContainerLowest;
+      bgColor = isSelected
+          ? AppColors.chipHighlightBg
+          : AppColors.surfaceContainerLowest;
       labelBg = isSelected ? AppColors.primary : AppColors.surfaceContainerHigh;
       labelFg = isSelected ? AppColors.onPrimaryFixed : AppColors.iconMuted;
     } else if (isCorrect) {
@@ -495,7 +514,9 @@ class _BottomAction extends StatelessWidget {
               ? _PrimaryButton(
                   key: const ValueKey('next'),
                   label: isLast ? 'Xem kết quả' : 'Câu tiếp theo',
-                  icon: isLast ? Icons.emoji_events_rounded : Icons.arrow_forward_rounded,
+                  icon: isLast
+                      ? Icons.emoji_events_rounded
+                      : Icons.arrow_forward_rounded,
                   enabled: true,
                   onTap: onNext,
                 )
@@ -528,33 +549,13 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 56,
-        decoration: BoxDecoration(
-          gradient: enabled ? AppColors.primaryGradient : null,
-          color: enabled ? null : AppColors.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(AppRadius.pill),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: AppTypography.headlineMedium.copyWith(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: enabled ? AppColors.onPrimaryFixed : AppColors.iconMuted,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Icon(icon, color: enabled ? AppColors.onPrimaryFixed : AppColors.iconMuted, size: 18),
-          ],
-        ),
-      ),
+    return AppButton(
+      label: label,
+      isTranslate: false,
+      onPressed: enabled ? onTap : null,
+      gradient: true,
+      radius: AppRadius.pill,
+      trailing: Icon(icon, size: 18),
     );
   }
 }
-

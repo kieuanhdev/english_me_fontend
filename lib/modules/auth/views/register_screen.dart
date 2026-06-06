@@ -1,17 +1,22 @@
+import 'package:englishme/core/config/app_config.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
-import 'package:englishme/gen/assets.gen.dart';
+import 'package:englishme/core/widgets/language_toggle_button.dart';
+import 'package:englishme/core/widgets/theme_toggle_button.dart';
 import 'package:englishme/modules/auth/controllers/auth_controller.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_form_panel.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class RegisterScreen extends GetView<AuthController> {
   const RegisterScreen({super.key});
@@ -35,7 +40,72 @@ class _RegisterViewState extends State<_RegisterView> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  bool _agreedToTerms = false;
+
   AuthController get _controller => Get.find<AuthController>();
+
+  Future<void> _openLegalPage(String path) async {
+    final uri = Uri.parse('${AppConfig.apiBaseUrl}$path');
+    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!opened) {
+      AppNotify.error('Lỗi', message: T.termsOpenFailed.tr);
+    }
+  }
+
+  Widget _buildTermsAgreement() {
+    final linkStyle = AppTypography.bodyRegular.copyWith(
+      fontSize: 12,
+      color: AppColors.primary,
+      fontWeight: FontWeight.w800,
+      decoration: TextDecoration.underline,
+    );
+    final baseStyle = AppTypography.bodyRegular.copyWith(
+      fontSize: 12,
+      color: AppColors.textSecondary,
+    );
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 22,
+          height: 22,
+          child: Checkbox(
+            value: _agreedToTerms,
+            onChanged: (v) => setState(() => _agreedToTerms = v ?? false),
+            activeColor: AppColors.primary,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+          ),
+        ),
+        AppGap.w8,
+        Expanded(
+          child: GestureDetector(
+            onTap: () => setState(() => _agreedToTerms = !_agreedToTerms),
+            child: Text.rich(
+              TextSpan(
+                style: baseStyle,
+                children: [
+                  TextSpan(text: T.registerAgreePrefix.tr),
+                  TextSpan(
+                    text: T.registerAgreeTerms.tr,
+                    style: linkStyle,
+                    recognizer: TapGestureRecognizer()..onTap = () => _openLegalPage('/terms'),
+                  ),
+                  TextSpan(text: T.registerAgreeConjunction.tr),
+                  TextSpan(
+                    text: T.registerAgreePrivacy.tr,
+                    style: linkStyle,
+                    recognizer: TapGestureRecognizer()..onTap = () => _openLegalPage('/privacy'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
   @override
   void dispose() {
@@ -50,36 +120,16 @@ class _RegisterViewState extends State<_RegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: const CommonAppBar(title: T.authRegister),
+      appBar: const CommonAppBar(
+        title: T.authRegister,
+        actions: [LanguageToggleButton(), ThemeToggleButton(), SizedBox(width: 4)],
+      ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Center(
-                child: Assets.images.iconAppEnglishMe.svg(
-                  width: 76,
-                  height: 76,
-                  semanticsLabel: T.appName,
-                ),
-              ),
-              AppGap.h20,
-              Text(
-                T.registerWelcomeTitle.tr,
-                style: AppTypography.displayLarge.copyWith(
-                  fontSize: 26,
-                  color: AppColors.primary,
-                ),
-              ),
-              AppGap.h6,
-              Text(
-                T.registerWelcomeSubtitle.tr,
-                style: AppTypography.bodyRegular.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              AppGap.h20,
               AuthFormPanel(
                 child: Column(
                   children: [
@@ -87,42 +137,45 @@ class _RegisterViewState extends State<_RegisterView> {
                       label: T.labelFullName,
                       controller: _fullNameController,
                     ),
-                    AppGap.h14,
+                    AppGap.h10,
                     AppTextField(
                       label: T.labelEmail,
                       keyboardType: TextInputType.emailAddress,
                       controller: _emailController,
                     ),
-                    AppGap.h14,
+                    AppGap.h10,
                     AppTextField(
                       label: T.labelPassword,
                       obscureText: true,
                       controller: _passwordController,
                     ),
-                    AppGap.h14,
+                    AppGap.h10,
                     AppTextField(
                       label: T.labelConfirmPassword,
                       obscureText: true,
                       controller: _confirmPasswordController,
                     ),
-                    AppGap.h18,
+                    AppGap.h12,
+                    _buildTermsAgreement(),
+                    AppGap.h14,
                     Obx(
                       () => AppButton(
                         label: T.buttonCreateAccount,
                         onPressed: _controller.isLoading.value
                             ? null
                             : () => _controller.signUpWithEmail(
-                                _fullNameController.text,
-                                _emailController.text,
-                                _passwordController.text,
-                                _confirmPasswordController.text,
-                              ),
+                                  _fullNameController.text,
+                                  _emailController.text,
+                                  _passwordController.text,
+                                  _confirmPasswordController.text,
+                                  agreedToTerms: _agreedToTerms,
+                                ),
                         isLoading: _controller.isLoading.value,
                       ),
                     ),
-                    AppGap.h24,
+                    AppGap.h16,
                     const AuthOrDivider(),
-                    AppGap.h22,
+                    AppGap.h14,
                     Obx(
                       () => AppButton(
                         label: T.buttonContinueWithGoogle,
@@ -132,16 +185,12 @@ class _RegisterViewState extends State<_RegisterView> {
                         variant: AppButtonVariant.secondary,
                         leading: const GoogleMark(),
                         isLoading: _controller.isLoading.value,
-                        textStyle: AppTypography.bodyRegular.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              AppGap.h20,
+              const Spacer(),
               AuthNavigationText(
                 promptText: T.alreadyHaveAccount.tr,
                 buttonText: T.loginNow.tr,

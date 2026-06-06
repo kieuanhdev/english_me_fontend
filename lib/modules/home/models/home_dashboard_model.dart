@@ -68,11 +68,19 @@ class DailyStats {
   final int activeDaysThisWeek;
   final int currentStreak;
 
+  /// Mục tiêu XP/ngày — backend trả về (user_daily_goals.targetXp, mặc định 30).
+  final int xpGoal;
+
+  /// Số thẻ flashcard tới hạn ôn hôm nay (mọi desk) — cá nhân hóa P5.
+  final int dueCardCount;
+
   const DailyStats({
     required this.xpToday,
     required this.xpWeek,
     required this.activeDaysThisWeek,
     required this.currentStreak,
+    this.xpGoal = 30,
+    this.dueCardCount = 0,
   });
 
   factory DailyStats.fromJson(Map<String, dynamic> json) => DailyStats(
@@ -80,6 +88,8 @@ class DailyStats {
     xpWeek: (json['xpWeek'] as num?)?.toInt() ?? 0,
     activeDaysThisWeek: (json['activeDaysThisWeek'] as num?)?.toInt() ?? 0,
     currentStreak: (json['currentStreak'] as num?)?.toInt() ?? 0,
+    xpGoal: (json['xpGoal'] as num?)?.toInt() ?? 30,
+    dueCardCount: (json['dueCardCount'] as num?)?.toInt() ?? 0,
   );
 }
 
@@ -125,11 +135,17 @@ class WordOfDayDto {
 class ContinueLearning {
   final String? type;
   final String? topicId;
+
+  /// id learning lesson (String) khi type=lesson — cá nhân hóa P3.
+  final String? lessonId;
   final String? pathId;
   final String? title;
   final String? description;
   final String? level;
   final String? slug;
+
+  /// "continue" (đang dở) | "retry" (chưa đạt điểm) | "start" | "grammar" (fallback).
+  final String? actionType;
   final double progress;
   final int activityCount;
   final int completedActivityCount;
@@ -137,30 +153,43 @@ class ContinueLearning {
   const ContinueLearning({
     this.type,
     this.topicId,
+    this.lessonId,
     this.pathId,
     this.title,
     this.description,
     this.level,
     this.slug,
+    this.actionType,
     this.progress = 0,
     this.activityCount = 0,
     this.completedActivityCount = 0,
   });
 
-  factory ContinueLearning.fromJson(Map<String, dynamic> json) => ContinueLearning(
-    type: json['type'] as String?,
-    topicId: json['topicId']?.toString(),
-    pathId: (json['pathId'] ?? json['currentPathId'] ?? json['id'])?.toString(),
-    title: json['title'] as String?,
-    description: (json['description'] ?? json['subtitle'])?.toString(),
-    level: json['level'] as String?,
-    slug: json['slug'] as String?,
-    progress: _asDouble(json['progress']).clamp(0, 1).toDouble(),
-    activityCount: _asInt(json['activityCount'] ?? json['lessonCount']),
-    completedActivityCount: _asInt(
-      json['completedActivityCount'] ?? json['completedLessonCount'],
-    ),
-  );
+  /// true nếu đây là gợi ý "làm lại" (điểm chưa đạt ngưỡng pass).
+  bool get isRetry => actionType == 'retry';
+
+  factory ContinueLearning.fromJson(Map<String, dynamic> json) {
+    // progress: backend P3 trả lastScore (0–100); các nguồn khác trả 0–1.
+    // Chuẩn hóa về 0–1 để LinearProgressIndicator dùng.
+    final rawProgress = _asDouble(json['progress']);
+    final normalized = rawProgress > 1 ? (rawProgress / 100.0) : rawProgress;
+    return ContinueLearning(
+      type: json['type'] as String?,
+      topicId: json['topicId']?.toString(),
+      lessonId: json['lessonId']?.toString(),
+      pathId: (json['pathId'] ?? json['currentPathId'] ?? json['id'])?.toString(),
+      title: json['title'] as String?,
+      description: (json['description'] ?? json['subtitle'])?.toString(),
+      level: json['level'] as String?,
+      slug: json['slug'] as String?,
+      actionType: json['actionType'] as String?,
+      progress: normalized.clamp(0, 1).toDouble(),
+      activityCount: _asInt(json['activityCount'] ?? json['lessonCount']),
+      completedActivityCount: _asInt(
+        json['completedActivityCount'] ?? json['completedLessonCount'],
+      ),
+    );
+  }
 }
 
 class HomeRecommendation {
@@ -169,11 +198,16 @@ class HomeRecommendation {
   final String description;
   final String? actionUrl;
 
+  /// Lý do cá nhân hóa (P2) — chỉ có khi gợi ý nhắm kỹ năng yếu nhất của user.
+  /// vd "Bạn dành ít thời gian cho phát âm nhất (5% XP) — luyện thêm nhé".
+  final String? reason;
+
   const HomeRecommendation({
     required this.type,
     required this.title,
     required this.description,
     this.actionUrl,
+    this.reason,
   });
 
   factory HomeRecommendation.fromJson(Map<String, dynamic> json) => HomeRecommendation(
@@ -181,6 +215,7 @@ class HomeRecommendation {
     title: (json['title'] ?? '').toString(),
     description: (json['description'] ?? '').toString(),
     actionUrl: json['actionUrl'] as String?,
+    reason: json['reason'] as String?,
   );
 }
 

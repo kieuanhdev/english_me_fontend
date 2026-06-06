@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:get/get.dart';
@@ -21,7 +22,6 @@ class PlacementResultScreen extends GetView<PlacementTestController> {
           return SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 AppGap.h16,
                 _LevelBadge(level: result.resultLevel),
@@ -40,6 +40,11 @@ class PlacementResultScreen extends GetView<PlacementTestController> {
                   ),
                   textAlign: TextAlign.center,
                 ),
+                if (result.canGoHigherThanB2 &&
+                    result.aboveLevelMessage.isNotEmpty) ...[
+                  AppGap.h16,
+                  _AboveB2Card(message: result.aboveLevelMessage),
+                ],
                 AppGap.h24,
                 _ScoreCard(score: result.score, total: result.totalQuestions),
                 AppGap.h24,
@@ -100,6 +105,44 @@ class _LevelBadge extends StatelessWidget {
               color: color.withValues(alpha: 0.7),
               fontSize: 12,
               letterSpacing: 3,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Card nổi bật khi học viên kịch trần B2 và có dấu hiệu giỏi hơn B2.
+class _AboveB2Card extends StatelessWidget {
+  const _AboveB2Card({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
+      decoration: BoxDecoration(
+        color: AppColors.successSoft,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.success.withValues(alpha: 0.4), width: 1.5),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.rocket_launch_rounded, size: 22, color: AppColors.success),
+          AppGap.w12,
+          Expanded(
+            child: Text(
+              message,
+              style: AppTypography.bodyLarge.copyWith(
+                fontSize: 14,
+                height: 1.4,
+                color: AppColors.successDark,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
@@ -202,15 +245,22 @@ class _ReviewTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool correct = item.isCorrect as bool;
     final Color borderColor = correct ? AppColors.success : AppColors.danger;
-    final Color bgColor = correct ? AppColors.successSoft : AppColors.dangerSoft;
-    final Color textColor = correct ? AppColors.successDark : AppColors.dangerDark;
+    final Color bgColor = correct
+        ? AppColors.successSoft
+        : AppColors.dangerSoft;
+    final Color textColor = correct
+        ? AppColors.successDark
+        : AppColors.dangerDark;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: borderColor.withValues(alpha: 0.4), width: 1.5),
+        border: Border.all(
+          color: borderColor.withValues(alpha: 0.4),
+          width: 1.5,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,7 +268,10 @@ class _ReviewTile extends StatelessWidget {
           Container(
             width: 26,
             height: 26,
-            decoration: BoxDecoration(color: borderColor, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: borderColor,
+              shape: BoxShape.circle,
+            ),
             child: Icon(
               correct ? Icons.check : Icons.close,
               color: AppColors.onPrimaryFixed,
@@ -270,29 +323,12 @@ class _ReviewTile extends StatelessWidget {
 class _GoToDashboardButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        boxShadow: [
-          BoxShadow(color: AppColors.primary.withValues(alpha: 0.35), offset: Offset(0, 4)),
-        ],
-      ),
-      child: ElevatedButton(
-        onPressed: () => ShellController.goToTab(0),
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.onPrimaryFixed,
-          minimumSize: const Size.fromHeight(56),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-        ),
-        child: Text(
-          'VÀO HỌC NGAY',
-          style: AppTypography.labelMedium.copyWith(fontSize: 18, color: AppColors.onPrimaryFixed),
-        ),
-      ),
+    return AppButton(
+      label: 'VÀO HỌC NGAY',
+      isTranslate: false,
+      onPressed: () => ShellController.goToTab(0),
+      radius: AppRadius.md,
+      textStyle: AppTypography.labelMedium.copyWith(fontSize: 18),
     );
   }
 }

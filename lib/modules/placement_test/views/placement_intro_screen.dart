@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
+import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/core/widgets/app_button.dart';
-import 'package:englishme/core/shell/shell_controller.dart';
+import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -17,52 +17,31 @@ class PlacementIntroScreen extends StatelessWidget {
       backgroundColor: AppColors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 28),
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _TopBar(onBack: () => Navigator.of(context).pop()),
+              AppMainAppBar(
+                title: 'Kiểm tra trình độ',
+                horizontalPadding: 0,
+                showBack: true,
+                showNotification: false,
+                showSettings: false,
+                onBack: () => Navigator.of(context).pop(),
+              ),
               AppGap.h18,
-              const Center(child: _PlacementMascot()),
-              AppGap.h16,
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primarySoft,
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
-                  child: Text(
-                    'BÀI KIỂM TRA ĐẦU VÀO',
-                    style: AppTypography.labelMedium.copyWith(
-                      color: AppColors.primaryContainer,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 0.4,
-                    ),
-                  ),
+              Text(
+                'Cùng xem trình độ của bạn nhé!',
+                style: AppTypography.displayLarge.copyWith(
+                  fontSize: 23,
+                  height: 1.15,
                 ),
               ),
-              AppGap.h14,
-              Center(
-                child: Text(
-                  'Cùng xem trình\nđộ của bạn nhé!',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.displayLarge.copyWith(
-                    fontSize: 23,
-                    height: 1.15,
-                  ),
-                ),
-              ),
-              AppGap.h10,
-              Center(
-                child: Text(
-                  'Một bài kiểm tra ngắn ~5 phút để hệ thống xếp bạn\nvào lộ trình phù hợp theo chuẩn CEFR (A1-C1).',
-                  textAlign: TextAlign.center,
-                  style: AppTypography.bodyLarge.copyWith(fontSize: 14),
-                ),
+              AppGap.h8,
+              Text(
+                'Một bài kiểm tra ngắn gồm 16 câu (ngữ pháp + từ vựng) để hệ thống xếp bạn vào lộ trình phù hợp theo chuẩn CEFR.',
+                style: AppTypography.bodyLarge.copyWith(fontSize: 14),
               ),
               AppGap.h18,
               Row(
@@ -82,16 +61,10 @@ class PlacementIntroScreen extends StatelessWidget {
                       color: AppColors.skillVocabulary,
                     ),
                   ),
-                  AppGap.w10,
-                  Expanded(
-                    child: _SkillCard(
-                      label: 'Nghe hiểu',
-                      icon: Icons.headphones_rounded,
-                      color: AppColors.skillListening,
-                    ),
-                  ),
                 ],
               ),
+              AppGap.h18,
+              const _CapNotice(),
               AppGap.h24,
               AppButton(
                 label: 'BẮT ĐẦU KIỂM TRA',
@@ -106,15 +79,14 @@ class PlacementIntroScreen extends StatelessWidget {
               ),
               AppGap.h18,
               Center(
-                child: TextButton(
-                  onPressed: () => ShellController.goToTab(0),
-                  child: Text(
-                    'Bỏ qua, vào thẳng Dashboard',
-                    style: AppTypography.bodyLarge.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 16,
-                    ),
+                child: AppButton(
+                  label: T.placementSelfSelectEntry,
+                  variant: AppButtonVariant.text,
+                  expand: false,
+                  onPressed: () => Get.toNamed(AppRoutes.placementLevelPicker),
+                  textStyle: AppTypography.bodyLarge.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 16,
                   ),
                 ),
               ),
@@ -126,62 +98,44 @@ class PlacementIntroScreen extends StatelessWidget {
   }
 }
 
-class _TopBar extends StatelessWidget {
-  const _TopBar({required this.onBack});
+/// Banner cảnh báo: bài đầu vào chỉ xác định trình độ tối đa tới B2.
+/// Ưu tiên dùng [notice] từ backend; fallback chuỗi tĩnh nếu rỗng.
+class _CapNotice extends StatelessWidget {
+  const _CapNotice();
 
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [AppBackButton(onPressed: onBack)]);
-  }
-}
-
-class _PlacementMascot extends StatelessWidget {
-  const _PlacementMascot();
+  static const String _fallback =
+      'Bài kiểm tra này chỉ xác định trình độ tối đa tới mức B2. Nếu trình độ '
+      'của bạn cao hơn, hãy làm các bài kiểm tra lên cấp trong lộ trình để xác '
+      'định chính xác. Câu bỏ trống được tính là sai.';
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 170,
-      height: 170,
-      child: Stack(
-        clipBehavior: Clip.none,
+    final controller = Get.find<PlacementTestController>();
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Align(
-            child: Container(
-              width: 138,
-              height: 138,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary,
-                border: Border.all(color: AppColors.primaryContainer, width: 4),
-              ),
-              child: Icon(
-                Icons.flutter_dash,
-                size: 76,
-                color: AppColors.primarySoft,
-              ),
-            ),
-          ),
-          Positioned(
-            right: 18,
-            top: 36,
-            child: Container(
-              width: 26,
-              height: 26,
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.primaryContainer, width: 2),
-              ),
-              child: Center(
-                child: Text(
-                  '?',
-                  style: AppTypography.labelMedium.copyWith(
-                    color: AppColors.primaryContainer,
-                    fontWeight: FontWeight.w900,
-                  ),
+          Icon(Icons.info_outline_rounded,
+              size: 20, color: AppColors.primaryContainer),
+          AppGap.w10,
+          Expanded(
+            child: Obx(
+              () => Text(
+                controller.notice.value.isNotEmpty
+                    ? controller.notice.value
+                    : _fallback,
+                style: AppTypography.bodyLarge.copyWith(
+                  fontSize: 13,
+                  height: 1.35,
+                  color: AppColors.primaryContainer,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

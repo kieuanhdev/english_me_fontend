@@ -6,6 +6,7 @@ import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/auth/models/user_model.dart';
 import 'package:englishme/modules/auth/repositories/auth_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
 
 class AuthController extends GetxController {
@@ -62,9 +63,16 @@ class AuthController extends GetxController {
     String fullName,
     String email,
     String password,
-    String confirmPassword,
-  ) async {
-    final error = _validateRegister(fullName, email, password, confirmPassword);
+    String confirmPassword, {
+    bool agreedToTerms = false,
+  }) async {
+    final error = _validateRegister(
+      fullName,
+      email,
+      password,
+      confirmPassword,
+      agreedToTerms,
+    );
     if (error != null) {
       _showError(error);
       return;
@@ -127,11 +135,13 @@ class AuthController extends GetxController {
     String email,
     String password,
     String confirmPassword,
+    bool agreedToTerms,
   ) {
     if (fullName.trim().isEmpty) return T.authValidateNameEmpty.tr;
     final emailError = _validateEmailPassword(email, password);
     if (emailError != null) return emailError;
     if (password != confirmPassword) return T.authValidatePasswordMismatch.tr;
+    if (!agreedToTerms) return T.authValidateTermsRequired.tr;
     return null;
   }
 
@@ -159,6 +169,6 @@ class AuthController extends GetxController {
   }
 
   void _showError(String message) {
-    Get.snackbar('Lỗi', message, snackPosition: SnackPosition.BOTTOM);
+    AppNotify.error('Lỗi', message: message);
   }
 }

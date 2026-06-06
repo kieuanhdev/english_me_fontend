@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
 import 'package:englishme/modules/create_desk/controllers/create_desk_controller.dart';
@@ -23,25 +24,24 @@ class CreateDeskScreen extends StatelessWidget {
         title: appTitle,
         isTranslate: false,
         actions: [
-          Obx(
-            () {
-              final c = Get.find<CreateDeskController>();
-              final busy = c.isSubmitting.value;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: TextButton(
-                  onPressed: busy ? null : c.submitDesk,
-                  child: Text(
-                    primaryActionLabel,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: busy ? AppColors.textSecondary : AppColors.primary,
-                    ),
-                  ),
+          Obx(() {
+            final c = Get.find<CreateDeskController>();
+            final busy = c.isSubmitting.value;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: AppButton(
+                label: primaryActionLabel,
+                isTranslate: false,
+                onPressed: busy ? null : c.submitDeck,
+                variant: AppButtonVariant.text,
+                expand: false,
+                height: 44,
+                textStyle: AppTypography.bodyLarge.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          }),
         ],
       ),
       body: SafeArea(
@@ -59,15 +59,19 @@ class CreateDeskScreen extends StatelessWidget {
                       children: [
                         _HeaderHero(isEditMode: ctl.isEditMode),
                         AppGap.h24,
-                        _SectionTitle(title: 'Tên bộ thẻ', required: true),
+                        const _SectionTitle(
+                          title: 'Tên bộ thẻ',
+                          required: true,
+                        ),
                         AppGap.h10,
                         AppTextField(
-                          label: null,
                           hintText: 'Ví dụ: Tiếng Anh Giao Tiếp',
                           controller: c.titleCtrl,
                           isTranslate: false,
                           validator: (v) {
-                            if (v == null || v.trim().isEmpty) return 'Vui lòng nhập tên bộ thẻ';
+                            if (v == null || v.trim().isEmpty) {
+                              return 'Vui lòng nhập tên bộ thẻ';
+                            }
                             return null;
                           },
                         ),
@@ -83,7 +87,8 @@ class CreateDeskScreen extends StatelessWidget {
                             color: AppColors.onSurface,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Bộ thẻ này tập trung vào các cụm từ phổ biến...',
+                            hintText:
+                                'Bộ thẻ này tập trung vào các cụm từ phổ biến...',
                             hintStyle: AppTypography.bodyLarge.copyWith(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
@@ -98,39 +103,11 @@ class CreateDeskScreen extends StatelessWidget {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(AppRadius.xl),
-                              borderSide: BorderSide(color: AppColors.primary, width: 2),
+                              borderSide: BorderSide(
+                                color: AppColors.primary,
+                                width: 2,
+                              ),
                             ),
-                          ),
-                        ),
-                        AppGap.h22,
-                        const _SectionTitle(title: 'Trình độ CEFR', required: true),
-                        AppGap.h10,
-                        Obx(
-                          () => Wrap(
-                            spacing: 10,
-                            runSpacing: 10,
-                            children: CreateDeskController.cefrOptions.map((level) {
-                              final selected = c.selectedCefr.value == level;
-                              return GestureDetector(
-                                onTap: () => c.selectedCefr.value = level,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    gradient: selected ? AppColors.primaryGradient : null,
-                                    color: selected ? null : AppColors.surfaceContainerHigh,
-                                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                                  ),
-                                  child: Text(
-                                    level,
-                                    style: AppTypography.bodyLarge.copyWith(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w800,
-                                      color: selected ? AppColors.onPrimaryFixed : AppColors.textSecondary,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
                           ),
                         ),
                         AppGap.h24,
@@ -139,24 +116,25 @@ class CreateDeskScreen extends StatelessWidget {
                         _IconSection(controller: c),
                         if (isEdit) ...[
                           AppGap.h28,
-                          Obx(
-                            () {
-                              final ctrl = Get.find<CreateDeskController>();
-                              final busy = ctrl.isSubmitting.value;
-                              return Center(
-                                child: TextButton(
-                                  onPressed: busy ? null : ctrl.confirmAndDeleteDesk,
-                                  child: Text(
-                                    'Xóa bộ thẻ',
-                                    style: AppTypography.bodyLarge.copyWith(
-                                      color: AppColors.danger,
-                                      fontWeight: FontWeight.w800,
-                                    ),
-                                  ),
+                          Obx(() {
+                            final ctrl = Get.find<CreateDeskController>();
+                            final busy = ctrl.isSubmitting.value;
+                            return Center(
+                              child: AppButton(
+                                label: 'Xóa bộ thẻ',
+                                isTranslate: false,
+                                onPressed: busy
+                                    ? null
+                                    : ctrl.confirmAndDeleteDeck,
+                                variant: AppButtonVariant.dangerText,
+                                expand: false,
+                                height: 44,
+                                textStyle: AppTypography.bodyLarge.copyWith(
+                                  fontWeight: FontWeight.w800,
                                 ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          }),
                         ],
                       ],
                     ),
@@ -171,7 +149,7 @@ class CreateDeskScreen extends StatelessWidget {
                           label: bottomPrimaryLabel,
                           icon: bottomIcon,
                           isLoading: c.isSubmitting.value,
-                          onPressed: c.submitDesk,
+                          onPressed: c.submitDeck,
                         ),
                       ),
                     ),
@@ -194,7 +172,7 @@ class _HeaderHero extends StatelessWidget {
   Widget build(BuildContext context) {
     final title = isEditMode ? 'Cập nhật bộ thẻ' : 'Bắt đầu hành trình mới';
     final subtitle = isEditMode
-        ? 'Chỉnh tên và trình độ CEFR phù hợp — thay đổi CEFR có thể báo conflict nếu đã có bộ cùng cấp.'
+        ? 'Chỉnh tên và giao diện bộ thẻ theo ý bạn.'
         : 'Tổ chức kiến thức theo cách của riêng bạn với thiết kế tối giản.';
     return Row(
       children: [
@@ -240,7 +218,11 @@ class _HeaderHero extends StatelessWidget {
               colors: [AppColors.levelBBg, AppColors.surfaceContainerLow],
             ),
           ),
-          child: Icon(Icons.auto_stories_rounded, color: AppColors.primary, size: 34),
+          child: Icon(
+            Icons.auto_stories_rounded,
+            color: AppColors.primary,
+            size: 34,
+          ),
         ),
       ],
     );
@@ -321,11 +303,18 @@ class _ColorSection extends StatelessWidget {
                       shape: BoxShape.circle,
                       color: color,
                       border: Border.all(
-                        color: selected ? AppColors.primary.withValues(alpha: 0.25) : Colors.transparent,
+                        color: selected
+                            ? AppColors.primary.withValues(alpha: 0.25)
+                            : Colors.transparent,
                         width: 5,
                       ),
                       boxShadow: selected
-                          ? [BoxShadow(color: color.withValues(alpha: 0.35), blurRadius: 8)]
+                          ? [
+                              BoxShadow(
+                                color: color.withValues(alpha: 0.35),
+                                blurRadius: 8,
+                              ),
+                            ]
                           : null,
                     ),
                   ),
@@ -357,23 +346,29 @@ class _IconSection extends StatelessWidget {
             crossAxisSpacing: 12,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1,
             children: CreateDeskController.iconOptions.map((iconName) {
               final selected = controller.selectedIcon.value == iconName;
               return GestureDetector(
                 onTap: () => controller.selectedIcon.value = iconName,
-                child: Container(
+                child: DecoratedBox(
                   decoration: BoxDecoration(
-                    color: selected ? AppColors.chipHighlightBg : AppColors.surfaceContainerHigh,
+                    color: selected
+                        ? AppColors.chipHighlightBg
+                        : AppColors.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
                     border: selected
-                        ? Border.all(color: AppColors.primary.withValues(alpha: 0.2), width: 2)
+                        ? Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                            width: 2,
+                          )
                         : null,
                   ),
                   child: Icon(
                     _mapIcon(iconName),
                     size: 30,
-                    color: selected ? AppColors.primary : AppColors.textSecondary,
+                    color: selected
+                        ? AppColors.primary
+                        : AppColors.textSecondary,
                   ),
                 ),
               );
@@ -400,47 +395,14 @@ class _PrimaryDeskButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: isLoading ? null : onPressed,
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-        child: Ink(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            gradient: isLoading ? null : AppColors.primaryGradient,
-            color: isLoading ? AppColors.surfaceContainerHigh : null,
-            borderRadius: BorderRadius.circular(AppRadius.xxl),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (isLoading)
-                SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: AppColors.primary,
-                  ),
-                )
-              else ...[
-                Icon(icon, color: AppColors.onPrimaryFixed),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: AppTypography.bodyLarge.copyWith(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.onPrimaryFixed,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
+    return AppButton(
+      label: label,
+      isTranslate: false,
+      onPressed: isLoading ? null : onPressed,
+      isLoading: isLoading,
+      gradient: true,
+      radius: AppRadius.xxl,
+      leading: Icon(icon, color: AppColors.onPrimaryFixed),
     );
   }
 }

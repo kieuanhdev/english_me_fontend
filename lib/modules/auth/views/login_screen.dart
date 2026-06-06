@@ -7,6 +7,8 @@ import 'package:englishme/modules/auth/controllers/auth_controller.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_form_panel.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_navigation_text.dart';
 import 'package:englishme/modules/auth/views/widgets/auth_or_divider.dart';
+import 'package:englishme/core/widgets/language_toggle_button.dart';
+import 'package:englishme/core/widgets/theme_toggle_button.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +47,10 @@ class _LoginViewState extends State<_LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: const CommonAppBar(title: T.authLogin),
+      appBar: const CommonAppBar(
+        title: T.authLogin,
+        actions: [LanguageToggleButton(), ThemeToggleButton(), SizedBox(width: 4)],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -85,15 +90,11 @@ class _LoginViewState extends State<_LoginView> {
                     AppGap.h8,
                     Align(
                       alignment: Alignment.centerRight,
-                      child: TextButton(
+                      child: AppButton(
+                        label: T.forgotPassword,
+                        variant: AppButtonVariant.text,
+                        expand: false,
                         onPressed: () {},
-                        child: Text(
-                          T.forgotPassword.tr,
-                          style: AppTypography.bodyRegular.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
                       ),
                     ),
                     AppGap.h10,
@@ -121,10 +122,6 @@ class _LoginViewState extends State<_LoginView> {
                         variant: AppButtonVariant.secondary,
                         leading: const GoogleMark(),
                         isLoading: _controller.isLoading.value,
-                        textStyle: AppTypography.bodyRegular.copyWith(
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary,
-                        ),
                       ),
                     ),
                   ],

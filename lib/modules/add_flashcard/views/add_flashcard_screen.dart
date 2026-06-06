@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
 import 'package:englishme/modules/add_flashcard/controllers/add_flashcard_controller.dart';
@@ -24,74 +25,37 @@ class AddFlashcardScreen extends StatelessWidget {
     }
 
     final c = Get.find<AddFlashcardController>();
-    final pageTitle = c.isEditMode ? T.flashcardEditWord.tr : T.flashcardNewWord.tr;
-    final headline = c.isEditMode ? T.flashcardEditCardTitle.tr : T.flashcardCreateWord.tr;
+    final pageTitle = c.isEditMode
+        ? T.flashcardEditWord.tr
+        : T.flashcardNewWord.tr;
+    final headline = c.isEditMode
+        ? T.flashcardEditCardTitle.tr
+        : T.flashcardCreateWord.tr;
     final subtitle = c.isEditMode
         ? T.flashcardEditSubtitle.tr
         : T.flashcardCreateSubtitle.tr;
-    final submitLabel = c.isEditMode ? T.actionSaveChanges.tr : T.actionSaveCard.tr;
+    final submitLabel = c.isEditMode
+        ? T.actionSaveChanges.tr
+        : T.actionSaveCard.tr;
 
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: CommonAppBar(
-        title: pageTitle,
-        isTranslate: false,
-        showBackButton: true,
-      ),
+      appBar: CommonAppBar(title: pageTitle, isTranslate: false),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
           child: Obx(() {
             final busy = c.isSubmitting.value;
-            return Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: busy ? null : c.submit,
-                borderRadius: BorderRadius.circular(AppRadius.lg),
-                child: Ink(
-                  width: double.infinity,
-                  height: 56,
-                  decoration: BoxDecoration(
-                    gradient: busy ? null : AppColors.primaryGradient,
-                    color: busy ? AppColors.surfaceContainerHigh : null,
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                    boxShadow: busy
-                        ? null
-                        : [
-                            BoxShadow(
-                              color: AppColors.primaryShadow,
-                              blurRadius: 16,
-                              offset: Offset(0, 6),
-                            ),
-                          ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (busy)
-                        SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: AppColors.primary,
-                          ),
-                        )
-                      else ...[
-                        Icon(Icons.save_rounded, color: AppColors.onPrimaryFixed, size: 22),
-                        const SizedBox(width: 10),
-                        Text(
-                          submitLabel,
-                          style: AppTypography.bodyLarge.copyWith(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.onPrimaryFixed,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+            return AppButton(
+              label: submitLabel,
+              isTranslate: false,
+              onPressed: busy ? null : c.submit,
+              isLoading: busy,
+              gradient: true,
+              leading: Icon(
+                Icons.save_rounded,
+                color: AppColors.onPrimaryFixed,
+                size: 22,
               ),
             );
           }),
@@ -144,7 +108,6 @@ class AddFlashcardScreen extends StatelessWidget {
                           _tinyLabel(T.flashcardEnglishWordLabel.tr),
                           AppGap.h8,
                           AppTextField(
-                            label: null,
                             hintText: 'Ví dụ: Ephemeral',
                             controller: c.wordCtrl,
                             isTranslate: false,
@@ -158,7 +121,9 @@ class AddFlashcardScreen extends StatelessWidget {
                           AppGap.h20,
                           Row(
                             children: [
-                              Expanded(child: _tinyLabel(T.flashcardIpaLabel.tr)),
+                              Expanded(
+                                child: _tinyLabel(T.flashcardIpaLabel.tr),
+                              ),
                               Tooltip(
                                 message: T.flashcardIpaTooltip.tr,
                                 child: Icon(
@@ -171,7 +136,6 @@ class AddFlashcardScreen extends StatelessWidget {
                           ),
                           AppGap.h8,
                           AppTextField(
-                            label: null,
                             hintText: '/ɪˈfɛmərəl/',
                             controller: c.ipaCtrl,
                             isTranslate: false,
@@ -192,19 +156,22 @@ class AddFlashcardScreen extends StatelessWidget {
                         children: [
                           _tinyLabel(T.flashcardPosLabel.tr),
                           AppGap.h12,
-                          Obx(() => Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: AddFlashcardController.posLabels.entries
-                                    .map(
-                                      (e) => _PosChip(
-                                        label: e.value,
-                                        selected: c.selectedPosKey.value == e.key,
-                                        onTap: () => c.selectedPosKey.value = e.key,
-                                      ),
-                                    )
-                                    .toList(),
-                              )),
+                          Obx(
+                            () => Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: AddFlashcardController.posLabels.entries
+                                  .map(
+                                    (e) => _PosChip(
+                                      label: e.value,
+                                      selected: c.selectedPosKey.value == e.key,
+                                      onTap: () =>
+                                          c.selectedPosKey.value = e.key,
+                                    ),
+                                  )
+                                  .toList(),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -222,7 +189,6 @@ class AddFlashcardScreen extends StatelessWidget {
                           _tinyLabel(T.flashcardMeaningLabel.tr),
                           AppGap.h8,
                           AppTextField(
-                            label: null,
                             hintText: 'Phù du, chóng tàn',
                             controller: c.meaningCtrl,
                             isTranslate: false,
@@ -246,7 +212,8 @@ class AddFlashcardScreen extends StatelessWidget {
                               height: 1.35,
                             ),
                             decoration: InputDecoration(
-                              hintText: 'The beauty of the sunset is ephemeral.',
+                              hintText:
+                                  'The beauty of the sunset is ephemeral.',
                               hintStyle: AppTypography.bodyLarge.copyWith(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -256,16 +223,31 @@ class AddFlashcardScreen extends StatelessWidget {
                               fillColor: AppColors.surfaceContainerHigh,
                               contentPadding: const EdgeInsets.all(16),
                               border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(AppRadius.md),
-                                borderSide: BorderSide(color: AppColors.neutralShadow, width: 2),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.neutralShadow,
+                                  width: 2,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(AppRadius.md),
-                                borderSide: BorderSide(color: AppColors.neutralShadow, width: 2),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.neutralShadow,
+                                  width: 2,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(AppRadius.md),
-                                borderSide: BorderSide(color: AppColors.primary, width: 2),
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
+                                ),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ),
@@ -362,7 +344,7 @@ class _PosChip extends StatelessWidget {
                     BoxShadow(
                       color: AppColors.primaryShadow,
                       blurRadius: 8,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ]
                 : null,
@@ -372,7 +354,9 @@ class _PosChip extends StatelessWidget {
             style: AppTypography.bodyLarge.copyWith(
               fontSize: 13,
               fontWeight: FontWeight.w700,
-              color: selected ? AppColors.onPrimaryFixed : AppColors.textSecondary,
+              color: selected
+                  ? AppColors.onPrimaryFixed
+                  : AppColors.textSecondary,
             ),
           ),
         ),

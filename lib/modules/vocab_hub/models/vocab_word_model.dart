@@ -1,11 +1,11 @@
 import 'vocab_level.dart';
 
 /// Unified word model — covers both topic-based (VocabularyWord) and
-/// desk-based flashcard (FlashcardModel) data sources.
+/// deck-based flashcard (FlashcardModel) data sources.
 class VocabWord {
   final String id;
-  final String deskId;   // empty when sourced from topic
-  final String topicId;  // empty when sourced from desk
+  final String deskId;   // empty when sourced from topic — JSON key 'deskId'/'desk_id' theo API backend
+  final String topicId;  // empty when sourced from deck
   final String word;
   final String ipa;
   final List<String> pos;
@@ -31,23 +31,7 @@ class VocabWord {
     required this.level,
   });
 
-  /// From topic API: GET /vocabulary/topics/{id}/words
-  factory VocabWord.fromTopicJson(Map<String, dynamic> json, {String topicId = ''}) =>
-      VocabWord(
-        id: (json['id'] ?? '').toString(),
-        topicId: (json['topicId'] ?? topicId).toString(),
-        word: (json['word'] ?? '').toString(),
-        ipa: (json['pronunciation'] ?? json['ipa'] ?? '').toString(),
-        pos: _toStringList(json['partOfSpeech']),
-        audioUrl: (json['audioUrl'] ?? '').toString(),
-        definitionEn: (json['definitionEn'] ?? json['definition'] ?? '').toString(),
-        definitionVi: (json['definitionVi'] ?? json['vietnamese'] ?? json['viDefinition'] ?? '').toString(),
-        exampleSentence: (json['exampleSentence'] ?? json['example'] ?? '').toString(),
-        exampleTranslation: (json['exampleTranslation'] ?? json['viExample'] ?? '').toString(),
-        level: VocabLevelX.fromString(json['level'] as String?),
-      );
-
-  /// From desk flashcard API: GET /desks/{id}/flashcards
+  /// From deck flashcard API: GET /desks/{id}/flashcards
   factory VocabWord.fromFlashcardJson(Map<String, dynamic> json) => VocabWord(
         id: _firstString(json, const ['id', 'flashcardId', 'cardId']),
         deskId: _firstString(json, const ['deskId', 'desk_id']),
@@ -71,7 +55,7 @@ class VocabWord {
   String get partOfSpeech => pos.join(', ');
 }
 
-// ─── Pagination wrapper (for desk flashcards) ─────────────────────────────────
+// ─── Pagination wrapper (for deck flashcards) ─────────────────────────────────
 
 class VocabWordPage {
   final List<VocabWord> content;
@@ -105,24 +89,6 @@ class VocabWordPage {
     );
   }
 }
-
-// ─── Spelling result ──────────────────────────────────────────────────────────
-
-class SpellingResult {
-  final String wordId;
-  final String word;
-  final String userInput;
-  final bool isCorrect;
-
-  const SpellingResult({
-    required this.wordId,
-    required this.word,
-    required this.userInput,
-    required this.isCorrect,
-  });
-}
-
-enum SpellingState { idle, typing, correct, wrong }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

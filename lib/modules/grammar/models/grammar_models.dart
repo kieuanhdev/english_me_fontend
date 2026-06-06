@@ -30,6 +30,23 @@ class GrammarTopic {
   }
 }
 
+class GrammarLevelGroup {
+  const GrammarLevelGroup({required this.level, required this.topics});
+
+  final String level;
+  final List<GrammarTopic> topics;
+
+  factory GrammarLevelGroup.fromJson(Map<String, dynamic> json) {
+    return GrammarLevelGroup(
+      level: json['level']?.toString() ?? '',
+      topics: ((json['topics'] as List?) ?? [])
+          .whereType<Map>()
+          .map((e) => GrammarTopic.fromJson(e.cast<String, dynamic>()))
+          .toList(),
+    );
+  }
+}
+
 class GrammarLessonListItem {
   const GrammarLessonListItem({
     required this.id,

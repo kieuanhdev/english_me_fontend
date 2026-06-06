@@ -13,7 +13,6 @@ class HomeHeroSection extends GetView<HomeController> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Expanded(
             flex: 3,
@@ -77,9 +76,7 @@ class _XpRing extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          CustomPaint(
-            painter: _RingPainter(progress: progress),
-          ),
+          CustomPaint(painter: _RingPainter(progress: progress)),
           Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

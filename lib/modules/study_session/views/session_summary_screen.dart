@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
@@ -18,24 +19,13 @@ class SessionSummaryScreen extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-          child: GestureDetector(
-            onTap: controller.closeSession,
-            child: Container(
-              height: 58,
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                'Hoàn thành',
-                style: AppTypography.headlineMedium.copyWith(
-                  fontSize: 17,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.onPrimaryFixed,
-                ),
-              ),
-            ),
+          child: AppButton(
+            label: 'Hoàn thành',
+            isTranslate: false,
+            onPressed: controller.closeSession,
+            gradient: true,
+            radius: AppRadius.pill,
+            height: 58,
           ),
         ),
       ),
@@ -74,37 +64,43 @@ class SessionSummaryScreen extends StatelessWidget {
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-                child: Obx(() => Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Celebration header
-                        _CelebrationHeader(),
-                        AppGap.h24,
-                        // Donut + legend
-                        _DonutCard(
-                          mastered: controller.summary.value?.masteredCards ??
-                              controller.masteredCount.value,
-                          remember: controller.rememberCount.value,
-                          vague: controller.summary.value?.hardCards ??
-                              controller.vagueCount.value,
-                          forget: controller.summary.value?.againCards ??
-                              controller.forgetCount.value,
-                          total: controller.totalReviewed,
-                        ),
-                        AppGap.h16,
-                        // New words card
-                        _NewWordsCard(
-                          count: controller.summary.value?.newWordsLearned ?? 0,
-                        ),
-                        AppGap.h12,
-                        // XP card
-                        _XpCard(
-                          xp: controller.summary.value?.xpEarned ??
-                              controller.sessionXp.value,
-                        ),
-                        AppGap.h32,
-                      ],
-                    )),
+                child: Obx(
+                  () => Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Celebration header
+                      _CelebrationHeader(),
+                      AppGap.h24,
+                      // Donut + legend
+                      _DonutCard(
+                        mastered:
+                            controller.summary.value?.masteredCards ??
+                            controller.masteredCount.value,
+                        remember: controller.rememberCount.value,
+                        vague:
+                            controller.summary.value?.hardCards ??
+                            controller.vagueCount.value,
+                        forget:
+                            controller.summary.value?.againCards ??
+                            controller.forgetCount.value,
+                        total: controller.totalReviewed,
+                      ),
+                      AppGap.h16,
+                      // New words card
+                      _NewWordsCard(
+                        count: controller.summary.value?.newWordsLearned ?? 0,
+                      ),
+                      AppGap.h12,
+                      // XP card
+                      _XpCard(
+                        xp:
+                            controller.summary.value?.xpEarned ??
+                            controller.sessionXp.value,
+                      ),
+                      AppGap.h32,
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -128,7 +124,11 @@ class _CelebrationHeader extends StatelessWidget {
             shape: BoxShape.circle,
             color: AppColors.levelCBg.withValues(alpha: 0.6),
           ),
-          child: Icon(Icons.celebration_rounded, size: 34, color: AppColors.accentWarm),
+          child: Icon(
+            Icons.celebration_rounded,
+            size: 34,
+            color: AppColors.accentWarm,
+          ),
         ),
         AppGap.h16,
         Text(
@@ -233,17 +233,33 @@ class _DonutCard extends StatelessWidget {
           // 2×2 legend grid
           Row(
             children: [
-              _LegendTile(color: AppColors.primary, label: 'MASTERED', count: mastered),
+              _LegendTile(
+                color: AppColors.primary,
+                label: 'MASTERED',
+                count: mastered,
+              ),
               AppGap.w12,
-              _LegendTile(color: AppColors.accentWarm, label: 'REMEMBER', count: remember),
+              _LegendTile(
+                color: AppColors.accentWarm,
+                label: 'REMEMBER',
+                count: remember,
+              ),
             ],
           ),
           AppGap.h12,
           Row(
             children: [
-              _LegendTile(color: const Color(0xFF565C84), label: 'VAGUE', count: vague),
+              _LegendTile(
+                color: const Color(0xFF565C84),
+                label: 'VAGUE',
+                count: vague,
+              ),
               AppGap.w12,
-              _LegendTile(color: AppColors.iconMuted, label: 'FORGET', count: forget),
+              _LegendTile(
+                color: AppColors.iconMuted,
+                label: 'FORGET',
+                count: forget,
+              ),
             ],
           ),
         ],
@@ -266,11 +282,19 @@ class _DonutPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final stroke = size.width * 0.115;
-    final rect = Rect.fromLTWH(stroke / 2, stroke / 2, size.width - stroke, size.height - stroke);
+    final rect = Rect.fromLTWH(
+      stroke / 2,
+      stroke / 2,
+      size.width - stroke,
+      size.height - stroke,
+    );
 
     // track
     canvas.drawArc(
-      rect, 0, math.pi * 2, false,
+      rect,
+      0,
+      math.pi * 2,
+      false,
       Paint()
         ..color = AppColors.surfaceContainerHigh
         ..style = PaintingStyle.stroke
@@ -307,7 +331,11 @@ class _DonutPainter extends CustomPainter {
 }
 
 class _LegendTile extends StatelessWidget {
-  const _LegendTile({required this.color, required this.label, required this.count});
+  const _LegendTile({
+    required this.color,
+    required this.label,
+    required this.count,
+  });
   final Color color;
   final String label;
   final int count;
@@ -326,7 +354,10 @@ class _LegendTile extends StatelessWidget {
             Container(
               width: 5,
               height: 34,
-              decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(AppRadius.pill)),
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
             ),
             AppGap.w12,
             Column(
@@ -371,7 +402,13 @@ class _NewWordsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.xxl),
-        boxShadow: [BoxShadow(color: AppColors.shadowSoft, blurRadius: 12, offset: Offset(0, 3))],
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowSoft,
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -382,7 +419,11 @@ class _NewWordsCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.md),
               color: AppColors.levelCBg.withValues(alpha: 0.5),
             ),
-            child: Icon(Icons.auto_awesome_rounded, color: AppColors.accentWarm, size: 26),
+            child: Icon(
+              Icons.auto_awesome_rounded,
+              color: AppColors.accentWarm,
+              size: 26,
+            ),
           ),
           AppGap.w16,
           Expanded(
@@ -400,7 +441,10 @@ class _NewWordsCard extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   'Số từ lần đầu bạn ôn trong session này.',
-                  style: AppTypography.bodyLarge.copyWith(fontSize: 12, color: AppColors.textSecondary),
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -432,8 +476,17 @@ class _XpCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.xxl),
-        border: Border.all(color: AppColors.primary.withValues(alpha: 0.07), width: 1.5),
-        boxShadow: [BoxShadow(color: AppColors.shadowSoft, blurRadius: 12, offset: Offset(0, 3))],
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.07),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowSoft,
+            blurRadius: 12,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         children: [
@@ -444,7 +497,11 @@ class _XpCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppRadius.md),
               color: AppColors.secondaryContainer.withValues(alpha: 0.45),
             ),
-            child: Icon(Icons.military_tech_rounded, color: AppColors.primary, size: 26),
+            child: Icon(
+              Icons.military_tech_rounded,
+              color: AppColors.primary,
+              size: 26,
+            ),
           ),
           AppGap.w16,
           Expanded(
@@ -462,7 +519,10 @@ class _XpCard extends StatelessWidget {
                 const SizedBox(height: 3),
                 Text(
                   'XP cộng từ SM-2 (quality 5: +3, q∈{3,4}: +2).',
-                  style: AppTypography.bodyLarge.copyWith(fontSize: 12, color: AppColors.textSecondary),
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),

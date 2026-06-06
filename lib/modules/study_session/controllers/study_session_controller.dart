@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
 
 import 'package:englishme/core/network/api_exception.dart';
@@ -64,7 +65,10 @@ class StudySessionController extends GetxController {
   VocabWord get currentCard => cards[currentIndex.value];
   int get totalCards => cards.length;
   int get totalReviewed =>
-      masteredCount.value + rememberCount.value + vagueCount.value + forgetCount.value;
+      masteredCount.value +
+      rememberCount.value +
+      vagueCount.value +
+      forgetCount.value;
 
   @override
   void onInit() {
@@ -73,13 +77,20 @@ class StudySessionController extends GetxController {
     _startSession();
   }
 
+  @override
+  void onClose() {
+    // XP chỉ cộng khi hoàn thành phiên, và đã được apply (kèm refresh Home/Progress)
+    // trong _loadSummary. Thoát giữa chừng → không cộng XP → không cần refresh.
+    super.onClose();
+  }
+
   Future<void> retryLoad() => _startSession();
 
   Future<void> _startSession() async {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      final session = await _repo.startSession(deskId, limit: 20);
+      final session = await _repo.startSession(deskId);
       _sessionId = session.sessionId;
       cards.value = session.cards;
       currentIndex.value = 0;
@@ -92,6 +103,7 @@ class StudySessionController extends GetxController {
       sessionXp.value = 0;
       summary.value = null;
       _cardStartedAt = DateTime.now();
+      _autoSpeakCurrent();
     } catch (e) {
       errorMessage.value = e.toString();
     } finally {
@@ -101,27 +113,32 @@ class StudySessionController extends GetxController {
 
   void speak() {
     if (cards.isEmpty) return;
-    final card = currentCard;
     final tts = Get.find<TtsService>();
-    tts.speak(card.word);
+    tts.speak(currentCard.word);
   }
 
-  void flipCard() => isCardFlipped.value = true;
+  /// Tự phát âm từ của thẻ hiện tại nếu user bật auto-speak (TtsService.autoSpeak).
+  /// Gọi khi mở thẻ mới: lúc bắt đầu phiên và khi chuyển sang thẻ kế.
+  void _autoSpeakCurrent() {
+    if (cards.isEmpty) return;
+    final tts = Get.find<TtsService>();
+    if (!tts.autoSpeak.value) return;
+    tts.speak(currentCard.word);
+  }
+
+  void flipCard() => isCardFlipped.toggle();
 
   Future<void> rateCard(CardRating rating) async {
     if (cards.isEmpty || _sessionId.isEmpty || isReviewing.value) return;
     final card = currentCard;
     if (card.id.trim().isEmpty) {
-      Get.snackbar(
-        T.errorGeneric.tr,
-        'Thiếu flashcardId cho thẻ "${card.word}". Vui lòng tải lại phiên học.',
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      AppNotify.error(T.errorGeneric.tr, message: 'Thiếu flashcardId cho thẻ "${card.word}". Vui lòng tải lại phiên học.');
       return;
     }
 
-    final responseTimeMs =
-        DateTime.now().difference(_cardStartedAt).inMilliseconds;
+    final responseTimeMs = DateTime.now()
+        .difference(_cardStartedAt)
+        .inMilliseconds;
     try {
       isReviewing.value = true;
       final res = await _repo.reviewCard(
@@ -132,14 +149,10 @@ class StudySessionController extends GetxController {
           responseTimeMs: responseTimeMs,
         ),
       );
+      // XP chỉ cộng khi HOÀN THÀNH cả phiên (BE grant ở /summary). Ở mỗi thẻ
+      // chỉ cập nhật `sessionXp` (pending) để hiển thị live; KHÔNG apply XP/streak
+      // per-thẻ. Việc apply 1 lần (cộng total, streak, bonus, sound) nằm ở _loadSummary.
       sessionXp.value = res.sessionXp;
-      // Per-card grant: BE đảm bảo 1 card/ngày chỉ cộng XP 1 lần (spec §9.3).
-      // Khi retry trong ngày → xpEarned=0, totalXp không đổi → applyXpGrant tự bỏ qua.
-      XpGrantHandler.apply(
-        totalXp: res.totalXp,
-        xpEarned: res.xpEarned,
-        streakUpdated: res.streakUpdated,
-      );
 
       switch (rating) {
         case CardRating.mastered:
@@ -156,22 +169,15 @@ class StudySessionController extends GetxController {
         currentIndex.value++;
         isCardFlipped.value = false;
         _cardStartedAt = DateTime.now();
+        _autoSpeakCurrent();
       } else {
         await _loadSummary();
         Get.off(() => const SessionSummaryScreen());
       }
     } on DioException catch (e) {
-      Get.snackbar(
-        T.errorGeneric.tr,
-        _reviewErrorMessage(e),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      AppNotify.error(T.errorGeneric.tr, message: _reviewErrorMessage(e));
     } catch (e) {
-      Get.snackbar(
-        T.errorGeneric.tr,
-        e.toString(),
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      AppNotify.error(T.errorGeneric.tr, message: e.toString());
     } finally {
       isReviewing.value = false;
     }
@@ -192,7 +198,19 @@ class StudySessionController extends GetxController {
   Future<void> _loadSummary() async {
     if (_sessionId.isEmpty) return;
     try {
-      summary.value = await _repo.getSummary(_sessionId);
+      final s = await _repo.getSummary(_sessionId);
+      summary.value = s;
+      // BE grant XP 1 lần khi phiên hoàn thành → summary trả totalXp (non-null).
+      // Apply tại đây: cộng total + streak + bonus + phát sound/confetti 1 lần.
+      final total = s.totalXp;
+      if (total != null) {
+        XpGrantHandler.apply(
+          totalXp: total,
+          xpEarned: s.xpEarned,
+          streakUpdated: s.streakUpdated,
+          bonuses: s.bonuses,
+        );
+      }
     } catch (_) {
       // ignore — UI dùng đếm cục bộ làm fallback.
     }

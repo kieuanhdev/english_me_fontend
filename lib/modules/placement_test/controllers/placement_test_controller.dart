@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
 
 import 'package:englishme/core/values/app_strings.dart';
@@ -23,6 +24,20 @@ class PlacementTestController extends GetxController {
   final testResult = Rxn<TestResultModel>();
   final errorMessage = ''.obs;
 
+  /// Thông báo giới hạn từ backend (bài đầu vào chỉ xác định tối đa B2).
+  final notice = ''.obs;
+
+  /// Đang lưu trình độ tự chọn (chặn double-tap nút xác nhận).
+  final isSelfSelecting = false.obs;
+
+  /// Level CEFR đang được chọn ở màn tự chọn trình độ.
+  final selfSelectedLevel = Rxn<String>();
+
+  /// Các mức CEFR cho phép tự chọn (khớp CEFR_ORDER ở backend).
+  static const List<String> cefrLevels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
+  void selectLevel(String level) => selfSelectedLevel.value = level;
+
   String _sessionId = '';
   bool _completing = false;
 
@@ -44,6 +59,7 @@ class PlacementTestController extends GetxController {
       state.value = PlacementTestState.loading;
       final response = await _repository.startTest();
       _sessionId = response.sessionId;
+      notice.value = response.notice;
       questions.assignAll(response.questions);
       currentIndex.value = 0;
       selectedAnswer.value = null;
@@ -76,7 +92,7 @@ class PlacementTestController extends GetxController {
       state.value = PlacementTestState.questioning;
     } catch (_) {
       state.value = PlacementTestState.questioning;
-      Get.snackbar(T.errorGeneric.tr, T.errorSubmitAnswer.tr, snackPosition: SnackPosition.BOTTOM);
+      AppNotify.error(T.errorGeneric.tr, message: T.errorSubmitAnswer.tr);
     }
   }
 
@@ -111,9 +127,28 @@ class PlacementTestController extends GetxController {
     }
   }
 
+  /// Học viên tự chọn trình độ (không làm bài kiểm tra).
+  /// Lưu level + onboarded ở backend, refresh profile rồi vào Dashboard.
+  Future<void> selfSelectLevel(String level) async {
+    if (isSelfSelecting.value) return;
+    try {
+      isSelfSelecting.value = true;
+      await _repository.selfSelectLevel(level);
+      // Refresh profile để Home/Profile thấy CEFR mới ngay lập tức.
+      if (Get.isRegistered<ProfileController>()) {
+        unawaited(Get.find<ProfileController>().loadProfile());
+      }
+      Get.offAllNamed(AppRoutes.shell);
+    } catch (_) {
+      AppNotify.error(T.errorGeneric.tr, message: T.placementSelfSelectError.tr);
+    } finally {
+      isSelfSelecting.value = false;
+    }
+  }
+
   void _showError(String message) {
     errorMessage.value = message;
     state.value = PlacementTestState.error;
-    Get.snackbar(T.errorGeneric.tr, message, snackPosition: SnackPosition.BOTTOM);
+    AppNotify.error(T.errorGeneric.tr, message: message);
   }
 }

@@ -131,19 +131,22 @@ class _TestAppBar extends StatelessWidget {
         title: Text(T.testExitDialogTitle.tr),
         content: Text(T.testExitDialogContent.tr),
         actions: [
-          TextButton(
+          AppButton(
+            label: T.testContinue,
             onPressed: () => Navigator.pop(ctx),
-            child: Text(T.testContinue.tr),
+            variant: AppButtonVariant.text,
+            expand: false,
+            height: 44,
           ),
-          TextButton(
+          AppButton(
+            label: T.testExit,
             onPressed: () {
               Navigator.pop(ctx);
               ctrl.closeTest();
             },
-            child: Text(
-              T.testExit.tr,
-              style: TextStyle(color: AppColors.danger),
-            ),
+            variant: AppButtonVariant.dangerText,
+            expand: false,
+            height: 44,
           ),
         ],
       ),

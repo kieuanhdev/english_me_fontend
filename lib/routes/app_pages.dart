@@ -1,9 +1,5 @@
 import 'package:englishme/modules/vocab_hub/bindings/vocab_hub_binding.dart';
 import 'package:englishme/modules/vocab_hub/views/vocab_hub_screen.dart';
-import 'package:englishme/modules/vocab_hub/views/vocab_topic_list_screen.dart';
-import 'package:englishme/modules/vocab_hub/views/vocab_word_list_screen.dart';
-import 'package:englishme/modules/vocab_hub/views/vocab_spelling_screen.dart';
-import 'package:englishme/modules/vocab_hub/views/vocab_spelling_result_screen.dart';
 import 'package:englishme/modules/test/bindings/test_binding.dart';
 import 'package:englishme/modules/test/views/test_home_screen.dart';
 import 'package:englishme/modules/test/views/test_question_screen.dart';
@@ -26,10 +22,16 @@ import 'package:englishme/modules/deck_prep/bindings/deck_prep_binding.dart';
 import 'package:englishme/modules/deck_prep/views/deck_prep_screen.dart';
 
 import 'package:englishme/modules/grammar/views/grammar_lesson_detail_screen.dart';
-import 'package:englishme/modules/grammar/views/grammar_screen.dart';
+import 'package:englishme/modules/grammar/views/grammar_theory_screen.dart';
+import 'package:englishme/modules/grammar/bindings/grammar_theory_binding.dart';
 import 'package:englishme/modules/home/bindings/home_binding.dart';
 import 'package:englishme/modules/grammar/bindings/grammar_binding.dart';
 import 'package:englishme/modules/learn/bindings/learning_binding.dart';
+import 'package:englishme/modules/learn/bindings/curriculum_binding.dart';
+import 'package:englishme/modules/learn/views/unit_list_screen.dart';
+import 'package:englishme/modules/learn/views/unit_detail_screen.dart';
+import 'package:englishme/modules/learn/views/lesson_player_screen.dart';
+import 'package:englishme/modules/learn/views/checkpoint_screen.dart';
 import 'package:englishme/modules/learn/views/learning_lesson_detail_screen.dart';
 import 'package:englishme/modules/learn/views/learning_path_detail_screen.dart';
 import 'package:englishme/modules/learn/views/learning_screen.dart';
@@ -37,6 +39,7 @@ import 'package:englishme/modules/learn/views/learning_skill_lessons_screen.dart
 import 'package:englishme/modules/learn/views/learning_support_screen.dart';
 import 'package:englishme/modules/placement_test/bindings/placement_test_binding.dart';
 import 'package:englishme/modules/placement_test/views/placement_intro_screen.dart';
+import 'package:englishme/modules/placement_test/views/placement_level_picker_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_question_screen.dart';
 import 'package:englishme/modules/placement_test/views/placement_result_screen.dart';
 import 'package:englishme/modules/pronunciation/bindings/pronunciation_binding.dart';
@@ -44,6 +47,11 @@ import 'package:englishme/modules/pronunciation/views/pronunciation_screen.dart'
 import 'package:englishme/modules/pronunciation/views/pronunciation_result_screen.dart';
 import 'package:englishme/modules/pronunciation/views/speaking_choice_screen.dart';
 import 'package:englishme/modules/pronunciation/views/ipa_screen.dart';
+import 'package:englishme/modules/pronunciation/views/pronunciation_insight_screen.dart';
+import 'package:englishme/modules/conversation/bindings/conversation_binding.dart';
+import 'package:englishme/modules/conversation/views/conversation_topic_screen.dart';
+import 'package:englishme/modules/conversation/views/conversation_chat_screen.dart';
+import 'package:englishme/modules/conversation/views/conversation_summary_screen.dart';
 import 'package:englishme/modules/profile/bindings/profile_binding.dart';
 import 'package:englishme/modules/profile/views/profile_screen.dart';
 import 'package:englishme/modules/progress/bindings/progress_binding.dart';
@@ -62,7 +70,16 @@ class AppPages {
     if (arguments is String && arguments.trim().isNotEmpty) {
       return arguments;
     }
+    if (arguments is Map && arguments['lessonId'] != null) {
+      return arguments['lessonId'].toString();
+    }
     return '';
+  }
+
+  static bool _getShowExercisesArg(dynamic arguments) {
+    // Theory-only browse passes {theoryOnly: true}; default keeps exercises.
+    if (arguments is Map && arguments['theoryOnly'] == true) return false;
+    return true;
   }
 
   static Map<String, dynamic> _getMapArg(dynamic arguments) {
@@ -86,7 +103,7 @@ class AppPages {
         LearningBinding(),
       ],
     ),
-    GetPage(name: AppRoutes.welcome, page: () => WelcomeScreen()),
+    GetPage(name: AppRoutes.welcome, page: () => const WelcomeScreen()),
     GetPage(
       name: AppRoutes.login,
       page: () => const LoginScreen(),
@@ -146,14 +163,36 @@ class AppPages {
       binding: LearningBinding(),
     ),
     GetPage(
-      name: AppRoutes.grammar,
-      page: () => const GrammarScreen(),
-      binding: GrammarBinding(),
+      name: AppRoutes.curriculumUnits,
+      page: () => const UnitListScreen(),
+      binding: CurriculumBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.curriculumUnitDetail,
+      page: () => const UnitDetailScreen(),
+      binding: CurriculumBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.curriculumLessonPlayer,
+      page: () => const LessonPlayerScreen(),
+      binding: CurriculumBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.curriculumCheckpoint,
+      page: () => const CheckpointScreen(),
+      binding: CurriculumBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.grammarTheory,
+      page: () => const GrammarTheoryScreen(),
+      binding: GrammarTheoryBinding(),
     ),
     GetPage(
       name: AppRoutes.grammarLessonDetail,
-      page: () =>
-          GrammarLessonDetailScreen(lessonId: _getLessonIdArg(Get.arguments)),
+      page: () => GrammarLessonDetailScreen(
+        lessonId: _getLessonIdArg(Get.arguments),
+        showExercises: _getShowExercisesArg(Get.arguments),
+      ),
       binding: GrammarBinding(),
     ),
     GetPage(
@@ -173,17 +212,22 @@ class AppPages {
     ),
     GetPage(
       name: AppRoutes.placementTest,
-      page: () => PlacementIntroScreen(),
+      page: () => const PlacementIntroScreen(),
       binding: PlacementTestBinding(),
     ),
     GetPage(
       name: AppRoutes.placementTestQuestion,
-      page: () => PlacementQuestionScreen(),
+      page: () => const PlacementQuestionScreen(),
       binding: PlacementTestBinding(),
     ),
     GetPage(
       name: AppRoutes.placementTestResult,
-      page: () => PlacementResultScreen(),
+      page: () => const PlacementResultScreen(),
+      binding: PlacementTestBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.placementLevelPicker,
+      page: () => const PlacementLevelPickerScreen(),
       binding: PlacementTestBinding(),
     ),
     GetPage(
@@ -213,6 +257,25 @@ class AppPages {
       page: () => const PronunciationResultScreen(),
     ),
     GetPage(name: AppRoutes.ipa, page: () => const IpaScreen()),
+    GetPage(
+      name: AppRoutes.pronunciationInsight,
+      page: () => const PronunciationInsightScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.conversation,
+      page: () => const ConversationTopicScreen(),
+      binding: ConversationBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.conversationChat,
+      page: () => const ConversationChatScreen(),
+      binding: ConversationBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.conversationSummary,
+      page: () => const ConversationSummaryScreen(),
+      binding: ConversationBinding(),
+    ),
     GetPage(
       name: AppRoutes.progress,
       page: () => const ProgressScreen(),
@@ -245,37 +308,6 @@ class AppPages {
       name: AppRoutes.profile,
       page: () => const ProfileScreen(),
       binding: ProfileBinding(),
-    ),
-    // Legacy aliases → redirect to VocabHub
-    GetPage(
-      name: AppRoutes.vocabulary,
-      page: () => const VocabTopicListScreen(),
-      binding: VocabHubBinding(),
-    ),
-    GetPage(
-      name: AppRoutes.vocabularyList,
-      page: () => const VocabWordListScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.spellingPractice,
-      page: () => const VocabSpellingScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.spellingResult,
-      page: () => const VocabSpellingResultScreen(),
-    ),
-    // New VocabHub routes
-    GetPage(
-      name: AppRoutes.vocabWordList,
-      page: () => const VocabWordListScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.vocabSpelling,
-      page: () => const VocabSpellingScreen(),
-    ),
-    GetPage(
-      name: AppRoutes.vocabSpellingResult,
-      page: () => const VocabSpellingResultScreen(),
     ),
   ];
 }

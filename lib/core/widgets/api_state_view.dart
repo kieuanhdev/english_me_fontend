@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 /// Trạng thái thống nhất cho các màn hình gọi API.
@@ -10,11 +11,12 @@ enum ApiState { idle, loading, success, error, empty }
 /// View thống nhất cho mọi tab gọi API.
 ///
 /// - `loading` → spinner.
-/// - `error` → icon + message + nút "Thử lại".
+/// - `error` → icon + message + nút "Thử lại" + nút "Quay lại".
 /// - `empty` → icon + message rỗng (tuỳ chọn).
 /// - `success` → render `builder()`.
 ///
 /// Lý do tách: trước đây mỗi screen tự viết riêng → UI không nhất quán khi mạng yếu.
+/// Mọi màn hình lỗi dùng chung `_ErrorView` này để giao diện báo lỗi thống nhất.
 class ApiStateView extends StatelessWidget {
   const ApiStateView({
     super.key,
@@ -24,6 +26,7 @@ class ApiStateView extends StatelessWidget {
     this.emptyMessage,
     this.emptyIcon,
     this.onRetry,
+    this.onBack,
   });
 
   final ApiState state;
@@ -32,6 +35,10 @@ class ApiStateView extends StatelessWidget {
   final String? emptyMessage;
   final IconData? emptyIcon;
   final VoidCallback? onRetry;
+
+  /// Hành động khi bấm "Quay lại". Nếu null → tự dùng [Navigator.maybePop].
+  /// Nút chỉ hiện khi thật sự có trang trước để quay về (canPop).
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +50,7 @@ class ApiStateView extends StatelessWidget {
         return _ErrorView(
           message: errorMessage ?? 'Đã xảy ra lỗi. Vui lòng thử lại.',
           onRetry: onRetry,
+          onBack: onBack,
         );
       case ApiState.empty:
         return _EmptyView(
@@ -65,13 +73,17 @@ class _LoadingView extends StatelessWidget {
 }
 
 class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.message, this.onRetry});
+  const _ErrorView({required this.message, this.onRetry, this.onBack});
 
   final String message;
   final VoidCallback? onRetry;
+  final VoidCallback? onBack;
 
   @override
   Widget build(BuildContext context) {
+    // Chỉ hiện nút "Quay lại" khi thật sự có trang trước (ẩn ở tab gốc).
+    final canGoBack = onBack != null || Navigator.of(context).canPop();
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -94,20 +106,33 @@ class _ErrorView extends StatelessWidget {
             ),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
-              ElevatedButton.icon(
+              AppButton(
+                label: 'Thử lại',
+                isTranslate: false,
                 onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded, size: 18),
-                label: const Text('Thử lại'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppRadius.pill),
-                  ),
+                expand: false,
+                height: 48,
+                radius: AppRadius.pill,
+                leading: const Icon(Icons.refresh_rounded, size: 18),
+              ),
+            ],
+            if (canGoBack) ...[
+              const SizedBox(height: 10),
+              AppButton(
+                label: 'Quay lại',
+                isTranslate: false,
+                onPressed: onBack ?? () => Navigator.of(context).maybePop(),
+                variant: AppButtonVariant.text,
+                expand: false,
+                height: 44,
+                leading: Icon(
+                  Icons.arrow_back_rounded,
+                  size: 18,
+                  color: AppColors.textSecondary,
+                ),
+                textStyle: AppTypography.bodyRegular.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
                 ),
               ),
             ],

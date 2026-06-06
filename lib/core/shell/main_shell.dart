@@ -23,13 +23,9 @@ class MainShellScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ShellController c = Get.find<ShellController>();
     return Scaffold(
+      // AppBottomNav tự reactive với ShellController — không cần Obx bọc ngoài.
       body: Obx(() => IndexedStack(index: c.currentTab.value, children: _tabs)),
-      bottomNavigationBar: Obx(
-        () => AppBottomNav(
-          initialIndex: c.currentTab.value,
-          onTap: (index, _) => c.switchTab(index),
-        ),
-      ),
+      bottomNavigationBar: const AppBottomNav(),
     );
   }
 }

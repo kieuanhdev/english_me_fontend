@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/word_card_parts.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -64,20 +65,24 @@ class StudySessionBackScreen extends StatelessWidget {
             // Progress
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Obx(() => _ProgressSection(
-                    current: controller.currentIndex.value + 1,
-                    total: controller.totalCards,
-                  )),
+              child: Obx(
+                () => _ProgressSection(
+                  current: controller.currentIndex.value + 1,
+                  total: controller.totalCards,
+                ),
+              ),
             ),
             AppGap.h16,
             // Card scrollable
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                child: Obx(() => StudySessionFlashcardBack(
-                      card: controller.currentCard,
-                      onSpeak: controller.speak,
-                    )),
+                child: Obx(
+                  () => StudySessionFlashcardBack(
+                    card: controller.currentCard,
+                    onSpeak: controller.speak,
+                  ),
+                ),
               ),
             ),
           ],
@@ -147,7 +152,7 @@ class _ProgressSection extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [AppColors.accentWarm, Color(0xFFD4761A)],
+                        colors: [AppColors.accentWarm, const Color(0xFFD4761A)],
                       ),
                     ),
                   ),
@@ -175,18 +180,21 @@ class StudySessionFlashcardBack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final posLabel = card.pos.isNotEmpty ? card.pos.first.toUpperCase() : '';
+    final posLabel = card.pos.isNotEmpty ? card.pos.first : '';
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.xxl),
         boxShadow: [
-          BoxShadow(color: AppColors.shadowSoft, blurRadius: 32, offset: Offset(0, 8)),
+          BoxShadow(
+            color: AppColors.shadowSoft,
+            blurRadius: 32,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Stack(
-        clipBehavior: Clip.hardEdge,
         children: [
           Positioned(
             top: -20,
@@ -201,143 +209,91 @@ class StudySessionFlashcardBack extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(20),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Part of speech + audio
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    if (posLabel.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: AppColors.levelCBg,
-                          borderRadius: BorderRadius.circular(AppRadius.pill),
-                        ),
-                        child: Text(
-                          posLabel,
-                          style: AppTypography.headlineMedium.copyWith(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.2,
-                            color: AppColors.levelCFg,
-                          ),
-                        ),
-                      )
-                    else
-                      const SizedBox.shrink(),
-                    GestureDetector(
-                      onTap: onSpeak,
-                      child: Container(
-                        width: 44,
-                        height: 44,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.primary.withValues(alpha: 0.08),
-                        ),
-                        child: Icon(Icons.volume_up_rounded, color: AppColors.primary, size: 22),
-                      ),
-                    ),
+                    posLabel.isNotEmpty
+                        ? WordPosBadge(text: posLabel, big: true)
+                        : const SizedBox.shrink(),
+                    WordSpeakButton(onTap: onSpeak),
                   ],
                 ),
-                AppGap.h20,
+                AppGap.h14,
                 // Word
                 Text(
                   card.word,
                   style: AppTypography.displayLarge.copyWith(
-                    fontSize: 38,
+                    fontSize: 30,
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
                     color: AppColors.primary,
                   ),
                 ),
                 if (card.ipa.isNotEmpty) ...[
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 4),
                   Text(
                     card.ipa,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontSize: 15,
+                    style: AppTypography.ipa.copyWith(
+                      fontSize: 14,
                       fontStyle: FontStyle.italic,
                       color: AppColors.textSecondary,
                     ),
                   ),
                 ],
-                AppGap.h24,
+                AppGap.h16,
                 Container(height: 1.5, color: AppColors.surfaceContainerLow),
-                AppGap.h20,
-                // Vietnamese meaning
+                AppGap.h14,
+                // Nghĩa tiếng Việt (chính)
                 if (card.definitionVi.isNotEmpty)
                   Text(
                     card.definitionVi,
                     style: AppTypography.displayLarge.copyWith(
-                      fontSize: 24,
+                      fontSize: 20,
                       fontWeight: FontWeight.w700,
                       color: AppColors.levelCFg,
                     ),
                   ),
-                AppGap.h10,
-                // Definition
-                if (card.definitionVi.isNotEmpty || card.definitionEn.isNotEmpty)
+                // Định nghĩa tiếng Anh (bổ sung — chỉ hiện khi có, KHÔNG lặp lại nghĩa Việt)
+                if (card.definitionEn.isNotEmpty) ...[
+                  AppGap.h8,
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(top: 2),
-                        child: Icon(Icons.translate_rounded, size: 16, color: AppColors.onSurface.withValues(alpha: 0.4)),
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Icon(
+                          Icons.translate_rounded,
+                          size: 15,
+                          color: AppColors.onSurface.withValues(alpha: 0.4),
+                        ),
                       ),
                       AppGap.w8,
                       Expanded(
                         child: Text(
-                          card.definitionVi.isNotEmpty ? card.definitionVi : card.definitionEn,
+                          card.definitionEn,
                           style: AppTypography.bodyLarge.copyWith(
-                            fontSize: 15,
-                            height: 1.55,
+                            fontSize: 14,
+                            height: 1.5,
                             color: AppColors.onSurface.withValues(alpha: 0.6),
                           ),
                         ),
                       ),
                     ],
                   ),
+                ],
                 // Example box
                 if (card.exampleSentence.isNotEmpty) ...[
-                  AppGap.h20,
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerLow,
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      border: Border(
-                        left: BorderSide(color: AppColors.primaryContainer, width: 3.5),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            style: AppTypography.bodyLarge.copyWith(
-                              fontSize: 15,
-                              fontStyle: FontStyle.italic,
-                              height: 1.6,
-                              color: AppColors.onSurface,
-                            ),
-                            children: _buildSpans(card.exampleSentence, card.word),
-                          ),
-                        ),
-                        if (card.exampleTranslation.isNotEmpty) ...[
-                          AppGap.h10,
-                          Text(
-                            card.exampleTranslation,
-                            style: AppTypography.bodyLarge.copyWith(
-                              fontSize: 13,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                  AppGap.h16,
+                  WordExampleBox(
+                    sentence: card.exampleSentence,
+                    translation: card.exampleTranslation,
+                    highlightWord: card.word,
                   ),
                 ],
               ],
@@ -346,24 +302,6 @@ class StudySessionFlashcardBack extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  List<TextSpan> _buildSpans(String sentence, String word) {
-    final lower = sentence.toLowerCase();
-    final idx = lower.indexOf(word.toLowerCase());
-    if (idx == -1) return [TextSpan(text: '"$sentence"')];
-    return [
-      TextSpan(text: '"${sentence.substring(0, idx)}'),
-      TextSpan(
-        text: sentence.substring(idx, idx + word.length),
-        style: TextStyle(
-          color: AppColors.primary,
-          fontWeight: FontWeight.w700,
-          fontStyle: FontStyle.normal,
-        ),
-      ),
-      TextSpan(text: '${sentence.substring(idx + word.length)}"'),
-    ];
   }
 }
 

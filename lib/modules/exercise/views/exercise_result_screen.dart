@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/exercise/controllers/exercise_controller.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -22,47 +23,25 @@ class ExerciseResultScreen extends StatelessWidget {
           child: Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: controller.retrySession,
-                  child: Container(
-                    height: 54,
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceContainerHigh,
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Làm lại',
-                      style: AppTypography.headlineMedium.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onSurface,
-                      ),
-                    ),
-                  ),
+                child: AppButton(
+                  label: 'Làm lại',
+                  isTranslate: false,
+                  onPressed: controller.retrySession,
+                  variant: AppButtonVariant.secondary,
+                  radius: AppRadius.pill,
+                  height: 54,
                 ),
               ),
               AppGap.w12,
               Expanded(
                 flex: 2,
-                child: GestureDetector(
-                  onTap: controller.closeExercise,
-                  child: Container(
-                    height: 54,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Hoàn thành',
-                      style: AppTypography.headlineMedium.copyWith(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.onPrimaryFixed,
-                      ),
-                    ),
-                  ),
+                child: AppButton(
+                  label: 'Hoàn thành',
+                  isTranslate: false,
+                  onPressed: controller.closeExercise,
+                  gradient: true,
+                  radius: AppRadius.pill,
+                  height: 54,
                 ),
               ),
             ],

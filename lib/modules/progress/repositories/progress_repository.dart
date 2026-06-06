@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import 'package:englishme/modules/progress/models/daily_goal.dart';
 import 'package:englishme/modules/progress/models/progress_model.dart';
 import 'package:englishme/modules/progress/models/progress_response.dart';
 import 'package:englishme/modules/progress/models/streak_calendar_response.dart';
@@ -23,6 +24,21 @@ class ProgressRepository {
       queryParameters: params,
     );
     return XpLedgerPage.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Lấy trạng thái mục tiêu XP/ngày hiện tại. `GET /users/me/daily-goal`.
+  Future<DailyGoal> getDailyGoal() async {
+    final response = await _dio.get('/users/me/daily-goal');
+    return DailyGoal.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// User đặt mục tiêu XP/ngày. `PUT /users/me/daily-goal`. Trả trạng thái mới.
+  Future<DailyGoal> updateDailyGoal(int targetXp) async {
+    final response = await _dio.put(
+      '/users/me/daily-goal',
+      data: {'targetXp': targetXp},
+    );
+    return DailyGoal.fromJson(response.data as Map<String, dynamic>);
   }
 
   Future<ProgressData> getProgressData() async {
@@ -79,7 +95,7 @@ class ProgressRepository {
       longestStreak: progress.longestStreak,
       totalXp: progress.totalXp,
       todayXp: todayXp,
-      xpGoal: 50,
+      xpGoal: progress.xpGoal,
       studyDates: streak.activeDates
           .map((d) => DateTime(d.year, d.month, d.day))
           .toList(),

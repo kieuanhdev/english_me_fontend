@@ -1,25 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class AppBottomNav extends StatefulWidget {
-  const AppBottomNav({
-    super.key,
-    this.initialIndex = 0,
-    this.onTap,
-  });
+/// Bottom navigation bar dùng chung cho shell và màn phụ.
+///
+/// - Trong shell: [initialIndex] bị bỏ qua, widget tự listen [ShellController]
+///   reactive — không cần Obx bọc ngoài, không rebuild widget tree ngoài.
+/// - Màn phụ (push trên shell): truyền [initialIndex] cố định (vd 2) để
+///   highlight đúng tab nguồn. [onTap] gọi [ShellController.goToTab] để pop
+///   về shell rồi switch tab.
+class AppBottomNav extends StatelessWidget {
+  const AppBottomNav({super.key, this.initialIndex = 0, this.onTap});
 
   final int initialIndex;
   final void Function(int index, String route)? onTap;
-
-  @override
-  State<AppBottomNav> createState() => _AppBottomNavState();
-}
-
-class _AppBottomNavState extends State<AppBottomNav> {
-  late int _currentIndex;
 
   static const List<_NavItemData> _items = [
     _NavItemData(
@@ -55,34 +52,26 @@ class _AppBottomNavState extends State<AppBottomNav> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-  }
-
-  @override
-  void didUpdateWidget(covariant AppBottomNav oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.initialIndex != oldWidget.initialIndex &&
-        widget.initialIndex != _currentIndex) {
-      _currentIndex = widget.initialIndex;
-    }
-  }
-
-  void switchTo(int index) {
-    if (index == _currentIndex) return;
-    setState(() => _currentIndex = index);
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final shell = Get.isRegistered<ShellController>()
+        ? Get.find<ShellController>()
+        : null;
+
+    // Nếu ShellController tồn tại (đang trong shell hoặc màn phụ push từ shell)
+    // → dùng Obx để reactive theo currentTab.
+    // Nếu không (standalone/test) → dùng initialIndex tĩnh.
+    if (shell != null) {
+      return Obx(() => _buildBar(shell.currentTab.value, shell));
+    }
+    return _buildBar(initialIndex, null);
+  }
+
+  Widget _buildBar(int activeIndex, ShellController? shell) {
     return Container(
       height: 76,
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest.withValues(alpha: 0.92),
-        border: Border(
-          top: BorderSide(color: AppColors.outlineVariant, width: 1),
-        ),
+        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
         boxShadow: [
           BoxShadow(
             color: AppColors.onSurface.withValues(alpha: 0.04),
@@ -94,16 +83,15 @@ class _AppBottomNavState extends State<AppBottomNav> {
       child: Row(
         children: List.generate(_items.length, (i) {
           final item = _items[i];
-          final bool active = i == _currentIndex;
           return Expanded(
             child: _NavItem(
               data: item,
-              active: active,
+              active: i == activeIndex,
               onTap: () {
-                if (i == _currentIndex) return;
-                setState(() => _currentIndex = i);
-                if (widget.onTap != null) {
-                  widget.onTap!(i, item.route);
+                if (onTap != null) {
+                  onTap!(i, item.route);
+                } else if (shell != null) {
+                  ShellController.goToTab(i);
                 } else {
                   Get.offAllNamed(item.route);
                 }

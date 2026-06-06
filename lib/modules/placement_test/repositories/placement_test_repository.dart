@@ -26,4 +26,13 @@ class PlacementTestRepository {
     final response = await _dio.post('/placement-test/$sessionId/complete');
     return TestResultModel.fromJson(response.data);
   }
+
+  /// Tự chọn trình độ CEFR mà không làm bài kiểm tra.
+  /// Backend set cefrLevel + onboarded, trả về user đã cập nhật.
+  Future<void> selfSelectLevel(String level) async {
+    await _dio.post(
+      '/placement-test/self-select',
+      data: {'level': level},
+    );
+  }
 }

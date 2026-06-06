@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_settings_icon_button.dart';
+import 'package:englishme/modules/notification/controllers/notification_controller.dart';
+import 'package:englishme/modules/notification/views/widgets/notification_sheet.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppMainAppBar extends StatelessWidget {
@@ -108,11 +109,7 @@ class AppPageHeader extends StatelessWidget {
           ],
           if (showNotification) ...[
             const SizedBox(width: 8),
-            _HeaderIconButton(
-              icon: Icons.notifications_outlined,
-              color: AppColors.primary,
-              onTap: onNotification ?? _showNotifications,
-            ),
+            _BellWithBadge(onTap: onNotification ?? _showNotifications),
           ],
           if (showSettings) ...[
             const SizedBox(width: 8),
@@ -131,10 +128,65 @@ class AppPageHeader extends StatelessWidget {
   }
 
   void _showNotifications() {
+    final controller = NotificationController.ensureRegistered();
+    controller.loadAll();
     Get.bottomSheet<void>(
-      const _NotificationSheet(),
+      const NotificationSheet(),
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
+    );
+  }
+}
+
+/// Chuông + badge số chưa đọc. Đọc [NotificationController] permanent qua Obx
+/// nên badge nhất quán ở mọi màn dùng [AppMainAppBar] mà không cần sửa per-screen.
+class _BellWithBadge extends StatelessWidget {
+  const _BellWithBadge({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = NotificationController.ensureRegistered();
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        _HeaderIconButton(
+          icon: Icons.notifications_outlined,
+          color: AppColors.primary,
+          onTap: onTap,
+        ),
+        Positioned(
+          right: -2,
+          top: -2,
+          child: Obx(() {
+            final count = controller.unreadCount.value;
+            if (count == 0) return const SizedBox.shrink();
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+              decoration: BoxDecoration(
+                color: AppColors.danger,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.surfaceContainerLowest,
+                  width: 1.5,
+                ),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                count > 9 ? '9+' : '$count',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  height: 1.1,
+                ),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }
@@ -217,129 +269,6 @@ class _HeaderIconButton extends StatelessWidget {
         ),
         child: Icon(icon, size: 20, color: color),
       ),
-    );
-  }
-}
-
-class _NotificationSheet extends StatelessWidget {
-  const _NotificationSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Container(
-        margin: const EdgeInsets.all(16),
-        padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceContainerLowest,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(color: AppColors.outlineVariant),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.neutralShadow,
-              blurRadius: 18,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Thông báo',
-                  style: AppTypography.headlineMedium.copyWith(
-                    fontSize: 18,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: Get.back,
-                  icon: Icon(Icons.close_rounded, color: AppColors.primary),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            _NotificationItem(
-              icon: Icons.local_fire_department_rounded,
-              title: 'Duy trì streak hôm nay',
-              message: 'Hoàn thành một bài học để giữ chuỗi học tập.',
-              color: AppColors.tertiary,
-            ),
-            const SizedBox(height: 10),
-            _NotificationItem(
-              icon: Icons.school_rounded,
-              title: 'Gợi ý học tiếp',
-              message: 'Bạn có thể tiếp tục lộ trình hoặc ôn phần bổ trợ.',
-              color: AppColors.primary,
-            ),
-            const SizedBox(height: 10),
-            _NotificationItem(
-              icon: Icons.assignment_turned_in_rounded,
-              title: 'Kiểm tra trình độ',
-              message: 'Khi hoàn thành level, app sẽ gợi ý bài kiểm tra nâng cấp.',
-              color: AppColors.success,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _NotificationItem extends StatelessWidget {
-  const _NotificationItem({
-    required this.icon,
-    required this.title,
-    required this.message,
-    required this.color,
-  });
-
-  final IconData icon;
-  final String title;
-  final String message;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 21),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: AppTypography.bodyRegular.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                message,
-                style: AppTypography.bodySmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

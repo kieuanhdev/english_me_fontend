@@ -22,11 +22,7 @@ class DeckPrepScreen extends StatelessWidget {
       });
       return Scaffold(
         backgroundColor: AppColors.surface,
-        appBar: CommonAppBar(
-          title: 'EnglishMe',
-          isTranslate: false,
-          showBackButton: true,
-        ),
+        appBar: const CommonAppBar(title: 'EnglishMe', isTranslate: false),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -37,27 +33,32 @@ class DeckPrepScreen extends StatelessWidget {
       appBar: CommonAppBar(
         title: 'EnglishMe',
         isTranslate: false,
-        showBackButton: true,
-        actions: [
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert_rounded),
-            offset: const Offset(0, 48),
-            onSelected: (v) {
-              if (v == 'edit') c.openEditDesk();
-              if (v == 'delete') c.confirmDeleteThisDesk();
-            },
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'edit', child: Text(T.deckEditDeck.tr)),
-              PopupMenuItem(
-                value: 'delete',
-                child: Text(
-                  T.deckDeleteDeck.tr,
-                  style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700),
+        // Bộ hệ thống: không cho sửa/xoá → ẩn menu 3 chấm (chỉ học).
+        actions: c.isSystem
+            ? const []
+            : [
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert_rounded),
+                  offset: const Offset(0, 48),
+                  onSelected: (v) {
+                    if (v == 'edit') c.openEditDeck();
+                    if (v == 'delete') c.confirmDeleteThisDeck();
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(value: 'edit', child: Text(T.deckEditDeck.tr)),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(
+                        T.deckDeleteDeck.tr,
+                        style: TextStyle(
+                          color: AppColors.danger,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
       ),
       body: SafeArea(
         top: false,
@@ -84,14 +85,17 @@ class DeckPrepScreen extends StatelessWidget {
                 AppGap.h28,
                 const _InventoryHeader(),
                 AppGap.h16,
-                ...c.previewCards.map((card) => Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _InventoryWordCard(
-                        card: card,
-                        onSpeak: () => c.speakWord(card.word),
-                        onEdit: () => c.onEditCard(card),
-                      ),
-                    )),
+                ...c.previewCards.map(
+                  (card) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _InventoryWordCard(
+                      card: card,
+                      onSpeak: () => c.speakWord(card.word),
+                      // Bộ hệ thống: không cho sửa từng thẻ → ẩn nút bút chì.
+                      onEdit: c.isSystem ? null : () => c.onEditCard(card),
+                    ),
+                  ),
+                ),
                 if (c.previewCards.isEmpty) const _EmptyPreview(),
               ],
             ),
@@ -125,7 +129,6 @@ class _ErrorState extends StatelessWidget {
             AppButton(
               label: T.actionRetry.tr,
               onPressed: onRetry,
-              variant: AppButtonVariant.primary,
               isTranslate: false,
             ),
           ],
@@ -155,7 +158,7 @@ class _DeckHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final desk = controller.desk;
+    final deck = controller.deck;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -174,7 +177,7 @@ class _DeckHeader extends StatelessWidget {
               ),
               AppGap.h6,
               Text(
-                desk.title,
+                deck.title,
                 style: AppTypography.displayLarge.copyWith(
                   fontSize: 26,
                   height: 1.15,
@@ -184,7 +187,7 @@ class _DeckHeader extends StatelessWidget {
               AppGap.h6,
               Obx(
                 () => Text(
-                  '${T.deckCardCountLabel.trParams({'count': controller.cardCount.toString()})} • ${_levelLabel(desk.cefrLevel)}',
+                  '${T.deckCardCountLabel.trParams({'count': controller.cardCount.toString()})} • ${_levelLabel(deck.cefrLevel)}',
                   style: AppTypography.bodyLarge.copyWith(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -231,87 +234,91 @@ class _WeeklyMasteryCard extends StatelessWidget {
     return Obx(() {
       final pct = controller.weeklyMasteryPercent;
       return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppRadius.xxl),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowSoft,
-            blurRadius: 24,
-            offset: Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                T.deckProgressWeek.tr,
-                style: AppTypography.displayLarge.copyWith(fontSize: 17),
-              ),
-              Text(
-                '$pct%',
-                style: AppTypography.displayLarge.copyWith(
-                  fontSize: 17,
-                  color: AppColors.tertiary,
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(24, 20, 20, 20),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
+          borderRadius: BorderRadius.circular(AppRadius.xxl),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.shadowSoft,
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  T.deckProgressWeek.tr,
+                  style: AppTypography.displayLarge.copyWith(fontSize: 17),
                 ),
-              ),
-            ],
-          ),
-          AppGap.h14,
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            child: SizedBox(
-              height: 10,
-              width: double.infinity,
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  ColoredBox(color: AppColors.secondaryContainer),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: FractionallySizedBox(
-                      widthFactor: (pct / 100.0).clamp(0.0, 1.0),
-                      heightFactor: 1,
-                      child: ColoredBox(color: AppColors.tertiary),
-                    ),
+                Text(
+                  '$pct%',
+                  style: AppTypography.displayLarge.copyWith(
+                    fontSize: 17,
+                    color: AppColors.tertiary,
                   ),
-                ],
+                ),
+              ],
+            ),
+            AppGap.h14,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              child: SizedBox(
+                height: 10,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ColoredBox(color: AppColors.secondaryContainer),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: (pct / 100.0).clamp(0.0, 1.0),
+                        heightFactor: 1,
+                        child: ColoredBox(color: AppColors.tertiary),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          AppGap.h14,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                T.deckNewCardsCount.trParams({'count': controller.newCardsCount.toString()}),
-                style: AppTypography.bodyLarge.copyWith(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                  color: AppColors.textSecondary,
+            AppGap.h14,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  T.deckNewCardsCount.trParams({
+                    'count': controller.newCardsCount.toString(),
+                  }),
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
-              Text(
-                T.deckMasteredCardsCount.trParams({'count': controller.masteredCardsCount.toString()}),
-                style: AppTypography.bodyLarge.copyWith(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                  color: AppColors.textSecondary,
+                Text(
+                  T.deckMasteredCardsCount.trParams({
+                    'count': controller.masteredCardsCount.toString(),
+                  }),
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.8,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+              ],
+            ),
+          ],
+        ),
+      );
     });
   }
 }
@@ -325,43 +332,24 @@ class _PrimaryActions extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: controller.startStudySession,
-            borderRadius: BorderRadius.circular(AppRadius.xxl),
-            child: Ink(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                borderRadius: BorderRadius.circular(AppRadius.xxl),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    T.actionStartSession.tr,
-                    style: AppTypography.bodyLarge.copyWith(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.onPrimaryFixed,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        AppGap.h12,
         AppButton(
-          label: T.actionAddCard.tr,
-          onPressed: controller.onAddCard,
-          variant: AppButtonVariant.secondary,
-          height: 56,
-          leading: Icon(Icons.add_rounded, color: AppColors.primary, size: 22),
+          label: T.actionStartSession.tr,
+          onPressed: controller.startStudySession,
+          gradient: true,
+          radius: AppRadius.xxl,
           isTranslate: false,
         ),
+        // Bộ hệ thống: không cho thêm thẻ → ẩn nút "Thêm thẻ".
+        if (!controller.isSystem) ...[
+          AppGap.h12,
+          AppButton(
+            label: T.actionAddCard.tr,
+            onPressed: controller.onAddCard,
+            variant: AppButtonVariant.secondary,
+            leading: Icon(Icons.add_rounded, color: AppColors.primary, size: 22),
+            isTranslate: false,
+          ),
+        ],
       ],
     );
   }
@@ -410,7 +398,9 @@ class _InventoryWordCard extends StatelessWidget {
 
   final VocabWord card;
   final VoidCallback onSpeak;
-  final VoidCallback onEdit;
+
+  /// null = bộ hệ thống (không cho sửa thẻ) → ẩn nút bút chì.
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -450,7 +440,10 @@ class _InventoryWordCard extends StatelessWidget {
                         color: AppColors.iconMuted,
                       ),
                       padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+                      constraints: const BoxConstraints(
+                        minWidth: 36,
+                        minHeight: 36,
+                      ),
                     ),
                   ],
                 ),
@@ -458,7 +451,7 @@ class _InventoryWordCard extends StatelessWidget {
                   AppGap.h6,
                   Text(
                     card.ipa,
-                    style: AppTypography.bodyLarge.copyWith(
+                    style: AppTypography.ipa.copyWith(
                       fontSize: 13,
                       fontStyle: FontStyle.italic,
                       fontWeight: FontWeight.w600,
@@ -488,14 +481,15 @@ class _InventoryWordCard extends StatelessWidget {
               ],
             ),
           ),
-          IconButton(
-            onPressed: onEdit,
-            style: IconButton.styleFrom(
-              backgroundColor: AppColors.surfaceContainerHigh,
-              foregroundColor: AppColors.iconMuted,
+          if (onEdit != null)
+            IconButton(
+              onPressed: onEdit,
+              style: IconButton.styleFrom(
+                backgroundColor: AppColors.surfaceContainerHigh,
+                foregroundColor: AppColors.iconMuted,
+              ),
+              icon: const Icon(Icons.edit_rounded, size: 20),
             ),
-            icon: const Icon(Icons.edit_rounded, size: 20),
-          ),
         ],
       ),
     );
@@ -512,7 +506,9 @@ class _EmptyPreview extends StatelessWidget {
       child: Center(
         child: Text(
           T.deckEmptyCards.tr,
-          style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary),
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
       ),
     );

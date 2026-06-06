@@ -17,7 +17,7 @@ class StreakCalendar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final startDay = DateTime(now.year, now.month, 1);
+    final startDay = DateTime(now.year, now.month);
     final firstWeekday = startDay.weekday % 7; // 0=Sun … 6=Sat
     final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
     final studySet = {
@@ -35,8 +35,11 @@ class StreakCalendar extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.local_fire_department_rounded,
-                  color: AppColors.tertiary, size: 20),
+              Icon(
+                Icons.local_fire_department_rounded,
+                color: AppColors.tertiary,
+                size: 20,
+              ),
               const SizedBox(width: 6),
               Text(
                 'Streak học tập',
@@ -54,17 +57,19 @@ class StreakCalendar extends StatelessWidget {
           // Weekday headers
           Row(
             children: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7']
-                .map((d) => Expanded(
-                      child: Text(
-                        d,
-                        textAlign: TextAlign.center,
-                        style: AppTypography.headlineMedium.copyWith(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textSecondary,
-                        ),
+                .map(
+                  (d) => Expanded(
+                    child: Text(
+                      d,
+                      textAlign: TextAlign.center,
+                      style: AppTypography.headlineMedium.copyWith(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textSecondary,
                       ),
-                    ))
+                    ),
+                  ),
+                )
                 .toList(),
           ),
           const SizedBox(height: 8),
@@ -76,7 +81,6 @@ class StreakCalendar extends StatelessWidget {
               crossAxisCount: 7,
               mainAxisSpacing: 4,
               crossAxisSpacing: 4,
-              childAspectRatio: 1,
             ),
             itemCount: firstWeekday + daysInMonth,
             itemBuilder: (_, index) {
@@ -93,45 +97,53 @@ class StreakCalendar extends StatelessWidget {
                   color: isToday
                       ? AppColors.primary
                       : isStudied
-                          ? AppColors.tertiary.withValues(alpha: 0.2)
-                          : AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
+                      ? AppColors.tertiary.withValues(alpha: 0.2)
+                      : AppColors.surfaceContainerHigh.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                   border: isStudied && !isToday
-                      ? Border.all(color: AppColors.tertiary.withValues(alpha: 0.5))
+                      ? Border.all(
+                          color: AppColors.tertiary.withValues(alpha: 0.5),
+                        )
                       : null,
                 ),
                 alignment: Alignment.center,
                 child: isFuture
                     ? null
                     : isStudied
-                        ? (isToday
-                            ? Text(
-                                '$day',
-                                style: AppTypography.headlineMedium.copyWith(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: AppColors.onPrimaryFixed,
-                                ),
-                              )
-                            : Icon(Icons.check_rounded,
-                                size: 12, color: AppColors.tertiary))
-                        : Text(
-                            '$day',
-                            style: AppTypography.headlineMedium.copyWith(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                              color: isToday
-                                  ? AppColors.onPrimaryFixed
-                                  : AppColors.textSecondary.withValues(alpha: 0.6),
-                            ),
-                          ),
+                    ? (isToday
+                          ? Text(
+                              '$day',
+                              style: AppTypography.headlineMedium.copyWith(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.onPrimaryFixed,
+                              ),
+                            )
+                          : Icon(
+                              Icons.check_rounded,
+                              size: 12,
+                              color: AppColors.tertiary,
+                            ))
+                    : Text(
+                        '$day',
+                        style: AppTypography.headlineMedium.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w600,
+                          color: isToday
+                              ? AppColors.onPrimaryFixed
+                              : AppColors.textSecondary.withValues(alpha: 0.6),
+                        ),
+                      ),
               );
             },
           ),
           const SizedBox(height: 12),
           Row(
             children: [
-              _LegendDot(color: AppColors.tertiary.withValues(alpha: 0.5), label: 'Đã học'),
+              _LegendDot(
+                color: AppColors.tertiary.withValues(alpha: 0.5),
+                label: 'Đã học',
+              ),
               const SizedBox(width: 16),
               _LegendDot(color: AppColors.primary, label: 'Hôm nay'),
               const Spacer(),

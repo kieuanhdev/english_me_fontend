@@ -37,7 +37,9 @@ class PlacementQuestionScreen extends GetView<PlacementTestController> {
                   totalQuestions: controller.questions.length,
                   onClose: () => Get.back(),
                 ),
-                AppGap.h24,
+                AppGap.h12,
+                const _CapBanner(),
+                AppGap.h16,
                 _SkillChip(skill: question.skillCategory),
                 AppGap.h14,
                 Text(
@@ -94,6 +96,40 @@ class PlacementQuestionScreen extends GetView<PlacementTestController> {
             ),
           );
         }),
+      ),
+    );
+  }
+}
+
+/// Banner nhỏ cố định nhắc giới hạn B2 trong suốt quá trình làm bài.
+class _CapBanner extends StatelessWidget {
+  const _CapBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline_rounded,
+              size: 16, color: AppColors.primaryContainer),
+          AppGap.w8,
+          Expanded(
+            child: Text(
+              'Bài kiểm tra đầu vào • Xác định trình độ tối đa tới B2',
+              style: AppTypography.labelMedium.copyWith(
+                fontSize: 12,
+                color: AppColors.primaryContainer,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

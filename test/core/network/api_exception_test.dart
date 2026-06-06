@@ -33,11 +33,7 @@ void main() {
       final requestOptions = RequestOptions(path: '/foo');
       final dioError = DioException(
         requestOptions: requestOptions,
-        response: Response(
-          requestOptions: requestOptions,
-          statusCode: 401,
-          data: null,
-        ),
+        response: Response(requestOptions: requestOptions, statusCode: 401),
         type: DioExceptionType.badResponse,
       );
 
@@ -65,26 +61,22 @@ void main() {
     test('maps 400/422 to BAD_REQUEST / VALIDATION_ERROR codes', () {
       final requestOptions = RequestOptions(path: '/foo');
 
-      final api400 = ApiException.fromDio(DioException(
-        requestOptions: requestOptions,
-        response: Response(
+      final api400 = ApiException.fromDio(
+        DioException(
           requestOptions: requestOptions,
-          statusCode: 400,
-          data: null,
+          response: Response(requestOptions: requestOptions, statusCode: 400),
+          type: DioExceptionType.badResponse,
         ),
-        type: DioExceptionType.badResponse,
-      ));
+      );
       expect(api400.code, 'BAD_REQUEST');
 
-      final api422 = ApiException.fromDio(DioException(
-        requestOptions: requestOptions,
-        response: Response(
+      final api422 = ApiException.fromDio(
+        DioException(
           requestOptions: requestOptions,
-          statusCode: 422,
-          data: null,
+          response: Response(requestOptions: requestOptions, statusCode: 422),
+          type: DioExceptionType.badResponse,
         ),
-        type: DioExceptionType.badResponse,
-      ));
+      );
       expect(api422.code, 'VALIDATION_ERROR');
     });
   });

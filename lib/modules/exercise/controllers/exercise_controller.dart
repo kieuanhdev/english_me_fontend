@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
+import 'package:englishme/core/services/sound_service.dart';
 import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
@@ -75,14 +76,16 @@ class ExerciseController extends GetxController {
     final q = currentExercise;
     if (answer == null || q == null || isAnswerRevealed.value) return;
 
+    final isCorrect = answer == q.correctAnswer;
     isAnswerRevealed.value = true;
     results.add(ExerciseAnswerResult(
       questionId: q.id,
       selectedAnswer: answer,
-      isCorrect: answer == q.correctAnswer,
+      isCorrect: isCorrect,
       correctAnswer: q.correctAnswer,
       explanation: q.explanation,
     ));
+    SoundService.to.play(isCorrect ? AppSound.correct : AppSound.wrong);
   }
 
   Future<void> nextQuestion() async {
@@ -120,6 +123,7 @@ class ExerciseController extends GetxController {
         totalXp: result.totalXp,
         xpEarned: result.xpEarned,
         streakUpdated: result.streakUpdated,
+        bonuses: result.bonuses,
       );
       state.value = ExerciseState.finished;
       Get.offNamed(AppRoutes.exerciseResult);

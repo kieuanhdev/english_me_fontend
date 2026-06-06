@@ -41,7 +41,10 @@ class _LearningPathDetailScreenState extends State<LearningPathDetailScreen> {
 
   void _reload() {
     if (!mounted) return;
-    setState(() => _future = _load());
+    final next = _load();
+    setState(() {
+      _future = next;
+    });
   }
 
   @override
@@ -116,8 +119,10 @@ class _LearningPathDetailScreenState extends State<LearningPathDetailScreen> {
                                   activity: path.activities[index],
                                   onTap: () async {
                                     await Get.toNamed(
-                                      AppRoutes.learningLessonDetail,
-                                      arguments: path.activities[index].id,
+                                      AppRoutes.curriculumLessonPlayer,
+                                      arguments: {
+                                        'lessonId': path.activities[index].id,
+                                      },
                                     );
                                     if (mounted) _reload();
                                   },
@@ -204,11 +209,13 @@ class _ActivityTile extends StatelessWidget {
   const _ActivityTile({required this.activity, required this.onTap});
 
   final LearningPathActivity activity;
-  final VoidCallback onTap;
+  final Future<void> Function() onTap;
 
   @override
   Widget build(BuildContext context) {
-    final color = _skillColor(activity.skill);
+    final color = activity.isFailed
+        ? AppColors.danger
+        : _skillColor(activity.skill);
     final disabled = activity.isLocked;
     return Material(
       color: disabled
@@ -216,7 +223,7 @@ class _ActivityTile extends StatelessWidget {
           : AppColors.surfaceContainerLowest,
       borderRadius: BorderRadius.circular(AppRadius.lg),
       child: InkWell(
-        onTap: disabled ? null : onTap,
+        onTap: disabled ? null : () { onTap(); },
         borderRadius: BorderRadius.circular(AppRadius.lg),
         child: Container(
           padding: const EdgeInsets.all(14),
@@ -271,11 +278,15 @@ class _ActivityTile extends StatelessWidget {
               Icon(
                 activity.isCompleted
                     ? Icons.check_circle_rounded
+                    : activity.isFailed
+                    ? Icons.cancel_rounded
                     : activity.isLocked
                     ? Icons.lock_rounded
                     : Icons.chevron_right_rounded,
                 color: activity.isCompleted
                     ? AppColors.success
+                    : activity.isFailed
+                    ? AppColors.danger
                     : AppColors.iconMuted,
               ),
             ],
@@ -313,6 +324,7 @@ class _SkillPill extends StatelessWidget {
 
 IconData _statusIcon(LearningPathActivity activity) {
   if (activity.isCompleted) return Icons.check_rounded;
+  if (activity.isFailed) return Icons.close_rounded;
   if (activity.isLocked) return Icons.lock_rounded;
   if (activity.status == 'in_progress') return Icons.play_arrow_rounded;
   return _skillIcon(activity.skill);

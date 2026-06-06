@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/services/sound_service.dart';
 import 'package:englishme/modules/profile/controllers/profile_controller.dart';
+import 'package:englishme/modules/progress/models/daily_goal.dart';
+import 'package:englishme/modules/progress/views/widgets/daily_goal_sheet.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class SettingsSection extends GetView<ProfileController> {
@@ -26,6 +29,10 @@ class SettingsSection extends GetView<ProfileController> {
         _SectionCard(
           children: [
             _ThemeTile(),
+            _Divider(),
+            _SoundTile(),
+            _Divider(),
+            _DailyGoalTile(),
             _Divider(),
             _SettingsTile(
               icon: Icons.assignment_rounded,
@@ -59,7 +66,7 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -96,7 +103,11 @@ class _ThemeTile extends GetView<ProfileController> {
               color: AppColors.tertiary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: Icon(Icons.palette_rounded, color: AppColors.tertiary, size: 18),
+            child: Icon(
+              Icons.palette_rounded,
+              color: AppColors.tertiary,
+              size: 18,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -131,6 +142,103 @@ class _ThemeTile extends GetView<ProfileController> {
           }),
         ],
       ),
+    );
+  }
+}
+
+class _SoundTile extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final sound = SoundService.to;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+            ),
+            child: Icon(
+              Icons.volume_up_rounded,
+              color: AppColors.primary,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Âm thanh hiệu ứng',
+                  style: AppTypography.headlineMedium.copyWith(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Tiếng khi trả lời đúng/sai, hoàn thành bài',
+                  style: AppTypography.headlineMedium.copyWith(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Obx(
+            () => Switch.adaptive(
+              value: sound.enabled.value,
+              activeColor: AppColors.primary,
+              onChanged: (v) {
+                sound.setEnabled(v);
+                // Phát thử 1 tiếng ngắn khi bật để user nghe ngay.
+                if (v) sound.play(AppSound.correct);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DailyGoalTile extends GetView<ProfileController> {
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      final goal = controller.dailyGoal.value;
+      final target = goal?.targetXp;
+      final subtitle = target == null
+          ? 'Đặt số XP cần đạt mỗi ngày'
+          : '${DailyGoal.labelFor(target)} · $target XP mỗi ngày';
+      return _SettingsTile(
+        icon: Icons.flag_rounded,
+        iconColor: AppColors.tertiary,
+        title: 'Mục tiêu XP mỗi ngày',
+        subtitle: subtitle,
+        onTap: () => _openSheet(context),
+      );
+    });
+  }
+
+  void _openSheet(BuildContext context) {
+    final goal = controller.dailyGoal.value;
+    if (goal == null) {
+      // Chưa tải xong → thử tải lại, tránh mở sheet rỗng.
+      controller.loadDailyGoal();
+      return;
+    }
+    DailyGoalSheet.show(
+      context,
+      goal: goal,
+      onSelect: controller.setDailyGoal,
+      isSaving: controller.savingGoal,
     );
   }
 }
@@ -174,7 +282,11 @@ class _ThemeToggle extends StatelessWidget {
 }
 
 class _ThemeOption extends StatelessWidget {
-  const _ThemeOption({required this.icon, required this.selected, required this.onTap});
+  const _ThemeOption({
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
   final IconData icon;
   final bool selected;
   final VoidCallback onTap;
@@ -263,7 +375,11 @@ class _SettingsTile extends StatelessWidget {
               ),
             ),
             if (titleColor == null)
-              Icon(Icons.chevron_right_rounded, color: AppColors.textSecondary, size: 20),
+              Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
           ],
         ),
       ),

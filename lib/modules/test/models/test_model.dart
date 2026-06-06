@@ -1,3 +1,5 @@
+import 'package:englishme/modules/learn/models/learning_models.dart' show XpBonus;
+
 enum TestTopic { grammar, vocabulary }
 
 enum TestLevel { a1, a2, b1, b2, c1, c2 }
@@ -167,6 +169,7 @@ class TestSubmitResponse {
   final bool streakUpdated;
   final String? cefrSuggestion;
   final int timeTakenSeconds;
+  final List<XpBonus> bonuses;
 
   const TestSubmitResponse({
     required this.sessionId,
@@ -180,9 +183,11 @@ class TestSubmitResponse {
     required this.streakUpdated,
     this.cefrSuggestion,
     required this.timeTakenSeconds,
+    this.bonuses = const [],
   });
 
   factory TestSubmitResponse.fromJson(Map<String, dynamic> json) {
+    final rawBonuses = json['bonuses'];
     return TestSubmitResponse(
       sessionId: (json['sessionId'] ?? '').toString(),
       totalQuestions: (json['totalQuestions'] as num?)?.toInt() ?? 0,
@@ -195,6 +200,12 @@ class TestSubmitResponse {
       streakUpdated: json['streakUpdated'] == true,
       cefrSuggestion: json['cefrSuggestion'] as String?,
       timeTakenSeconds: (json['timeTakenSeconds'] as num?)?.toInt() ?? 0,
+      bonuses: rawBonuses is List
+          ? rawBonuses
+              .whereType<Map<String, dynamic>>()
+              .map(XpBonus.fromJson)
+              .toList()
+          : const [],
     );
   }
 }

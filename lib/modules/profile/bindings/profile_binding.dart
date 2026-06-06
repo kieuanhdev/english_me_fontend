@@ -4,6 +4,7 @@ import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/modules/auth/repositories/user_repository.dart';
 import 'package:englishme/modules/profile/controllers/profile_controller.dart';
 import 'package:englishme/modules/profile/repositories/profile_repository.dart';
+import 'package:englishme/modules/progress/repositories/progress_repository.dart';
 
 class ProfileBinding extends Bindings {
   @override
@@ -12,8 +13,14 @@ class ProfileBinding extends Bindings {
     Get.lazyPut<ProfileRepository>(
       () => ProfileRepository(userRepo: Get.find<UserRepository>()),
     );
+    Get.lazyPut<ProgressRepository>(
+      () => ProgressRepository(DioClient.instance),
+    );
     Get.lazyPut<ProfileController>(
-      () => ProfileController(Get.find<ProfileRepository>()),
+      () => ProfileController(
+        Get.find<ProfileRepository>(),
+        Get.find<ProgressRepository>(),
+      ),
     );
   }
 }

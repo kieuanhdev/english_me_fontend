@@ -18,6 +18,10 @@ class AppSpacing {
   static const double s32 = 32;
   static const double s40 = 40;
   static const double s48 = 48;
+
+  /// Chiều cao tối thiểu chung cho card từ vựng (chủ đề & bộ thẻ),
+  /// để 2 loại card luôn đồng nhất kích thước dù nội dung khác nhau.
+  static const double vocabCardMinHeight = 96;
 }
 
 class AppGap {

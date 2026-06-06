@@ -15,6 +15,15 @@ class GrammarRepository {
         .toList();
   }
 
+  Future<List<GrammarLevelGroup>> getTopicsByLevel() async {
+    final response = await _dio.get('/grammar/levels');
+    final list = (response.data as List?) ?? const [];
+    return list
+        .whereType<Map>()
+        .map((e) => GrammarLevelGroup.fromJson(e.cast<String, dynamic>()))
+        .toList();
+  }
+
   Future<List<GrammarLessonListItem>> getLessonsByTopic(String topicId) async {
     final response = await _dio.get('/grammar/topics/$topicId/lessons');
     final list = (response.data as List?) ?? const [];

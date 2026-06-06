@@ -1,3 +1,4 @@
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,7 +30,8 @@ class _LearningLessonDetailScreenState
   LearningLessonDetail? _lesson;
 
   // Queue-based activity state
-  late List<LearningActivity> _queue; // còn cần làm
+  List<LearningActivity> _queue = [];
+  bool _queueReady = false;
   int _currentIndex = 0;             // vị trí trong _queue
   String? _selectedOptionId;         // đáp án đang chọn câu hiện tại
   late TextEditingController _writingController;
@@ -38,13 +40,13 @@ class _LearningLessonDetailScreenState
 
   // Kết quả tổng hợp sau khi xong tất cả
   final Map<String, bool> _results = {}; // activityId -> isCorrect (lần đầu tiên làm đúng)
-  final Set<String> _retryIds = {};      // activityId đã đưa vào retry
 
   LearningCompleteResponse? _completion;
   bool _submitting = false;
   bool _loadingNext = false;
   bool _levelUpPromptShown = false;
   bool _hasCompleted = false;
+  bool _showSummary = false; // Đã làm hết queue, đang xem tổng kết
 
   @override
   void initState() {
@@ -52,18 +54,50 @@ class _LearningLessonDetailScreenState
     _repo = Get.find<LearningRepository>();
     _lessonId = widget.lessonId;
     _writingController = TextEditingController();
-    _future = _repo.getLessonDetail(_lessonId);
+    _future = _loadLesson(_lessonId);
+  }
+
+  Future<LearningLessonDetail> _loadLesson(String id) async {
+    final lesson = await _repo.getLessonDetail(id);
+    if (!mounted) return lesson;
+    setState(() {
+      _lesson = lesson;
+      _initQueue(lesson);
+    });
+    return lesson;
   }
 
   void _initQueue(LearningLessonDetail lesson) {
     _queue = List.of(lesson.activities);
+    _queueReady = true;
     _currentIndex = 0;
     _selectedOptionId = null;
     _writingController.clear();
     _answered = false;
     _currentCorrect = false;
     _results.clear();
-    _retryIds.clear();
+    _showSummary = false;
+  }
+
+  /// Chuyển queue sang chỉ chứa các câu đã làm sai, reset state để làm lại.
+  void _retryWrongOnly(LearningLessonDetail lesson) {
+    final wrong = lesson.activities
+        .where((a) => _results[a.id] == false)
+        .toList();
+    if (wrong.isEmpty) return;
+    setState(() {
+      _queue = wrong;
+      _currentIndex = 0;
+      _selectedOptionId = null;
+      _writingController.clear();
+      _answered = false;
+      _currentCorrect = false;
+      _showSummary = false;
+      // Xóa kết quả các câu sai để cho làm lại từ đầu
+      for (final a in wrong) {
+        _results.remove(a.id);
+      }
+    });
   }
 
   @override
@@ -73,9 +107,8 @@ class _LearningLessonDetailScreenState
   }
 
   LearningActivity? get _currentActivity =>
-      _queue.isEmpty ? null : _queue[_currentIndex];
+      (!_queueReady || _currentIndex >= _queue.length) ? null : _queue[_currentIndex];
 
-  bool get _allDone => _queue.isEmpty;
 
   // Số câu còn lại (tính câu hiện tại)
   int get _remaining => _queue.length - _currentIndex;
@@ -99,34 +132,41 @@ class _LearningLessonDetailScreenState
                 ? ApiState.empty
                 : ApiState.success;
 
-            if (lesson != null && _queue.isEmpty && _completion == null) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (mounted && _queue.isEmpty && _completion == null) {
-                  setState(() => _initQueue(lesson));
-                }
-              });
-            }
-
             return Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
               child: ApiStateView(
                 state: state,
                 errorMessage: 'Không tải được bài học.',
                 emptyMessage: 'Không tìm thấy bài học.',
-                onRetry: () => setState(() {
-                  _lesson = null;
-                  _future = _repo.getLessonDetail(_lessonId);
-                }),
+                onRetry: () {
+                  final next = _loadLesson(_lessonId);
+                  setState(() {
+                    _lesson = null;
+                    _queueReady = false;
+                    _future = next;
+                  });
+                },
                 builder: (_) {
-                  if (_completion != null) {
-                    return _CompletionView(
-                      lesson: lesson!,
-                      result: _completion!,
-                      loadingNext: _loadingNext,
-                      onContinue: _continueAfterComplete,
+                  if (_submitting || _loadingNext) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (!_queueReady) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (_showSummary) {
+                    final wrongCount = lesson!.activities
+                        .where((a) => _results[a.id] == false)
+                        .length;
+                    return _SummaryView(
+                      lesson: lesson,
+                      results: _results,
+                      onRetryWrong: wrongCount > 0
+                          ? () => _retryWrongOnly(lesson)
+                          : null,
+                      onContinue: _submitLesson,
                     );
                   }
-                  if (_allDone) {
+                  if (_currentActivity == null) {
                     return const Center(child: CircularProgressIndicator());
                   }
                   return _QuizView(
@@ -174,10 +214,7 @@ class _LearningLessonDetailScreenState
       correct = true; // pronunciation và các loại khác tự tính đúng
     }
 
-    // Chỉ ghi nhận kết quả lần đầu tiên gặp câu này
-    if (!_retryIds.contains(activity.id)) {
-      _results[activity.id] = correct;
-    }
+    _results[activity.id] = correct;
 
     setState(() {
       _answered = true;
@@ -189,18 +226,17 @@ class _LearningLessonDetailScreenState
     final activity = _currentActivity;
     if (activity == null) return;
 
-    if (!_currentCorrect && !_retryIds.contains(activity.id)) {
-      // Câu sai lần đầu: đẩy xuống cuối queue để làm lại
-      _retryIds.add(activity.id);
-      _queue.add(activity);
-    }
-
-    // Chuyển sang câu kế
+    // Đúng hay sai đều chuyển sang câu kế tiếp.
     final nextIndex = _currentIndex + 1;
 
     if (nextIndex >= _queue.length) {
-      // Hết queue → submit
-      _submitLesson();
+      // Hết queue → hiển thị màn tổng kết.
+      setState(() {
+        _showSummary = true;
+        _answered = false;
+        _selectedOptionId = null;
+        _writingController.clear();
+      });
       return;
     }
 
@@ -215,9 +251,14 @@ class _LearningLessonDetailScreenState
 
   Future<void> _submitLesson() async {
     if (_submitting) return;
+    if (!mounted) return;
     setState(() => _submitting = true);
 
-    final lesson = _lesson ?? (await _future);
+    final lesson = _lesson;
+    if (lesson == null) {
+      if (mounted) setState(() => _submitting = false);
+      return;
+    }
     final totalOriginal = lesson.activities.length;
 
     // Tính score dựa trên số câu gốc làm đúng ngay lần đầu
@@ -258,21 +299,25 @@ class _LearningLessonDetailScreenState
         timeSpentSeconds: lesson.durationMinutes * 60,
         answers: answers,
       );
+      if (!mounted) return;
       XpGrantHandler.apply(
         totalXp: result.totalXp,
         xpEarned: result.xpEarned,
         streakUpdated: result.streakUpdated,
         bonuses: result.bonuses,
       );
+      _hasCompleted = true;
+      setState(() {
+        _completion = result;
+        _submitting = false;
+      });
+      if (result.completed && result.levelProgress >= 1) {
+        await _showLevelUpPrompt();
+        return;
+      }
+      // Tự động sang lesson kế tiếp; nếu không có thì back về path detail.
       if (mounted) {
-        _hasCompleted = true;
-        setState(() {
-          _completion = result;
-          _submitting = false;
-        });
-        if (result.completed && result.levelProgress >= 1) {
-          _showLevelUpPrompt();
-        }
+        await _continueAfterComplete();
       }
     } catch (_) {
       if (mounted) {
@@ -310,6 +355,7 @@ class _LearningLessonDetailScreenState
         _completion = null;
         _submitting = false;
         _loadingNext = false;
+        _queueReady = false;
         _future = Future.value(nextLesson);
         _initQueue(nextLesson);
       });
@@ -337,13 +383,19 @@ class _LearningLessonDetailScreenState
           'Bạn đã học xong level này. Bạn có muốn làm bài kiểm tra để nâng level không?',
         ),
         actions: [
-          TextButton(
+          AppButton(
+            label: 'Để sau',
+            isTranslate: false,
+            variant: AppButtonVariant.text,
+            expand: false,
             onPressed: () => Get.back(result: false),
-            child: const Text('Để sau'),
           ),
-          FilledButton(
+          AppButton(
+            label: 'Đi kiểm tra',
+            isTranslate: false,
+            variant: AppButtonVariant.text,
+            expand: false,
             onPressed: () => Get.back(result: true),
-            child: const Text('Đi kiểm tra'),
           ),
         ],
       ),
@@ -359,21 +411,11 @@ class _LearningLessonDetailScreenState
     required String message,
     bool isError = false,
   }) {
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.TOP,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      borderRadius: AppRadius.md,
-      backgroundColor: isError ? AppColors.danger : AppColors.success,
-      colorText: AppColors.onPrimaryFixed,
-      icon: Icon(
-        isError ? Icons.error_outline_rounded : Icons.check_circle_rounded,
-        color: AppColors.onPrimaryFixed,
-      ),
-      duration: const Duration(seconds: 2),
-      shouldIconPulse: false,
-    );
+    if (isError) {
+      AppNotify.error(title, message: message);
+    } else {
+      AppNotify.success(title, message: message);
+    }
   }
 }
 
@@ -472,6 +514,204 @@ class _QuizView extends StatelessWidget {
   }
 }
 
+// ─── Summary view: tổng kết các câu sau khi làm hết 1 lượt ───────────────────
+
+class _SummaryView extends StatelessWidget {
+  const _SummaryView({
+    required this.lesson,
+    required this.results,
+    required this.onRetryWrong,
+    required this.onContinue,
+  });
+
+  final LearningLessonDetail lesson;
+  final Map<String, bool> results;
+  final VoidCallback? onRetryWrong;
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    final activities = lesson.activities;
+    final correct = activities.where((a) => results[a.id] == true).length;
+    final wrong = activities.where((a) => results[a.id] == false).length;
+    final total = activities.length;
+    final allCorrect = wrong == 0;
+    final color = _skillColor(lesson.skill);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AppMainAppBar(
+          title: lesson.title,
+          showBack: true,
+          showSettings: false,
+          showNotification: false,
+          horizontalPadding: 0,
+          onBack: Get.back,
+        ),
+        AppGap.h16,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: allCorrect
+                ? AppColors.successSoft
+                : AppColors.recommendationOrangeBg,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            border: Border.all(
+              color: (allCorrect ? AppColors.success : AppColors.danger)
+                  .withValues(alpha: 0.35),
+            ),
+          ),
+          child: Column(
+            children: [
+              Icon(
+                allCorrect
+                    ? Icons.emoji_events_rounded
+                    : Icons.fact_check_rounded,
+                color: allCorrect ? AppColors.success : AppColors.tertiary,
+                size: 40,
+              ),
+              AppGap.h8,
+              Text(
+                allCorrect ? 'Tuyệt vời!' : 'Tổng kết bài làm',
+                style: AppTypography.headlineMedium.copyWith(
+                  color: allCorrect ? AppColors.success : AppColors.tertiary,
+                ),
+              ),
+              AppGap.h4,
+              Text(
+                'Đúng $correct/$total • Sai $wrong/$total',
+                style: AppTypography.bodyRegular.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+        ),
+        AppGap.h14,
+        Expanded(
+          child: ListView.separated(
+            itemCount: activities.length,
+            separatorBuilder: (_, __) => AppGap.h8,
+            itemBuilder: (_, index) {
+              final activity = activities[index];
+              final result = results[activity.id];
+              return _SummaryItem(
+                index: index + 1,
+                activity: activity,
+                isCorrect: result,
+                color: color,
+              );
+            },
+          ),
+        ),
+        AppGap.h12,
+        if (onRetryWrong != null) ...[
+          AppButton(
+            label: 'Làm lại các câu sai ($wrong)',
+            onPressed: onRetryWrong,
+            isTranslate: false,
+          ),
+          AppGap.h8,
+        ],
+        AppButton(
+          label: allCorrect ? 'Sang lesson tiếp theo' : 'Hoàn thành',
+          onPressed: onContinue,
+          isTranslate: false,
+        ),
+      ],
+    );
+  }
+}
+
+class _SummaryItem extends StatelessWidget {
+  const _SummaryItem({
+    required this.index,
+    required this.activity,
+    required this.isCorrect,
+    required this.color,
+  });
+
+  final int index;
+  final LearningActivity activity;
+  final bool? isCorrect;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final statusColor = isCorrect == true
+        ? AppColors.success
+        : isCorrect == false
+        ? AppColors.danger
+        : AppColors.iconMuted;
+    final statusIcon = isCorrect == true
+        ? Icons.check_circle_rounded
+        : isCorrect == false
+        ? Icons.cancel_rounded
+        : Icons.help_outline_rounded;
+
+    final title = activity.type == 'multiple_choice'
+        ? activity.question
+        : activity.type == 'writing_prompt'
+        ? activity.prompt
+        : activity.expectedText.isNotEmpty
+        ? activity.expectedText
+        : 'Câu $index';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(
+          color: statusColor.withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(statusIcon, color: statusColor, size: 22),
+          AppGap.w10,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Câu $index',
+                  style: AppTypography.labelSmall.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                AppGap.h2,
+                Text(
+                  title,
+                  style: AppTypography.bodySmall,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (isCorrect == false &&
+                    activity.type == 'multiple_choice' &&
+                    activity.correctOptionId != null) ...[
+                  AppGap.h6,
+                  Text(
+                    'Đáp án đúng: ${activity.correctOptionId}',
+                    style: AppTypography.labelXSmall.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Progress bar câu ────────────────────────────────────────────────────────
 
 class _ProgressBar extends StatelessWidget {
@@ -564,112 +804,6 @@ class _AnswerFeedback extends StatelessWidget {
               explanationVi!,
               style: AppTypography.bodySmall.copyWith(
                 color: AppColors.onSurface,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-// ─── Completion view sau khi nộp bài ─────────────────────────────────────────
-
-class _CompletionView extends StatelessWidget {
-  const _CompletionView({
-    required this.lesson,
-    required this.result,
-    required this.loadingNext,
-    required this.onContinue,
-  });
-
-  final LearningLessonDetail lesson;
-  final LearningCompleteResponse result;
-  final bool loadingNext;
-  final VoidCallback onContinue;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _skillColor(lesson.skill);
-    final buttonLabel = loadingNext
-        ? 'Đang tải...'
-        : result.nextLessonId?.trim().isNotEmpty == true
-        ? 'Câu tiếp theo'
-        : 'Hoàn thành';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppMainAppBar(
-          title: lesson.title,
-          showBack: true,
-          showSettings: false,
-          showNotification: false,
-          horizontalPadding: 0,
-          onBack: Get.back,
-        ),
-        AppGap.h16,
-        Expanded(
-          child: ListView(
-            children: [
-              _LessonHeader(lesson: lesson, color: color),
-              AppGap.h20,
-              _ResultCard(result: result),
-            ],
-          ),
-        ),
-        AppGap.h12,
-        AppButton(
-          label: buttonLabel,
-          onPressed: loadingNext ? null : onContinue,
-          isTranslate: false,
-        ),
-      ],
-    );
-  }
-}
-
-class _ResultCard extends StatelessWidget {
-  const _ResultCard({required this.result});
-
-  final LearningCompleteResponse result;
-
-  @override
-  Widget build(BuildContext context) {
-    final passed = result.completed;
-    final color = passed ? AppColors.success : AppColors.tertiary;
-    final bgColor = passed ? AppColors.successSoft : AppColors.recommendationOrangeBg;
-    final icon = passed ? Icons.emoji_events_rounded : Icons.replay_rounded;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        border: Border.all(color: color.withValues(alpha: 0.35)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 48),
-          AppGap.h12,
-          Text(
-            passed ? 'Hoàn thành!' : 'Cần luyện thêm',
-            style: AppTypography.headlineMedium.copyWith(color: color),
-          ),
-          AppGap.h8,
-          Text(
-            '${result.score} điểm • +${result.xpEarned} XP',
-            style: AppTypography.bodyRegular.copyWith(
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          if (result.bonuses.isNotEmpty) ...[
-            AppGap.h8,
-            ...result.bonuses.map(
-              (b) => Text(
-                '${b.label} +${b.amount} XP',
-                style: AppTypography.bodySmall.copyWith(color: color),
               ),
             ),
           ],

@@ -37,16 +37,21 @@ class StartTestResponse {
   final int totalQuestions;
   final List<QuestionModel> questions;
 
+  /// Thông báo giới hạn: bài đầu vào chỉ xác định trình độ tối đa tới B2.
+  final String notice;
+
   const StartTestResponse({
     required this.sessionId,
     required this.totalQuestions,
     required this.questions,
+    this.notice = '',
   });
 
   factory StartTestResponse.fromJson(Map<String, dynamic> json) => StartTestResponse(
     sessionId: json['sessionId'],
     totalQuestions: json['totalQuestions'],
     questions: (json['questions'] as List).map((q) => QuestionModel.fromJson(q)).toList(),
+    notice: json['notice'] ?? '',
   );
 }
 
@@ -114,12 +119,20 @@ class TestResultModel {
   final int totalQuestions;
   final List<ReviewItemModel> review;
 
+  /// Học viên đã kịch trần B2 và có dấu hiệu giỏi hơn B2 (chỉ là tín hiệu UI).
+  final bool canGoHigherThanB2;
+
+  /// Thông báo gợi ý làm bài kiểm tra lên cấp (rỗng nếu [canGoHigherThanB2] false).
+  final String aboveLevelMessage;
+
   const TestResultModel({
     required this.sessionId,
     required this.resultLevel,
     required this.score,
     required this.totalQuestions,
     required this.review,
+    this.canGoHigherThanB2 = false,
+    this.aboveLevelMessage = '',
   });
 
   factory TestResultModel.fromJson(Map<String, dynamic> json) => TestResultModel(
@@ -128,5 +141,7 @@ class TestResultModel {
     score: json['score'],
     totalQuestions: json['totalQuestions'],
     review: (json['review'] as List).map((r) => ReviewItemModel.fromJson(r)).toList(),
+    canGoHigherThanB2: json['canGoHigherThanB2'] ?? false,
+    aboveLevelMessage: json['aboveLevelMessage'] ?? '',
   );
 }

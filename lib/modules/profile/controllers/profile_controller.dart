@@ -1,8 +1,13 @@
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/profile/models/profile_model.dart';
 import 'package:englishme/modules/profile/repositories/profile_repository.dart';
+import 'package:englishme/modules/progress/controllers/progress_controller.dart';
+import 'package:englishme/modules/progress/models/daily_goal.dart';
+import 'package:englishme/modules/progress/repositories/progress_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/theme_controller.dart';
 
@@ -10,14 +15,19 @@ enum ProfileLoadState { idle, loading, success, error }
 
 class ProfileController extends GetxController {
   final ProfileRepository _repo;
+  final ProgressRepository _progressRepo;
 
-  ProfileController(this._repo);
+  ProfileController(this._repo, this._progressRepo);
 
   final loadState = ProfileLoadState.idle.obs;
   final Rxn<ProfileUser> user = Rxn<ProfileUser>();
   final isEditingName = false.obs;
   final isSavingName = false.obs;
   final nameController = TextEditingController();
+
+  /// Mục tiêu XP/ngày — để chỉnh ngay trong Cài đặt (Hồ sơ).
+  final Rxn<DailyGoal> dailyGoal = Rxn<DailyGoal>();
+  final savingGoal = false.obs;
 
   ThemeController get _themeCtrl => Get.find<ThemeController>();
   ThemeMode get themeMode => _themeCtrl.themeMode;
@@ -26,6 +36,7 @@ class ProfileController extends GetxController {
   void onInit() {
     super.onInit();
     loadProfile();
+    loadDailyGoal();
   }
 
   @override
@@ -43,6 +54,32 @@ class ProfileController extends GetxController {
       loadState.value = ProfileLoadState.success;
     } catch (_) {
       loadState.value = ProfileLoadState.error;
+    }
+  }
+
+  Future<void> loadDailyGoal() async {
+    try {
+      dailyGoal.value = await _progressRepo.getDailyGoal();
+    } catch (_) {
+      // Im lặng — tile sẽ hiện mục tiêu mặc định khi chưa tải được.
+    }
+  }
+
+  /// User đổi mục tiêu XP/ngày từ Cài đặt. Trả true nếu lưu thành công.
+  Future<bool> setDailyGoal(int targetXp) async {
+    if (savingGoal.value) return false;
+    savingGoal.value = true;
+    try {
+      dailyGoal.value = await _progressRepo.updateDailyGoal(targetXp);
+      // Đồng bộ sang màn Progress nếu đang mở → card "XP hôm nay" cập nhật target mới.
+      if (Get.isRegistered<ProgressController>()) {
+        Get.find<ProgressController>().loadProgress();
+      }
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      savingGoal.value = false;
     }
   }
 
@@ -66,7 +103,7 @@ class ProfileController extends GetxController {
       user.value = await _repo.updateDisplayName(name);
       isEditingName.value = false;
     } catch (_) {
-      Get.snackbar(T.errorGeneric.tr, T.errorUpdateName.tr);
+      AppNotify.error(T.errorGeneric.tr, message: T.errorUpdateName.tr);
     } finally {
       isSavingName.value = false;
     }
@@ -82,13 +119,19 @@ class ProfileController extends GetxController {
         title: Text(T.actionLogout.tr),
         content: Text(T.profileLogoutConfirmContent.tr),
         actions: [
-          TextButton(
+          AppButton(
+            label: T.actionCancel,
             onPressed: () => Get.back(result: false),
-            child: Text(T.actionCancel.tr),
+            variant: AppButtonVariant.text,
+            expand: false,
+            height: 44,
           ),
-          TextButton(
+          AppButton(
+            label: T.actionLogout,
             onPressed: () => Get.back(result: true),
-            child: Text(T.actionLogout.tr, style: const TextStyle(color: Colors.red)),
+            variant: AppButtonVariant.dangerText,
+            expand: false,
+            height: 44,
           ),
         ],
       ),

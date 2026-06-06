@@ -1,29 +1,30 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/modules/vocab_hub/models/vocab_desk_model.dart';
+import 'package:englishme/modules/vocab_hub/models/vocab_deck_model.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
-import 'package:englishme/modules/vocab_hub/repositories/vocab_desk_repository.dart';
+import 'package:englishme/modules/vocab_hub/repositories/vocab_deck_repository.dart';
 
 class AddFlashcardArgs {
   const AddFlashcardArgs({
-    required this.desk,
+    required this.deck,
     this.editCard,
   });
 
-  final VocabDesk desk;
+  final VocabDeck deck;
   final VocabWord? editCard;
 }
 
 class AddFlashcardController extends GetxController {
   AddFlashcardController({
-    required this.desk,
+    required this.deck,
     this.editCard,
   });
 
-  final VocabDesk desk;
+  final VocabDeck deck;
   final VocabWord? editCard;
 
   final formKey = GlobalKey<FormState>();
@@ -32,7 +33,7 @@ class AddFlashcardController extends GetxController {
   final meaningCtrl = TextEditingController();
   final exampleCtrl = TextEditingController();
 
-  late final VocabDeskRepository _repo;
+  late final VocabDeckRepository _repo;
 
   final RxString selectedPosKey = 'NOUN'.obs;
   final RxBool isSubmitting = false.obs;
@@ -50,7 +51,7 @@ class AddFlashcardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = VocabDeskRepository(DioClient.instance);
+    _repo = VocabDeckRepository(DioClient.instance);
     _bindInitialValues();
   }
 
@@ -69,24 +70,24 @@ class AddFlashcardController extends GetxController {
     try {
       if (isEditMode) {
         await _repo.updateFlashcard(
-          deskId: desk.id,
+          deckId: deck.id,
           flashcardId: editCard!.id,
           word: wordCtrl.text.trim(),
           ipa: ipaCtrl.text.trim(),
           pos: [selectedPosKey.value],
           vietnamese: meaningCtrl.text.trim(),
           example: exampleCtrl.text.trim(),
-          cefr: desk.cefrLevel,
+          cefr: deck.cefrLevel,
         );
       } else {
         await _repo.createFlashcard(
-          deskId: desk.id,
+          deckId: deck.id,
           word: wordCtrl.text.trim(),
           ipa: ipaCtrl.text.trim(),
           pos: [selectedPosKey.value],
           vietnamese: meaningCtrl.text.trim(),
           example: exampleCtrl.text.trim(),
-          cefr: desk.cefrLevel,
+          cefr: deck.cefrLevel,
         );
       }
       Get.back(result: true);
@@ -94,7 +95,7 @@ class AddFlashcardController extends GetxController {
       final msg = e.response?.data is Map
           ? (e.response!.data as Map)['message']?.toString()
           : null;
-      Get.snackbar(T.errorSaveFailedTitle.tr, msg ?? e.message ?? T.errorNetwork.tr);
+      AppNotify.error(T.errorSaveFailedTitle.tr, message: msg ?? e.message ?? T.errorNetwork.tr);
     } finally {
       isSubmitting.value = false;
     }

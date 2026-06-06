@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:englishme/modules/vocab_hub/models/vocab_level.dart';
-import 'package:englishme/modules/vocab_hub/models/vocab_topic_model.dart';
 
 void main() {
   group('VocabLevelX.fromString', () {
@@ -23,34 +22,6 @@ void main() {
       expect(VocabLevelX.fromString(null), VocabLevel.a1);
       expect(VocabLevelX.fromString(''), VocabLevel.a1);
       expect(VocabLevelX.fromString('Z9'), VocabLevel.a1);
-    });
-  });
-
-  group('VocabTopic.fromJson', () {
-    test('parses backend topic shape', () {
-      final topic = VocabTopic.fromJson({
-        'id': 'travel',
-        'name': 'Du lịch',
-        'nameEn': 'Travel',
-        'icon': '✈️',
-        'wordCount': 10,
-        'level': 'A2',
-        'colorHex': '#2196F3',
-      });
-      expect(topic.id, 'travel');
-      expect(topic.name, 'Du lịch');
-      expect(topic.nameEn, 'Travel');
-      expect(topic.wordCount, 10);
-      expect(topic.level, VocabLevel.a2);
-      expect(topic.colorHex, '#2196F3');
-    });
-
-    test('applies safe defaults for missing fields', () {
-      final topic = VocabTopic.fromJson({'id': 'x'});
-      expect(topic.icon, '📚');
-      expect(topic.wordCount, 0);
-      expect(topic.level, VocabLevel.a1);
-      expect(topic.colorHex, '#4CAF50');
     });
   });
 }

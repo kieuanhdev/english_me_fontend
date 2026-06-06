@@ -64,19 +64,25 @@ class LearningController extends GetxController {
     switch (track.type) {
       case 'grammar':
         Get.toNamed(
-          AppRoutes.grammar,
+          AppRoutes.grammarTheory,
           arguments: {'level': selectedLevel.value},
         );
         return;
       case 'vocabulary':
         Get.toNamed(
-          AppRoutes.vocabulary,
+          AppRoutes.vocabHub,
           arguments: {'level': selectedLevel.value},
         );
         return;
       case 'flashcard':
         Get.toNamed(
           AppRoutes.flashcards,
+          arguments: {'level': selectedLevel.value},
+        );
+        return;
+      case 'pronunciation':
+        Get.toNamed(
+          AppRoutes.pronunciation,
           arguments: {'level': selectedLevel.value},
         );
         return;

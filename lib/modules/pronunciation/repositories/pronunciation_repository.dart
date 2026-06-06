@@ -8,8 +8,17 @@ class PronunciationRepository {
 
   final Dio _dio;
 
-  Future<List<PronunciationExercise>> getExercises() async {
-    final response = await _dio.get('/pronunciation/exercises');
+  Future<List<PronunciationExercise>> getExercises({
+    String? level,
+    String? keyword,
+  }) async {
+    final response = await _dio.get(
+      '/pronunciation/exercises',
+      queryParameters: {
+        if (level != null && level.isNotEmpty) 'level': level,
+        if (keyword != null && keyword.isNotEmpty) 'keyword': keyword,
+      },
+    );
     final body = response.data;
 
     List<dynamic> list;
@@ -48,5 +57,43 @@ class PronunciationRepository {
       );
     }
     return PronunciationFeedback.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Chấm phát âm dựa trên transcript (text STT) — backend dùng DeepSeek.
+  Future<PronunciationFeedback> assessTranscript({
+    required String referenceText,
+    required String spokenText,
+    required String exerciseId,
+  }) async {
+    final response = await _dio.post(
+      '/pronunciation/assess-text',
+      data: {
+        'referenceText': referenceText,
+        'spokenText': spokenText,
+        'exerciseId': exerciseId,
+      },
+    );
+    if (response.data is! Map<String, dynamic>) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        message: 'Invalid response format from assess-text endpoint',
+      );
+    }
+    return PronunciationFeedback.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Insight cá nhân hóa: từ phát âm yếu nhất + phân bố lỗi của user.
+  Future<PronunciationInsight> getInsights({int limit = 10}) async {
+    final response = await _dio.get(
+      '/pronunciation/insights',
+      queryParameters: {'limit': limit},
+    );
+    if (response.data is! Map<String, dynamic>) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        message: 'Invalid response format from insights endpoint',
+      );
+    }
+    return PronunciationInsight.fromJson(response.data as Map<String, dynamic>);
   }
 }

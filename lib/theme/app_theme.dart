@@ -138,11 +138,8 @@ class AppPaletteColors {
   /// Accent nâu ấm cho nội dung từ vựng (word of day, flashcard)
   final Color accentWarm;
 
-  Gradient get primaryGradient => LinearGradient(
-    colors: [primary, primaryContainer],
-    begin: Alignment.centerLeft,
-    end: Alignment.centerRight,
-  );
+  Gradient get primaryGradient =>
+      LinearGradient(colors: [primary, primaryContainer]);
 }
 
 const AppPaletteColors kLightPalette = AppPaletteColors(
@@ -446,6 +443,16 @@ class AppTypography {
     letterSpacing: -0.5,
   );
 
+  /// Phiên âm IPA — dùng NotoSans (đủ glyph ə ɪ ʃ θ ˈ ˌ ː...).
+  /// Baloo2/Nunito thiếu IPA extended nên render lỗi font; style này thay thế
+  /// cho mọi chỗ hiển thị phiên âm. Cỡ/màu copyWith tại nơi dùng.
+  static TextStyle get ipa => TextStyle(
+    fontFamily: FontFamily.notoSans,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.onSurface,
+  );
+
   static Brightness _effectiveBrightness() {
     if (!Get.isRegistered<ThemeController>()) return Brightness.light;
     return Get.find<ThemeController>().effectiveBrightness;
@@ -467,7 +474,6 @@ ThemeData _buildTheme(AppPaletteColors p) {
     ),
     Brightness.light => ColorScheme.light(
       primary: p.primary,
-      onPrimary: Colors.white,
       tertiary: p.tertiary,
       surface: p.surface,
       onSurface: p.onSurface,
@@ -531,6 +537,28 @@ ThemeData _buildTheme(AppPaletteColors p) {
           color: p.brightness == Brightness.dark
               ? const Color(0xFF151620)
               : Colors.white,
+        ),
+      ),
+    ),
+
+    // Đồng bộ FilledButton với ElevatedButton: cùng màu primary, chữ trắng/dark,
+    // bo góc lg. Trước đây thiếu theme này nên FilledButton dùng style Material
+    // mặc định (bo stadium, lệch tông) — gây lỗi UI ở nút "Luyện đánh vần".
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        foregroundColor: p.brightness == Brightness.dark
+            ? const Color(0xFF151620)
+            : Colors.white,
+        backgroundColor: p.primary,
+        disabledBackgroundColor: p.primary.withValues(alpha: 0.4),
+        disabledForegroundColor: Colors.white.withValues(alpha: 0.8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+        ),
+        textStyle: const TextStyle(
+          fontFamily: FontFamily.nunito,
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
         ),
       ),
     ),

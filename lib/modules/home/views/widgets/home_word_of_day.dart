@@ -48,7 +48,6 @@ class HomeWordOfDay extends GetView<HomeController> {
             borderRadius: BorderRadius.circular(AppRadius.xxl),
           ),
           child: Stack(
-            clipBehavior: Clip.hardEdge,
             children: [
               Positioned(
                 right: -16,
@@ -63,7 +62,10 @@ class HomeWordOfDay extends GetView<HomeController> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: _badgeBg,
                       borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -91,7 +93,7 @@ class HomeWordOfDay extends GetView<HomeController> {
                     const SizedBox(height: 4),
                     Text(
                       word.pronunciation!,
-                      style: AppTypography.bodyLarge.copyWith(
+                      style: AppTypography.ipa.copyWith(
                         fontSize: 13,
                         fontStyle: FontStyle.italic,
                         fontWeight: FontWeight.w500,
@@ -130,7 +132,10 @@ class HomeWordOfDay extends GetView<HomeController> {
                         return GestureDetector(
                           onTap: playing ? null : controller.onListenWordOfDay,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: playing
                                   ? AppColors.primary.withValues(alpha: 0.7)
@@ -150,7 +155,11 @@ class HomeWordOfDay extends GetView<HomeController> {
                                     ),
                                   )
                                 else
-                                  Icon(Icons.volume_up_rounded, color: AppColors.onPrimaryFixed, size: 16),
+                                  Icon(
+                                    Icons.volume_up_rounded,
+                                    color: AppColors.onPrimaryFixed,
+                                    size: 16,
+                                  ),
                                 const SizedBox(width: 6),
                                 Text(
                                   playing ? 'Đang phát...' : 'Nghe phát âm',
@@ -166,47 +175,54 @@ class HomeWordOfDay extends GetView<HomeController> {
                         );
                       }),
                       const SizedBox(width: 10),
-                      Obx(() => GestureDetector(
-                        onTap: controller.onAddWordToFlashcard,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: controller.wordSaved.value
-                                ? _wordColor
-                                : _bgColor,
-                            borderRadius: BorderRadius.circular(AppRadius.xl),
-                            border: Border.all(
-                              color: _wordColor.withValues(alpha: 0.4),
-                              width: 1.5,
+                      Obx(
+                        () => GestureDetector(
+                          onTap: controller.onAddWordToFlashcard,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
                             ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                controller.wordSaved.value
-                                    ? Icons.bookmark_rounded
-                                    : Icons.bookmark_add_outlined,
-                                color: controller.wordSaved.value
-                                    ? AppColors.onPrimaryFixed
-                                    : _wordColor,
-                                size: 16,
+                            decoration: BoxDecoration(
+                              color: controller.wordSaved.value
+                                  ? _wordColor
+                                  : _bgColor,
+                              borderRadius: BorderRadius.circular(AppRadius.xl),
+                              border: Border.all(
+                                color: _wordColor.withValues(alpha: 0.4),
+                                width: 1.5,
                               ),
-                              const SizedBox(width: 6),
-                              Text(
-                                controller.wordSaved.value ? 'Đã lưu' : 'Lưu từ',
-                                style: AppTypography.bodyLarge.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  controller.wordSaved.value
+                                      ? Icons.bookmark_rounded
+                                      : Icons.bookmark_add_outlined,
                                   color: controller.wordSaved.value
                                       ? AppColors.onPrimaryFixed
                                       : _wordColor,
+                                  size: 16,
                                 ),
-                              ),
-                            ],
+                                const SizedBox(width: 6),
+                                Text(
+                                  controller.wordSaved.value
+                                      ? 'Đã lưu'
+                                      : 'Lưu từ',
+                                  style: AppTypography.bodyLarge.copyWith(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: controller.wordSaved.value
+                                        ? AppColors.onPrimaryFixed
+                                        : _wordColor,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      )),
+                      ),
                     ],
                   ),
                 ],
@@ -233,7 +249,7 @@ class _WordOfDayLoadingCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 22,
             height: 22,
             child: CircularProgressIndicator(

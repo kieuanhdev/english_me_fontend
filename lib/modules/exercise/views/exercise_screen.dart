@@ -35,7 +35,8 @@ class ExerciseScreen extends GetView<ExerciseController> {
                 icon: Icons.style_rounded,
                 accentColor: AppColors.skillVocabulary,
                 questionCount: 10,
-                onTap: () => controller.startSession(ExerciseCategory.vocabulary),
+                onTap: () =>
+                    controller.startSession(ExerciseCategory.vocabulary),
               ),
               AppGap.h14,
               _CategoryCard(
@@ -87,7 +88,11 @@ class _CategoryCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: AppColors.outlineVariant),
           boxShadow: [
-            BoxShadow(color: AppColors.shadowSoft, blurRadius: 12, offset: Offset(0, 3)),
+            BoxShadow(
+              color: AppColors.shadowSoft,
+              blurRadius: 12,
+              offset: const Offset(0, 3),
+            ),
           ],
         ),
         child: Row(
@@ -141,7 +146,11 @@ class _CategoryCard extends StatelessWidget {
               ),
             ),
             AppGap.w12,
-            Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.iconMuted),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: AppColors.iconMuted,
+            ),
           ],
         ),
       ),
@@ -191,7 +200,11 @@ class _HowItWorksSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb_outline_rounded, size: 16, color: AppColors.primary),
+              Icon(
+                Icons.lightbulb_outline_rounded,
+                size: 16,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 6),
               Text(
                 'Cách thức hoạt động',

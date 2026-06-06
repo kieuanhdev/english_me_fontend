@@ -6,6 +6,7 @@ import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/learn/controllers/learning_controller.dart';
 import 'package:englishme/modules/learn/models/learning_models.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class LearningScreen extends GetView<LearningController> {
@@ -52,68 +53,26 @@ class LearningScreen extends GetView<LearningController> {
                         horizontalPadding: 0,
                       ),
                       AppGap.h18,
-                      if (level != null) ...[
-                        _LevelOverview(level: level, dailyGoal: hub.dailyGoal),
-                        AppGap.h16,
-                      ],
                       _LevelSelector(
                         levels: hub.levels,
                         selectedLevel: hub.selectedLevel,
                         onChanged: controller.selectLevel,
                       ),
-                      AppGap.h22,
-                      _SectionTitle(
-                        title: 'Path học ${hub.selectedLevel}',
-                        subtitle:
-                            'Mỗi path tập trung vào một chủ đề và trộn bài tập của nhiều kỹ năng.',
-                      ),
-                      AppGap.h12,
-                      _PathWindow(
-                        paths: hub.paths,
-                        currentPathId: hub.currentPathId,
-                        onOpenPath: controller.openPath,
-                      ),
-                      AppGap.h24,
-                      if (hub.paths.isEmpty) ...[
-                        const _SectionTitle(
-                          title: '4 kỹ năng chính',
-                          subtitle:
-                              'Lộ trình nghe, nói, đọc, viết được chia theo từng cấp CEFR.',
-                        ),
-                        AppGap.h12,
-                        GridView.builder(
-                          itemCount: hub.skillTracks.length,
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 12,
-                                mainAxisSpacing: 12,
-                                childAspectRatio: 0.88,
-                              ),
-                          itemBuilder: (_, index) => _SkillCard(
-                            skill: hub.skillTracks[index],
-                            levelCode: hub.selectedLevel,
-                            onTap: () =>
-                                controller.openSkill(hub.skillTracks[index]),
-                          ),
-                        ),
-                        AppGap.h24,
-                        _SectionTitle(
-                          title: 'Lộ trình ${hub.selectedLevel}',
-                          subtitle:
-                              'Các unit tổng hợp bài học từ cả 4 kỹ năng.',
-                        ),
-                        AppGap.h12,
-                        ...hub.units.map(
-                          (unit) => Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: _UnitTile(unit: unit),
+                      AppGap.h14,
+                      if (level != null) ...[
+                        _LevelOverview(
+                          level: level,
+                          dailyGoal: hub.dailyGoal,
+                          unitCount: hub.units
+                              .where((u) => u.level == hub.selectedLevel)
+                              .length,
+                          onOpenCurriculum: () => Get.toNamed(
+                            AppRoutes.curriculumUnits,
+                            arguments: {'level': hub.selectedLevel},
                           ),
                         ),
                       ],
-                      AppGap.h16,
+                      AppGap.h24,
                       const _SectionTitle(
                         title: 'Học phần bổ trợ',
                         subtitle:
@@ -129,6 +88,19 @@ class LearningScreen extends GetView<LearningController> {
                           ),
                         ),
                       ),
+                      AppGap.h22,
+                      const _SectionTitle(
+                        title: 'Thư viện lý thuyết ngữ pháp',
+                        subtitle:
+                            'Tra cứu toàn bộ lý thuyết ngữ pháp theo từng cấp độ A1 → C2.',
+                      ),
+                      AppGap.h12,
+                      _GrammarTheoryEntryCard(
+                        onTap: () => Get.toNamed(
+                          AppRoutes.grammarTheory,
+                          arguments: {'level': hub.selectedLevel},
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -141,81 +113,152 @@ class LearningScreen extends GetView<LearningController> {
   }
 }
 
+/// Hero card tổng quan cấp độ — gộp luôn lối vào lộ trình (Học theo Unit).
+/// Bấm cả card → mở curriculum, bỏ card "Xem lộ trình" riêng để tránh trùng lặp.
 class _LevelOverview extends StatelessWidget {
-  const _LevelOverview({required this.level, this.dailyGoal});
+  const _LevelOverview({
+    required this.level,
+    required this.onOpenCurriculum,
+    this.dailyGoal,
+    this.unitCount = 0,
+  });
 
   final LearningLevel level;
   final LearningDailyGoal? dailyGoal;
+  final int unitCount;
+  final VoidCallback onOpenCurriculum;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: AppColors.primaryGradient,
+    final onFixed = AppColors.onPrimaryFixed;
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(AppRadius.xl),
+      child: InkWell(
+        onTap: onOpenCurriculum,
         borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryShadow,
-            offset: const Offset(0, 8),
-            blurRadius: 18,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              _LevelBadge(code: level.code, filled: true),
-              AppGap.w10,
-              Expanded(
-                child: Text(
-                  level.title,
-                  style: AppTypography.headlineMedium.copyWith(
-                    color: AppColors.onPrimaryFixed,
-                    fontSize: 20,
-                  ),
-                ),
+        child: Ink(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            gradient: AppColors.primaryGradient,
+            borderRadius: BorderRadius.circular(AppRadius.xl),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryShadow,
+                offset: const Offset(0, 8),
+                blurRadius: 18,
               ),
-              if (dailyGoal != null)
-                Text(
-                  '${dailyGoal!.earnedXp}/${dailyGoal!.targetXp} XP',
-                  style: AppTypography.labelSmall.copyWith(
-                    color: AppColors.onPrimaryFixed,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
             ],
           ),
-          AppGap.h10,
-          Text(
-            level.description,
-            style: AppTypography.bodyRegular.copyWith(
-              color: AppColors.onPrimaryFixed.withValues(alpha: 0.86),
-            ),
-          ),
-          AppGap.h16,
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.pill),
-            child: LinearProgressIndicator(
-              value: level.progress,
-              minHeight: 8,
-              backgroundColor: AppColors.onPrimaryFixed.withValues(alpha: 0.22),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                AppColors.tertiaryFixedDim,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  _LevelBadge(code: level.code, filled: true),
+                  AppGap.w10,
+                  Expanded(
+                    child: Text(
+                      level.title,
+                      style: AppTypography.headlineMedium.copyWith(
+                        color: onFixed,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  if (dailyGoal != null)
+                    Text(
+                      '${dailyGoal!.earnedXp}/${dailyGoal!.targetXp} XP',
+                      style: AppTypography.labelSmall.copyWith(
+                        color: onFixed,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                ],
               ),
-            ),
+              AppGap.h10,
+              Text(
+                level.description,
+                style: AppTypography.bodyRegular.copyWith(
+                  color: onFixed.withValues(alpha: 0.86),
+                ),
+              ),
+              AppGap.h16,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                child: LinearProgressIndicator(
+                  value: level.progress,
+                  minHeight: 8,
+                  backgroundColor: onFixed.withValues(alpha: 0.22),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.tertiaryFixedDim,
+                  ),
+                ),
+              ),
+              AppGap.h8,
+              Text(
+                '${(level.progress * 100).round()}% hoàn thành cấp độ',
+                style: AppTypography.labelSmall.copyWith(
+                  color: onFixed.withValues(alpha: 0.9),
+                ),
+              ),
+              AppGap.h16,
+              // Đường kẻ mảnh ngăn phần overview với CTA vào lộ trình.
+              Divider(
+                height: 1,
+                thickness: 1,
+                color: onFixed.withValues(alpha: 0.20),
+              ),
+              AppGap.h14,
+              Row(
+                children: [
+                  Icon(Icons.auto_stories_rounded, color: onFixed, size: 20),
+                  AppGap.w10,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Học theo Unit',
+                          style: AppTypography.bodyRegular.copyWith(
+                            color: onFixed,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        AppGap.h2,
+                        Text(
+                          unitCount > 0
+                              ? '$unitCount Unit · Lý thuyết → Bài tập → Quiz'
+                              : 'Lý thuyết → Bài tập → Quiz, lên cấp khi hoàn thành',
+                          style: AppTypography.labelSmall.copyWith(
+                            color: onFixed.withValues(alpha: 0.9),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  AppGap.w8,
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: onFixed.withValues(alpha: 0.18),
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: onFixed,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          AppGap.h8,
-          Text(
-            '${(level.progress * 100).round()}% hoàn thành cấp độ',
-            style: AppTypography.labelSmall.copyWith(
-              color: AppColors.onPrimaryFixed.withValues(alpha: 0.9),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -292,6 +335,70 @@ class _LevelSelector extends StatelessWidget {
   }
 }
 
+/// Lối vào thư viện lý thuyết ngữ pháp (đọc lý thuyết theo level A1→C2).
+class _GrammarTheoryEntryCard extends StatelessWidget {
+  const _GrammarTheoryEntryCard({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: AppColors.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: AppColors.skillGrammar.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Icon(
+                  Icons.library_books_rounded,
+                  color: AppColors.skillGrammar,
+                ),
+              ),
+              AppGap.w12,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Xem tất cả lý thuyết',
+                      style: AppTypography.bodyRegular.copyWith(
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    AppGap.h2,
+                    Text(
+                      'Toàn bộ chủ đề ngữ pháp theo cấp độ, đọc nhanh không cần làm bài tập.',
+                      style: AppTypography.bodySmall,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: AppColors.iconMuted),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SectionTitle extends StatelessWidget {
   const _SectionTitle({required this.title, required this.subtitle});
 
@@ -307,451 +414,6 @@ class _SectionTitle extends StatelessWidget {
         AppGap.h4,
         Text(subtitle, style: AppTypography.bodySmall),
       ],
-    );
-  }
-}
-
-class _SkillCard extends StatelessWidget {
-  const _SkillCard({
-    required this.skill,
-    required this.levelCode,
-    required this.onTap,
-  });
-
-  final LearningSkillTrack skill;
-  final String levelCode;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _colorFromHex(
-      skill.accentColor,
-      fallback: _skillColor(skill.type),
-    );
-    return Material(
-      color: AppColors.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(AppRadius.xl),
-      child: InkWell(
-        onTap: skill.enabled ? onTap : null,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.xl),
-            border: Border.all(color: AppColors.outlineVariant),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: color.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    child: Icon(_skillIcon(skill), color: color, size: 23),
-                  ),
-                  const Spacer(),
-                  _LevelBadge(code: levelCode),
-                ],
-              ),
-              AppGap.h12,
-              Text(
-                skill.title,
-                style: AppTypography.headlineMedium.copyWith(fontSize: 16),
-              ),
-              AppGap.h4,
-              Text(
-                '${skill.completedLessons}/${skill.totalLessons} bài',
-                style: AppTypography.labelSmall.copyWith(color: color),
-              ),
-              AppGap.h6,
-              Expanded(
-                child: Text(
-                  skill.description,
-                  style: AppTypography.bodySmall,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              AppGap.h8,
-              ClipRRect(
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                child: LinearProgressIndicator(
-                  value: skill.progress,
-                  minHeight: 5,
-                  backgroundColor: AppColors.progressTrack,
-                  valueColor: AlwaysStoppedAnimation<Color>(color),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PathTile extends StatelessWidget {
-  const _PathTile({required this.path, required this.onTap});
-
-  final LearningPath path;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final disabled = path.isLocked;
-    return Material(
-      color: disabled
-          ? AppColors.surfaceContainerLow
-          : AppColors.surfaceContainerLowest,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: InkWell(
-        onTap: disabled ? null : onTap,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: AppColors.outlineVariant),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: AppColors.primarySoft,
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    child: Icon(
-                      disabled ? Icons.lock_rounded : Icons.route_rounded,
-                      color: AppColors.primary,
-                      size: 22,
-                    ),
-                  ),
-                  AppGap.w12,
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${path.level} • ${path.title}',
-                          style: AppTypography.bodyRegular.copyWith(
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                        AppGap.h2,
-                        Text(
-                          path.description,
-                          style: AppTypography.bodySmall,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  AppGap.w8,
-                  Icon(
-                    path.isCompleted
-                        ? Icons.check_circle_rounded
-                        : disabled
-                        ? Icons.lock_rounded
-                        : Icons.chevron_right_rounded,
-                    color: path.isCompleted
-                        ? AppColors.success
-                        : AppColors.iconMuted,
-                  ),
-                ],
-              ),
-              AppGap.h12,
-              Row(
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
-                      child: LinearProgressIndicator(
-                        value: path.progress,
-                        minHeight: 6,
-                        backgroundColor: AppColors.progressTrack,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  AppGap.w10,
-                  Text(
-                    '${path.completedActivityCount}/${path.activityCount}',
-                    style: AppTypography.labelSmall.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
-              if (path.skillsCoverage.isNotEmpty) ...[
-                AppGap.h10,
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: path.skillsCoverage
-                      .map((skill) => _SkillCoveragePill(skill: skill))
-                      .toList(growable: false),
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _PathWindow extends StatefulWidget {
-  const _PathWindow({
-    required this.paths,
-    required this.currentPathId,
-    required this.onOpenPath,
-  });
-
-  final List<LearningPath> paths;
-  final String? currentPathId;
-  final Future<void> Function(LearningPath) onOpenPath;
-
-  @override
-  State<_PathWindow> createState() => _PathWindowState();
-}
-
-class _PathWindowState extends State<_PathWindow> {
-  static const int _visibleCount = 5;
-  late int _startIndex;
-  late int _endIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _resetVisibleRange();
-  }
-
-  @override
-  void didUpdateWidget(covariant _PathWindow oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.paths != widget.paths ||
-        oldWidget.currentPathId != widget.currentPathId) {
-      _resetVisibleRange();
-    }
-  }
-
-  void _resetVisibleRange() {
-    _startIndex = _initialStartIndex();
-    _endIndex = (_startIndex + _visibleCount).clamp(0, widget.paths.length);
-  }
-
-  int _initialStartIndex() {
-    if (widget.paths.length <= _visibleCount) return 0;
-    final currentIndex = _currentPathIndex();
-    final maxStart = widget.paths.length - _visibleCount;
-    return (currentIndex - 2).clamp(0, maxStart);
-  }
-
-  int _currentPathIndex() {
-    final currentPathId = widget.currentPathId;
-    if (currentPathId != null && currentPathId.trim().isNotEmpty) {
-      final byId = widget.paths.indexWhere((path) => path.id == currentPathId);
-      if (byId >= 0) return byId;
-    }
-
-    final inProgress = widget.paths.indexWhere(
-      (path) => path.status == 'in_progress' || path.progress > 0,
-    );
-    if (inProgress >= 0) return inProgress;
-
-    final available = widget.paths.indexWhere((path) => !path.isLocked);
-    return available >= 0 ? available : 0;
-  }
-
-  void _showPrevious() {
-    setState(() => _startIndex = (_startIndex - _visibleCount).clamp(0, _startIndex));
-  }
-
-  void _showNext() {
-    setState(() => _endIndex = (_endIndex + _visibleCount).clamp(0, widget.paths.length));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.paths.isEmpty) return const SizedBox.shrink();
-
-    final visiblePaths = widget.paths.sublist(_startIndex, _endIndex);
-    final hasPrevious = _startIndex > 0;
-    final hasNext = _endIndex < widget.paths.length;
-
-    return Column(
-      children: [
-        if (hasPrevious) ...[
-          _PathWindowButton(
-            icon: Icons.keyboard_arrow_up_rounded,
-            label: 'Xem lại path trước',
-            onTap: _showPrevious,
-          ),
-          AppGap.h10,
-        ],
-        ...visiblePaths.map(
-          (path) => Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: _PathTile(
-              path: path,
-              onTap: () => widget.onOpenPath(path),
-            ),
-          ),
-        ),
-        if (hasNext)
-          _PathWindowButton(
-            icon: Icons.keyboard_arrow_down_rounded,
-            label: 'Xem thêm path sau',
-            onTap: _showNext,
-          ),
-      ],
-    );
-  }
-}
-
-class _PathWindowButton extends StatelessWidget {
-  const _PathWindowButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: AppColors.primarySoft,
-      borderRadius: BorderRadius.circular(AppRadius.pill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon, color: AppColors.primary, size: 20),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SkillCoveragePill extends StatelessWidget {
-  const _SkillCoveragePill({required this.skill});
-
-  final String skill;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = _skillColor(skill);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppRadius.sm),
-      ),
-      child: Text(
-        _skillLabel(skill),
-        style: AppTypography.labelXSmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.w900,
-        ),
-      ),
-    );
-  }
-}
-
-class _UnitTile extends StatelessWidget {
-  const _UnitTile({required this.unit});
-
-  final LearningUnit unit;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.outlineVariant),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: AppColors.primarySoft,
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            child: Icon(
-              unit.status == 'locked'
-                  ? Icons.lock_rounded
-                  : Icons.route_rounded,
-              color: AppColors.primary,
-              size: 22,
-            ),
-          ),
-          AppGap.w12,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${unit.level} • ${unit.title}',
-                  style: AppTypography.bodyRegular.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                AppGap.h2,
-                Text(
-                  unit.subtitle,
-                  style: AppTypography.bodySmall,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          AppGap.w8,
-          Text(
-            '${unit.completedLessonCount}/${unit.lessonCount}',
-            style: AppTypography.labelSmall.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -860,45 +522,12 @@ class _LevelBadge extends StatelessWidget {
   }
 }
 
-IconData _skillIcon(LearningSkillTrack skill) {
-  return switch (skill.type) {
-    'listening' => Icons.headphones_rounded,
-    'speaking' => Icons.record_voice_over_rounded,
-    'reading' => Icons.article_rounded,
-    'writing' => Icons.edit_note_rounded,
-    _ => Icons.school_rounded,
-  };
-}
-
-String _skillLabel(String skill) {
-  return switch (skill) {
-    'listening' => 'Nghe',
-    'speaking' => 'Nói',
-    'reading' => 'Đọc',
-    'writing' => 'Viết',
-    'grammar' => 'Ngữ pháp',
-    'vocabulary' => 'Từ vựng',
-    _ => skill,
-  };
-}
-
-Color _skillColor(String skill) {
-  return switch (skill) {
-    'listening' => AppColors.skillListening,
-    'speaking' => AppColors.tertiary,
-    'reading' => AppColors.success,
-    'writing' => AppColors.primary,
-    'grammar' => AppColors.skillGrammar,
-    'vocabulary' => AppColors.skillVocabulary,
-    _ => AppColors.primary,
-  };
-}
-
 IconData _supportIcon(String type) {
   return switch (type) {
     'grammar' => Icons.menu_book_rounded,
     'vocabulary' => Icons.style_rounded,
     'flashcard' => Icons.layers_rounded,
+    'pronunciation' => Icons.mic_rounded,
     _ => Icons.school_rounded,
   };
 }
@@ -908,13 +537,7 @@ Color _supportColor(String type) {
     'grammar' => AppColors.skillGrammar,
     'vocabulary' => AppColors.skillVocabulary,
     'flashcard' => AppColors.tertiary,
+    'pronunciation' => AppColors.skillListening,
     _ => AppColors.primary,
   };
-}
-
-Color _colorFromHex(String hex, {required Color fallback}) {
-  final normalized = hex.replaceAll('#', '').trim();
-  if (normalized.length != 6) return fallback;
-  final value = int.tryParse('FF$normalized', radix: 16);
-  return value == null ? fallback : Color(value);
 }

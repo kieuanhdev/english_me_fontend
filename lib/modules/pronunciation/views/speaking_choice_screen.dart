@@ -15,7 +15,7 @@ class SpeakingChoiceScreen extends StatelessWidget {
       Get.back();
       return;
     }
-    ShellController.goToTab(0);
+    ShellController.goToTab(2);
   }
 
   @override
@@ -23,7 +23,7 @@ class SpeakingChoiceScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.surface,
       bottomNavigationBar: AppBottomNav(
-        initialIndex: 1,
+        initialIndex: 2,
         onTap: (index, _) => ShellController.goToTab(index),
       ),
       body: SafeArea(
@@ -54,28 +54,36 @@ class SpeakingChoiceScreen extends StatelessWidget {
               ),
               AppGap.h24,
               Expanded(
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: _OptionCard(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _OptionCard(
                         icon: Icons.translate_rounded,
                         title: 'Bảng IPA',
                         subtitle: 'Học phát âm theo bảng ký hiệu ngữ âm quốc tế',
                         color: AppColors.tertiary,
                         onTap: () => Get.toNamed(AppRoutes.ipa),
                       ),
-                    ),
-                    AppGap.h14,
-                    Expanded(
-                      child: _OptionCard(
+                      AppGap.h14,
+                      _OptionCard(
                         icon: Icons.record_voice_over_rounded,
                         title: 'Luyện tập theo mẫu câu',
                         subtitle: 'Luyện nói với các câu mẫu, được AI chấm điểm',
                         color: AppColors.primary,
-                        onTap: () => Get.toNamed(AppRoutes.pronunciationPractice),
+                        onTap: () =>
+                            Get.toNamed(AppRoutes.pronunciationPractice),
                       ),
-                    ),
-                  ],
+                      AppGap.h14,
+                      _OptionCard(
+                        icon: Icons.forum_rounded,
+                        title: 'Hội thoại với AI',
+                        subtitle:
+                            'Nói chuyện tiếng Anh với AI như một người bạn',
+                        color: AppColors.tertiaryFixedDim,
+                        onTap: () => Get.toNamed(AppRoutes.conversation),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -111,39 +119,46 @@ class _OptionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.xxl),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(color: AppColors.outlineVariant),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
             children: [
               Container(
-                width: 72,
-                height: 72,
+                width: 56,
+                height: 56,
                 decoration: BoxDecoration(
                   color: color.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.xl),
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                 ),
-                child: Icon(icon, color: color, size: 36),
+                child: Icon(icon, color: color, size: 30),
               ),
-              AppGap.h16,
-              Text(
-                title,
-                style: AppTypography.headlineMedium.copyWith(fontSize: 20),
-                textAlign: TextAlign.center,
-              ),
-              AppGap.h8,
-              Text(
-                subtitle,
-                style: AppTypography.bodyLarge.copyWith(
-                  color: AppColors.textSecondary,
-                  fontSize: 14,
+              AppGap.w16,
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTypography.headlineMedium.copyWith(fontSize: 18),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    AppGap.h6,
+                    Text(
+                      subtitle,
+                      style: AppTypography.bodyLarge.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 13,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

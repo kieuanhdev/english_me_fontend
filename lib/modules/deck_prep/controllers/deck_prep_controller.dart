@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/core/widgets/app_button.dart';
@@ -18,7 +19,12 @@ import 'package:englishme/modules/study_session/views/study_session_front_screen
 import 'package:englishme/routes/app_routes.dart';
 
 class DeckPrepController extends GetxController {
-  DeckPrepController({required this.deck});
+  DeckPrepController({
+    required this.deck,
+    required VocabDeckRepository repo,
+    required StudySessionRepository sessionRepo,
+  })  : _repo = repo,
+        _sessionRepo = sessionRepo;
 
   final VocabDeck deck;
 
@@ -26,8 +32,8 @@ class DeckPrepController extends GetxController {
   /// Backend cũng chặn (trả 404 theo owner) — đây là lớp ẩn UI cho khớp.
   bool get isSystem => deck.isSystem;
 
-  late final VocabDeckRepository _repo;
-  late final StudySessionRepository _sessionRepo;
+  final VocabDeckRepository _repo;
+  final StudySessionRepository _sessionRepo;
 
   final RxList<VocabWord> previewCards = <VocabWord>[].obs;
   final Rxn<DueCardsResponse> dueCards = Rxn();
@@ -57,8 +63,6 @@ class DeckPrepController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = VocabDeckRepository(DioClient.instance);
-    _sessionRepo = StudySessionRepository(DioClient.instance);
     _loadPreview();
   }
 
@@ -85,19 +89,26 @@ class DeckPrepController extends GetxController {
 
   void speakWord(String word) {
     final tts = Get.find<TtsService>();
-    tts.speak(word);
+    unawaited(tts.speak(word));
   }
 
   void startStudySession() {
     if (previewCards.isEmpty) {
-      AppNotify.warning(T.errorEmptyDeckForStudy.tr, message: T.deckEmptyForStudy.tr);
+      AppNotify.warning(
+        T.errorEmptyDeckForStudy.tr,
+        message: T.deckEmptyForStudy.tr,
+      );
       return;
     }
     if (Get.isRegistered<StudySessionController>()) {
       Get.delete<StudySessionController>();
     }
     Get.put<StudySessionController>(
-      StudySessionController(deskId: deck.id, deskTitle: deck.title),
+      StudySessionController(
+        deskId: deck.id,
+        deskTitle: deck.title,
+        repo: _sessionRepo,
+      ),
       permanent: true,
     );
     Get.off(() => const StudySessionFrontScreen());
@@ -112,20 +123,20 @@ class DeckPrepController extends GetxController {
       addedSinceOpen.value++;
       await _loadPreview();
       if (Get.isRegistered<VocabDeckController>()) {
-        Get.find<VocabDeckController>().loadDecks();
+        unawaited(Get.find<VocabDeckController>().loadDecks());
       }
     }
   }
 
   void openEditDeck() {
-    Get.toNamed(AppRoutes.createDesk, arguments: deck);
+    Get.toNamed(AppRoutes.createDeck, arguments: deck);
   }
 
   Future<void> confirmDeleteThisDeck() async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: Text(T.errorDeleteDeskTitle.tr),
-        content: Text(T.errorDeleteDeskContent.trParams({'title': deck.title})),
+        title: Text(T.errorDeleteDeckTitle.tr),
+        content: Text(T.errorDeleteDeckContent.trParams({'title': deck.title})),
         actions: [
           AppButton(
             label: T.actionCancel,
@@ -173,7 +184,7 @@ class DeckPrepController extends GetxController {
     if (updated == true) {
       await _loadPreview();
       if (Get.isRegistered<VocabDeckController>()) {
-        Get.find<VocabDeckController>().loadDecks();
+        unawaited(Get.find<VocabDeckController>().loadDecks());
       }
     }
   }

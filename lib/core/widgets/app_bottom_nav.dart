@@ -32,12 +32,6 @@ class AppBottomNav extends StatelessWidget {
       route: AppRoutes.learn,
     ),
     _NavItemData(
-      icon: Icons.extension_rounded,
-      inactiveIcon: Icons.extension_outlined,
-      label: 'Học bổ trợ',
-      route: AppRoutes.learningSupport,
-    ),
-    _NavItemData(
       icon: Icons.bar_chart_rounded,
       inactiveIcon: Icons.bar_chart_outlined,
       label: 'Tiến trình',

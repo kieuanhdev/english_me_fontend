@@ -59,7 +59,10 @@ class SoundService extends GetxService {
           focus: AudioContextConfigFocus.mixWithOthers,
         ).build(),
       );
-    } catch (_) {}
+    } catch (e) {
+      // Cấu hình audio context lỗi (tuỳ nền tảng) → sfx vẫn phát ở mode mặc định.
+      if (kDebugMode) debugPrint('[SoundService] setAudioContext failed: $e');
+    }
     try {
       _prefs = await SharedPreferences.getInstance();
       enabled.value = _prefs?.getBool(_prefsKey) ?? true;
@@ -73,7 +76,10 @@ class SoundService extends GetxService {
     enabled.value = value;
     try {
       await _prefs?.setBool(_prefsKey, value);
-    } catch (_) {}
+    } catch (e) {
+      // Lưu prefs lỗi → giá trị runtime vẫn đúng, chỉ không persist.
+      if (kDebugMode) debugPrint('[SoundService] setEnabled persist failed: $e');
+    }
   }
 
   /// Phát 1 hiệu ứng. Luôn kèm haptic nhẹ làm fallback (kể cả khi thiếu file).
@@ -103,7 +109,9 @@ class SoundService extends GetxService {
       }
       try {
         await player.dispose();
-      } catch (_) {}
+      } catch (_) {
+        // dispose lỗi trong nhánh xử lý lỗi → không cần log thêm.
+      }
     }
   }
 
@@ -119,7 +127,10 @@ class SoundService extends GetxService {
         case AppSound.levelUp:
           HapticFeedback.mediumImpact();
       }
-    } catch (_) {}
+    } catch (e) {
+      // Thiết bị không hỗ trợ haptic → bỏ qua.
+      if (kDebugMode) debugPrint('[SoundService] haptic failed: $e');
+    }
   }
 
   // Mỗi lần phát tạo player riêng và tự dispose khi xong, nên không có player

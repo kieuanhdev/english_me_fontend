@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_deck_model.dart';
@@ -10,8 +9,11 @@ import 'package:englishme/modules/vocab_hub/repositories/vocab_deck_repository.d
 import 'package:englishme/modules/vocab_hub/controllers/vocab_deck_controller.dart';
 import 'package:englishme/routes/app_routes.dart';
 
-class CreateDeskController extends GetxController {
-  CreateDeskController({this.editingDeck});
+class CreateDeckController extends GetxController {
+  CreateDeckController({
+    required VocabDeckRepository repo,
+    this.editingDeck,
+  }) : _repo = repo;
 
   /// Khi khác `null` — chế độ sửa bộ thẻ (API `PUT /desks/{id}`).
   final VocabDeck? editingDeck;
@@ -23,7 +25,7 @@ class CreateDeskController extends GetxController {
   final titleCtrl = TextEditingController();
   final descCtrl = TextEditingController();
 
-  late final VocabDeckRepository _repo;
+  final VocabDeckRepository _repo;
 
   final RxBool isSubmitting = false.obs;
   final RxString selectedColor = '#24389C'.obs;
@@ -50,7 +52,6 @@ class CreateDeskController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = VocabDeckRepository(DioClient.instance);
     _applyEditingDeckIfAny();
   }
 
@@ -86,9 +87,7 @@ class CreateDeskController extends GetxController {
         await _reloadFlashcardListIfAny();
         Get.offNamed(AppRoutes.deckPrep, arguments: deck);
       } else {
-        final deck = await _repo.createDeck(
-          title: titleCtrl.text.trim(),
-        );
+        final deck = await _repo.createDeck(title: titleCtrl.text.trim());
         await _reloadFlashcardListIfAny();
         Get.offNamed(AppRoutes.deckPrep, arguments: deck);
       }
@@ -97,7 +96,7 @@ class CreateDeskController extends GetxController {
           ? (e.response!.data as Map)['message']?.toString()
           : null;
       AppNotify.error(
-        isEditMode ? T.errorUpdateDeskFailed.tr : T.errorCreateDeskFailed.tr,
+        isEditMode ? T.errorUpdateDeckFailed.tr : T.errorCreateDeckFailed.tr,
         message: msg ?? e.message ?? T.errorNetwork.tr,
       );
     } finally {
@@ -109,8 +108,10 @@ class CreateDeskController extends GetxController {
     if (!isEditMode || isSubmitting.value) return;
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: Text(T.errorDeleteDeskTitle.tr),
-        content: Text(T.errorDeleteDeskContent.trParams({'title': editingDeck!.title})),
+        title: Text(T.errorDeleteDeckTitle.tr),
+        content: Text(
+          T.errorDeleteDeckContent.trParams({'title': editingDeck!.title}),
+        ),
         actions: [
           AppButton(
             label: T.actionCancel,
@@ -134,13 +135,18 @@ class CreateDeskController extends GetxController {
     try {
       await _repo.deleteDeck(editingDeck!.id);
       await _reloadFlashcardListIfAny();
-      Get.until((route) => route.settings.name == AppRoutes.flashcards || route.isFirst);
+      Get.until(
+        (route) => route.settings.name == AppRoutes.flashcards || route.isFirst,
+      );
       AppNotify.success(T.deckDeleted.tr, message: editingDeck!.title);
     } on DioException catch (e) {
       final msg = e.response?.data is Map
           ? (e.response!.data as Map)['message']?.toString()
           : null;
-      AppNotify.error(T.errorDeleteFailedTitle.tr, message: msg ?? e.message ?? T.errorNetwork.tr);
+      AppNotify.error(
+        T.errorDeleteFailedTitle.tr,
+        message: msg ?? e.message ?? T.errorNetwork.tr,
+      );
     } finally {
       isSubmitting.value = false;
     }

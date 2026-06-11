@@ -6,11 +6,6 @@ abstract class AppRoutes {
   static const register = '/register';
   static const home = '/home';
   static const learn = '/learn';
-  static const learningSupport = '/learn/support';
-  static const learningPathDetail = '/learn/path';
-  static const learningPathQuiz = '/learn/path/quiz';
-  static const learningSkillLessons = '/learn/skills';
-  static const learningLessonDetail = '/learn/lesson';
   static const curriculumUnits = '/learn/curriculum/units';
   static const curriculumUnitDetail = '/learn/curriculum/unit';
   static const curriculumLessonPlayer = '/learn/curriculum/lesson';
@@ -29,7 +24,7 @@ abstract class AppRoutes {
       '/learn/pronunciation/conversation/summary';
   static const deckPrep = '/learn/flashcards/deck-prep';
   static const addFlashcard = '/learn/flashcards/add-card';
-  static const createDesk = '/learn/flashcards/create-desk';
+  static const createDeck = '/learn/flashcards/create-deck';
   static const exercise = '/exercise';
   static const exerciseQuiz = '/exercise/quiz';
   static const exerciseResult = '/exercise/result';
@@ -41,11 +36,62 @@ abstract class AppRoutes {
   static const placementTestResult = '/placement-test/result';
   static const placementLevelPicker = '/placement-test/self-select';
   static const studySession = '/study-session';
-  static const studySessionBack = '/study-session/back';
+  static const studySessionCardBack = '/study-session/card-back';
   static const sessionSummary = '/study-session/summary';
   static const progress = '/progress';
   static const profile = '/profile';
 
-  // VocabHub (flashcard / desk)
-  static const vocabHub = '/vocab';
+  // VocabHub (flashcard / deck)
+  static const vocabHub = '/learn/vocab';
+
+  /// Tập hợp mọi route hợp lệ — dùng để validate route do backend trả về
+  /// (notification.actionRoute, learningPath.route) trước khi `Get.toNamed`.
+  /// Backend trả route lạ → bỏ qua điều hướng thay vì văng màn trắng.
+  static const Set<String> all = {
+    splash,
+    shell,
+    welcome,
+    login,
+    register,
+    home,
+    learn,
+    curriculumUnits,
+    curriculumUnitDetail,
+    curriculumLessonPlayer,
+    curriculumCheckpoint,
+    flashcards,
+    grammarTheory,
+    grammarLessonDetail,
+    pronunciation,
+    pronunciationPractice,
+    pronunciationResult,
+    ipa,
+    pronunciationInsight,
+    conversation,
+    conversationChat,
+    conversationSummary,
+    deckPrep,
+    addFlashcard,
+    createDeck,
+    exercise,
+    exerciseQuiz,
+    exerciseResult,
+    test,
+    testQuestion,
+    testResult,
+    placementTest,
+    placementTestQuestion,
+    placementTestResult,
+    placementLevelPicker,
+    studySession,
+    studySessionCardBack,
+    sessionSummary,
+    progress,
+    profile,
+    vocabHub,
+  };
+
+  /// `true` nếu [route] là một route đã đăng ký (so khớp chính xác, bỏ khoảng trắng).
+  static bool isKnown(String? route) =>
+      route != null && all.contains(route.trim());
 }

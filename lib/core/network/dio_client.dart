@@ -31,7 +31,28 @@ class DioClient {
               }
               handler.next(options);
             },
-            onError: (error, handler) {
+            onError: (error, handler) async {
+              // 401: token Firebase có thể đã hết hạn / bị revoke / lệch giờ.
+              // Force refresh idToken rồi retry request đúng 1 lần. Cờ trong
+              // extra chống vòng lặp vô hạn nếu sau refresh vẫn 401.
+              final req = error.requestOptions;
+              final is401 = error.response?.statusCode == 401;
+              final alreadyRetried = req.extra['retried_401'] == true;
+              if (is401 && !alreadyRetried) {
+                try {
+                  final user = FirebaseAuth.instance.currentUser;
+                  final fresh = await user?.getIdToken(true); // force refresh
+                  if (fresh != null && fresh.isNotEmpty) {
+                    req.extra['retried_401'] = true;
+                    req.headers['Authorization'] = 'Bearer $fresh';
+                    final res = await _instance.fetch<dynamic>(req);
+                    handler.resolve(res);
+                    return;
+                  }
+                } catch (_) {
+                  // Refresh / retry thất bại → rơi xuống reject như lỗi gốc.
+                }
+              }
               handler.reject(
                 DioException(
                   requestOptions: error.requestOptions,
@@ -58,10 +79,10 @@ class _AppLogInterceptor extends Interceptor {
     _log('${options.method} ${options.uri}');
     _log('headers: ${_redactHeaders(options.headers)}');
     if (options.queryParameters.isNotEmpty) {
-      _log('query: ${options.queryParameters}');
+      _log('query: ${_redact(options.queryParameters)}');
     }
     if (options.data != null) {
-      _log('body: ${_preview(options.data)}');
+      _log('body: ${_preview(_redact(options.data))}');
     }
     handler.next(options);
   }
@@ -78,7 +99,7 @@ class _AppLogInterceptor extends Interceptor {
       'status: ${response.statusCode} ${response.statusMessage ?? ''}'.trim(),
     );
     _log('dataType: ${response.data.runtimeType}');
-    _log('body: ${_preview(response.data)}');
+    _log('body: ${_preview(_redact(response.data))}');
     handler.next(response);
   }
 
@@ -94,7 +115,7 @@ class _AppLogInterceptor extends Interceptor {
           .trim(),
     );
     _log('dataType: ${err.response?.data.runtimeType}');
-    _log('body: ${_preview(err.response?.data)}');
+    _log('body: ${_preview(_redact(err.response?.data))}');
     handler.next(err);
   }
 
@@ -111,6 +132,46 @@ class _AppLogInterceptor extends Interceptor {
     final text = value?.toString() ?? '';
     if (text.length <= 18) return '***';
     return '${text.substring(0, 14)}...${text.substring(text.length - 6)}';
+  }
+
+  /// Các khoá chứa dữ liệu nhạy cảm (PII / bí mật) — che khi log body & query.
+  /// So khớp không phân biệt hoa thường, theo substring (vd 'idToken' khớp 'token').
+  static const _sensitiveKeys = {
+    'password',
+    'token',
+    'idtoken',
+    'accesstoken',
+    'refreshtoken',
+    'authorization',
+    'secret',
+    'apikey',
+    'api_key',
+    'email',
+    'fullname',
+    'phone',
+    'firebaseuid',
+  };
+
+  bool _isSensitiveKey(String key) {
+    final k = key.toLowerCase();
+    return _sensitiveKeys.any(k.contains);
+  }
+
+  /// Che đệ quy các field nhạy cảm trong Map/List trước khi log.
+  /// Giữ nguyên kiểu cấu trúc để output đọc được; chỉ thay giá trị nhạy cảm = '***'.
+  Object? _redact(Object? data) {
+    if (data is Map) {
+      return data.map(
+        (key, value) => MapEntry(
+          key,
+          _isSensitiveKey('$key') ? '***' : _redact(value),
+        ),
+      );
+    }
+    if (data is List) {
+      return data.map(_redact).toList();
+    }
+    return data;
   }
 
   String _preview(Object? data) {

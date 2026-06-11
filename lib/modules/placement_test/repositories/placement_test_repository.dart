@@ -7,7 +7,7 @@ class PlacementTestRepository {
 
   Future<StartTestResponse> startTest() async {
     final response = await _dio.post('/placement-test/start');
-    return StartTestResponse.fromJson(response.data);
+    return StartTestResponse.fromJson(_asMap(response.data));
   }
 
   Future<AnswerResponseModel> answerQuestion(
@@ -19,13 +19,17 @@ class PlacementTestRepository {
       '/placement-test/$sessionId/answer',
       data: {'questionId': questionId, 'selectedAnswer': selectedAnswer},
     );
-    return AnswerResponseModel.fromJson(response.data);
+    return AnswerResponseModel.fromJson(_asMap(response.data));
   }
 
   Future<TestResultModel> completeTest(String sessionId) async {
     final response = await _dio.post('/placement-test/$sessionId/complete');
-    return TestResultModel.fromJson(response.data);
+    return TestResultModel.fromJson(_asMap(response.data));
   }
+
+  /// Ép response.data về Map an toàn; trả map rỗng nếu backend trả null/sai kiểu.
+  Map<String, dynamic> _asMap(dynamic data) =>
+      data is Map ? Map<String, dynamic>.from(data) : const <String, dynamic>{};
 
   /// Tự chọn trình độ CEFR mà không làm bài kiểm tra.
   /// Backend set cefrLevel + onboarded, trả về user đã cập nhật.

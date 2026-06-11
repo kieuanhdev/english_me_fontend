@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:dio/dio.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 
@@ -38,28 +36,7 @@ class PronunciationRepository {
         .toList();
   }
 
-  Future<PronunciationFeedback> assessPronunciation({
-    required File audioFile,
-    required String exerciseId,
-    required String expectedText,
-  }) async {
-    final formData = FormData.fromMap({
-      'audio': await MultipartFile.fromFile(audioFile.path, filename: 'recording.m4a'),
-      'exerciseId': exerciseId,
-      'expectedText': expectedText,
-    });
-
-    final response = await _dio.post('/pronunciation/assess', data: formData);
-    if (response.data is! Map<String, dynamic>) {
-      throw DioException(
-        requestOptions: response.requestOptions,
-        message: 'Invalid response format from assess endpoint',
-      );
-    }
-    return PronunciationFeedback.fromJson(response.data as Map<String, dynamic>);
-  }
-
-  /// Chấm phát âm dựa trên transcript (text STT) — backend dùng DeepSeek.
+  /// Chấm phát âm dựa trên transcript (text STT) — backend dùng Levenshtein Distance.
   Future<PronunciationFeedback> assessTranscript({
     required String referenceText,
     required String spokenText,
@@ -77,6 +54,34 @@ class PronunciationRepository {
       throw DioException(
         requestOptions: response.requestOptions,
         message: 'Invalid response format from assess-text endpoint',
+      );
+    }
+    return PronunciationFeedback.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Chấm phát âm từ FILE AUDIO thật (đề cương MT4): upload audio lên backend,
+  /// backend gọi Google Cloud Speech-to-Text ra transcript rồi chấm Levenshtein.
+  ///
+  /// Ném [DioException] với status 422 khi STT chưa bật / không nhận ra tiếng nói
+  /// — controller bắt mã này để fallback STT on-device.
+  Future<PronunciationFeedback> assessAudio({
+    required String audioPath,
+    required String referenceText,
+    required String exerciseId,
+  }) async {
+    final formData = FormData.fromMap({
+      'referenceText': referenceText,
+      'exerciseId': exerciseId,
+      'audio': await MultipartFile.fromFile(audioPath, filename: 'audio.wav'),
+    });
+    final response = await _dio.post(
+      '/pronunciation/assess-audio',
+      data: formData,
+    );
+    if (response.data is! Map<String, dynamic>) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        message: 'Invalid response format from assess-audio endpoint',
       );
     }
     return PronunciationFeedback.fromJson(response.data as Map<String, dynamic>);

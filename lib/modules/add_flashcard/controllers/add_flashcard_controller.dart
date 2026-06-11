@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_deck_model.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
@@ -21,8 +20,9 @@ class AddFlashcardArgs {
 class AddFlashcardController extends GetxController {
   AddFlashcardController({
     required this.deck,
+    required VocabDeckRepository repo,
     this.editCard,
-  });
+  }) : _repo = repo;
 
   final VocabDeck deck;
   final VocabWord? editCard;
@@ -33,7 +33,7 @@ class AddFlashcardController extends GetxController {
   final meaningCtrl = TextEditingController();
   final exampleCtrl = TextEditingController();
 
-  late final VocabDeckRepository _repo;
+  final VocabDeckRepository _repo;
 
   final RxString selectedPosKey = 'NOUN'.obs;
   final RxBool isSubmitting = false.obs;
@@ -51,7 +51,6 @@ class AddFlashcardController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = VocabDeckRepository(DioClient.instance);
     _bindInitialValues();
   }
 

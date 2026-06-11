@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/modules/conversation/models/conversation_models.dart';
@@ -16,7 +17,9 @@ enum ConversationPhase { chatting, summarizing, summary }
 /// user nói -> STT -> gửi server -> AI trả text -> TTS đọc luôn.
 /// Giới hạn 10 lượt user, hết lượt thì tổng kết & nhận xét.
 class ConversationController extends GetxController {
-  late final ConversationRepository _repository;
+  final ConversationRepository _repository;
+  ConversationController(this._repository);
+
   final SpeechToText _speech = SpeechToText();
   TtsService get _tts => Get.find<TtsService>();
   bool _speechReady = false;
@@ -42,15 +45,9 @@ class ConversationController extends GetxController {
       phase.value == ConversationPhase.chatting;
 
   @override
-  void onInit() {
-    super.onInit();
-    _repository = ConversationRepository(DioClient.instance);
-  }
-
-  @override
   void onClose() {
     _speech.cancel();
-    _tts.stop();
+    unawaited(_tts.stop());
     super.onClose();
   }
 
@@ -110,13 +107,16 @@ class ConversationController extends GetxController {
     if (status == 'done' || status == 'notListening') {
       if (isRecording.value) {
         isRecording.value = false;
-        _submitTranscript();
+        // Callback đồng bộ từ plugin → không await được. Fire-and-forget có
+        // chủ đích; _submitTranscript tự guard isClosed trước khi đụng state.
+        unawaited(_submitTranscript());
       }
     }
   }
 
   /// Gửi câu user vừa nói, lấy câu trả lời AI rồi đọc bằng TTS.
   Future<void> _submitTranscript() async {
+    if (isClosed) return; // controller đã dispose giữa chừng
     final spoken = liveTranscript.value.trim();
     liveTranscript.value = '';
     if (spoken.isEmpty || phase.value != ConversationPhase.chatting) return;
@@ -163,10 +163,12 @@ class ConversationController extends GetxController {
     }
     phase.value = ConversationPhase.summarizing;
     try {
-      summary.value = await _repository.summarize(
+      final result = await _repository.summarize(
         topic: topic.value,
         history: messages.toList(),
       );
+      if (isClosed) return; // controller đã dispose trong lúc chờ server
+      summary.value = result;
       phase.value = ConversationPhase.summary;
       Get.toNamed(AppRoutes.conversationSummary);
     } on DioException {
@@ -180,7 +182,7 @@ class ConversationController extends GetxController {
 
   /// Về màn chọn chủ đề để luyện chủ đề khác.
   void resetSession() {
-    _tts.stop();
+    unawaited(_tts.stop());
     _speech.cancel();
     messages.clear();
     userTurnsUsed.value = 0;
@@ -191,5 +193,5 @@ class ConversationController extends GetxController {
     Get.until((route) => Get.currentRoute == AppRoutes.conversation);
   }
 
-  void replay(String text) => _tts.speak(text);
+  void replay(String text) => unawaited(_tts.speak(text));
 }

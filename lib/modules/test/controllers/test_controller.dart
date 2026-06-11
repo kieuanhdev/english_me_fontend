@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/sound_service.dart';
@@ -89,7 +90,8 @@ class TestController extends GetxController {
       secondsRemaining.value = session.durationSeconds;
       state.value = TestState.playing;
       _startTimer();
-    } catch (_) {
+    } catch (e) {
+      if (kDebugMode) debugPrint('[TestController] _fetchQuestions failed: $e');
       errorMessage.value = T.errorLoadTest.tr;
       state.value = TestState.error;
     }
@@ -171,8 +173,10 @@ class TestController extends GetxController {
       );
       state.value = TestState.finished;
       Get.offNamed(AppRoutes.testResult);
-      _loadHistory();
-    } catch (_) {
+      unawaited(_loadHistory()); // nạp lịch sử nền, không chặn điều hướng
+    } catch (e) {
+      // Submit lỗi → vẫn sang màn kết quả (UI tự hiển thị trạng thái).
+      if (kDebugMode) debugPrint('[TestController] _finishTest failed: $e');
       state.value = TestState.finished;
       Get.offNamed(AppRoutes.testResult);
     }
@@ -204,8 +208,9 @@ class TestController extends GetxController {
       isHistoryLoading.value = true;
       final data = await _repo.getTestHistory();
       history.assignAll(data);
-    } catch (_) {
-      // ignore — history là phụ
+    } catch (e) {
+      // history là phụ — lỗi không chặn UI, chỉ log để debug.
+      if (kDebugMode) debugPrint('[TestController] _loadHistory failed: $e');
     } finally {
       isHistoryLoading.value = false;
     }

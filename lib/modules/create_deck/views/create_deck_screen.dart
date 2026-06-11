@@ -4,15 +4,15 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
-import 'package:englishme/modules/create_desk/controllers/create_desk_controller.dart';
+import 'package:englishme/modules/create_deck/controllers/create_deck_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class CreateDeskScreen extends StatelessWidget {
-  const CreateDeskScreen({super.key});
+class CreateDeckScreen extends StatelessWidget {
+  const CreateDeckScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final ctl = Get.find<CreateDeskController>();
+    final ctl = Get.find<CreateDeckController>();
     final isEdit = ctl.isEditMode;
     final appTitle = isEdit ? 'Sửa bộ thẻ' : 'Tạo bộ thẻ mới';
     final primaryActionLabel = isEdit ? 'Lưu' : 'Tạo';
@@ -25,7 +25,7 @@ class CreateDeskScreen extends StatelessWidget {
         isTranslate: false,
         actions: [
           Obx(() {
-            final c = Get.find<CreateDeskController>();
+            final c = Get.find<CreateDeckController>();
             final busy = c.isSubmitting.value;
             return Padding(
               padding: const EdgeInsets.only(right: 8),
@@ -46,7 +46,7 @@ class CreateDeskScreen extends StatelessWidget {
       ),
       body: SafeArea(
         top: false,
-        child: GetBuilder<CreateDeskController>(
+        child: GetBuilder<CreateDeckController>(
           builder: (c) {
             return Form(
               key: c.formKey,
@@ -117,7 +117,7 @@ class CreateDeskScreen extends StatelessWidget {
                         if (isEdit) ...[
                           AppGap.h28,
                           Obx(() {
-                            final ctrl = Get.find<CreateDeskController>();
+                            final ctrl = Get.find<CreateDeckController>();
                             final busy = ctrl.isSubmitting.value;
                             return Center(
                               child: AppButton(
@@ -145,7 +145,7 @@ class CreateDeskScreen extends StatelessWidget {
                       color: AppColors.surface.withValues(alpha: 0.9),
                       padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
                       child: Obx(
-                        () => _PrimaryDeskButton(
+                        () => _PrimaryDeckButton(
                           label: bottomPrimaryLabel,
                           icon: bottomIcon,
                           isLoading: c.isSubmitting.value,
@@ -263,7 +263,7 @@ class _SectionTitle extends StatelessWidget {
 
 class _ColorSection extends StatelessWidget {
   const _ColorSection({required this.controller});
-  final CreateDeskController controller;
+  final CreateDeckController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +290,7 @@ class _ColorSection extends StatelessWidget {
             () => Wrap(
               spacing: 14,
               runSpacing: 14,
-              children: CreateDeskController.colorOptions.map((hex) {
+              children: CreateDeckController.colorOptions.map((hex) {
                 final color = _hexToColor(hex);
                 final selected = controller.selectedColor.value == hex;
                 return GestureDetector(
@@ -330,7 +330,7 @@ class _ColorSection extends StatelessWidget {
 
 class _IconSection extends StatelessWidget {
   const _IconSection({required this.controller});
-  final CreateDeskController controller;
+  final CreateDeckController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -346,7 +346,7 @@ class _IconSection extends StatelessWidget {
             crossAxisSpacing: 12,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            children: CreateDeskController.iconOptions.map((iconName) {
+            children: CreateDeckController.iconOptions.map((iconName) {
               final selected = controller.selectedIcon.value == iconName;
               return GestureDetector(
                 onTap: () => controller.selectedIcon.value = iconName,
@@ -380,8 +380,8 @@ class _IconSection extends StatelessWidget {
   }
 }
 
-class _PrimaryDeskButton extends StatelessWidget {
-  const _PrimaryDeskButton({
+class _PrimaryDeckButton extends StatelessWidget {
+  const _PrimaryDeckButton({
     required this.label,
     required this.icon,
     required this.isLoading,

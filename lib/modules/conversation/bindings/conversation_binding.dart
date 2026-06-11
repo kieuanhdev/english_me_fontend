@@ -1,5 +1,7 @@
+import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/modules/conversation/controllers/conversation_controller.dart';
+import 'package:englishme/modules/conversation/repositories/conversation_repository.dart';
 import 'package:get/get.dart';
 
 class ConversationBinding extends Bindings {
@@ -9,6 +11,11 @@ class ConversationBinding extends Bindings {
     if (!Get.isRegistered<TtsService>()) {
       Get.put(TtsService(), permanent: true);
     }
-    Get.lazyPut<ConversationController>(() => ConversationController());
+    if (!Get.isRegistered<ConversationRepository>()) {
+      Get.lazyPut<ConversationRepository>(() => ConversationRepository(DioClient.instance));
+    }
+    Get.lazyPut<ConversationController>(
+      () => ConversationController(Get.find<ConversationRepository>()),
+    );
   }
 }

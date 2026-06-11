@@ -295,10 +295,13 @@ abstract class T {
   static const placementSelfSelectSubtitle = 'placement_self_select_subtitle';
   static const placementSelfSelectConfirm = 'placement_self_select_confirm';
   static const placementSelfSelectError = 'placement_self_select_error';
-  static const placementSelfSelectWarnTitle = 'placement_self_select_warn_title';
+  static const placementSelfSelectWarnTitle =
+      'placement_self_select_warn_title';
   static const placementSelfSelectWarnBody = 'placement_self_select_warn_body';
-  static const placementSelfSelectWarnTakeTest = 'placement_self_select_warn_take_test';
-  static const placementSelfSelectWarnProceed = 'placement_self_select_warn_proceed';
+  static const placementSelfSelectWarnTakeTest =
+      'placement_self_select_warn_take_test';
+  static const placementSelfSelectWarnProceed =
+      'placement_self_select_warn_proceed';
 
   // ── Study Session ──
   static const sessionComplete = 'session_complete';
@@ -339,12 +342,13 @@ abstract class T {
   static const authErrorUnknown = 'auth_error_unknown';
 
   // ── Controller Errors ──
-  static const errorDeleteDeskTitle = 'error_delete_desk_title';
-  static const errorDeleteDeskContent = 'error_delete_desk_content';
-  static const errorDeleteDeskContentSimple = 'error_delete_desk_content_simple';
+  static const errorDeleteDeckTitle = 'error_delete_deck_title';
+  static const errorDeleteDeckContent = 'error_delete_deck_content';
+  static const errorDeleteDeckContentSimple =
+      'error_delete_deck_content_simple';
   static const errorDeleteFailedTitle = 'error_delete_failed_title';
-  static const errorUpdateDeskFailed = 'error_update_desk_failed';
-  static const errorCreateDeskFailed = 'error_create_desk_failed';
+  static const errorUpdateDeckFailed = 'error_update_deck_failed';
+  static const errorCreateDeckFailed = 'error_create_deck_failed';
   static const errorEmptyDeckForStudy = 'error_empty_deck_for_study';
   static const errorSaveFailedTitle = 'error_save_failed_title';
   static const errorLoadGrammarLessons = 'error_load_grammar_lessons';

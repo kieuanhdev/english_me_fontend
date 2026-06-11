@@ -21,11 +21,13 @@ class QuestionModel {
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) => QuestionModel(
-    id: json['id'],
-    cefrLevel: json['cefrLevel'] ?? '',
-    skillCategory: json['skillCategory'] ?? '',
-    question: json['question'],
-    options: Map<String, String>.from(json['options'] as Map),
+    id: json['id'] as String? ?? '',
+    cefrLevel: json['cefrLevel'] as String? ?? '',
+    skillCategory: json['skillCategory'] as String? ?? '',
+    question: json['question'] as String? ?? '',
+    options: (json['options'] is Map)
+        ? (json['options'] as Map).map((k, v) => MapEntry('$k', '$v'))
+        : const <String, String>{},
   );
 
   List<QuestionOptionModel> get optionList =>
@@ -48,10 +50,13 @@ class StartTestResponse {
   });
 
   factory StartTestResponse.fromJson(Map<String, dynamic> json) => StartTestResponse(
-    sessionId: json['sessionId'],
-    totalQuestions: json['totalQuestions'],
-    questions: (json['questions'] as List).map((q) => QuestionModel.fromJson(q)).toList(),
-    notice: json['notice'] ?? '',
+    sessionId: json['sessionId'] as String? ?? '',
+    totalQuestions: json['totalQuestions'] as int? ?? 0,
+    questions: ((json['questions'] as List?) ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .map(QuestionModel.fromJson)
+        .toList(),
+    notice: json['notice'] as String? ?? '',
   );
 }
 
@@ -75,13 +80,13 @@ class AnswerResponseModel {
   });
 
   factory AnswerResponseModel.fromJson(Map<String, dynamic> json) => AnswerResponseModel(
-    questionId: json['questionId'],
-    selectedAnswer: json['selectedAnswer'],
-    correctAnswer: json['correctAnswer'],
-    isCorrect: json['isCorrect'] ?? json['correct'] ?? false,
-    explanation: json['explanation'] ?? '',
-    answeredCount: json['answeredCount'],
-    totalQuestions: json['totalQuestions'],
+    questionId: json['questionId'] as String? ?? '',
+    selectedAnswer: json['selectedAnswer'] as String? ?? '',
+    correctAnswer: json['correctAnswer'] as String? ?? '',
+    isCorrect: (json['isCorrect'] ?? json['correct'] ?? false) as bool,
+    explanation: json['explanation'] as String? ?? '',
+    answeredCount: json['answeredCount'] as int? ?? 0,
+    totalQuestions: json['totalQuestions'] as int? ?? 0,
   );
 }
 
@@ -103,12 +108,12 @@ class ReviewItemModel {
   });
 
   factory ReviewItemModel.fromJson(Map<String, dynamic> json) => ReviewItemModel(
-    questionId: json['questionId'],
-    question: json['question'],
-    selectedAnswer: json['selectedAnswer'],
-    correctAnswer: json['correctAnswer'],
-    isCorrect: json['isCorrect'] ?? json['correct'] ?? false,
-    explanation: json['explanation'] ?? '',
+    questionId: json['questionId'] as String? ?? '',
+    question: json['question'] as String? ?? '',
+    selectedAnswer: json['selectedAnswer'] as String? ?? '',
+    correctAnswer: json['correctAnswer'] as String? ?? '',
+    isCorrect: (json['isCorrect'] ?? json['correct'] ?? false) as bool,
+    explanation: json['explanation'] as String? ?? '',
   );
 }
 
@@ -136,12 +141,15 @@ class TestResultModel {
   });
 
   factory TestResultModel.fromJson(Map<String, dynamic> json) => TestResultModel(
-    sessionId: json['sessionId'],
-    resultLevel: json['resultLevel'],
-    score: json['score'],
-    totalQuestions: json['totalQuestions'],
-    review: (json['review'] as List).map((r) => ReviewItemModel.fromJson(r)).toList(),
-    canGoHigherThanB2: json['canGoHigherThanB2'] ?? false,
-    aboveLevelMessage: json['aboveLevelMessage'] ?? '',
+    sessionId: json['sessionId'] as String? ?? '',
+    resultLevel: json['resultLevel'] as String? ?? '',
+    score: json['score'] as int? ?? 0,
+    totalQuestions: json['totalQuestions'] as int? ?? 0,
+    review: ((json['review'] as List?) ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .map(ReviewItemModel.fromJson)
+        .toList(),
+    canGoHigherThanB2: (json['canGoHigherThanB2'] ?? false) as bool,
+    aboveLevelMessage: json['aboveLevelMessage'] as String? ?? '',
   );
 }

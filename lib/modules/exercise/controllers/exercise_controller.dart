@@ -1,5 +1,5 @@
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/sound_service.dart';
 import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/values/app_strings.dart';
@@ -10,7 +10,8 @@ import 'package:englishme/routes/app_routes.dart';
 enum ExerciseState { idle, loading, playing, submitting, finished, error }
 
 class ExerciseController extends GetxController {
-  late final ExerciseRepository _repo;
+  final ExerciseRepository _repo;
+  ExerciseController(this._repo);
 
   final state = ExerciseState.idle.obs;
   final errorMessage = ''.obs;
@@ -24,12 +25,6 @@ class ExerciseController extends GetxController {
 
   ExerciseCategory? _activeCategory;
   String? _sessionId;
-
-  @override
-  void onInit() {
-    super.onInit();
-    _repo = ExerciseRepository(DioClient.instance);
-  }
 
   ExerciseQuestion? get currentExercise =>
       questions.isNotEmpty && currentIndex.value < questions.length
@@ -54,7 +49,8 @@ class ExerciseController extends GetxController {
       _sessionId = session.sessionId;
       questions.assignAll(session.questions);
       state.value = ExerciseState.playing;
-    } catch (_) {
+    } catch (e) {
+      if (kDebugMode) debugPrint('[ExerciseController] _fetchQuestions failed: $e');
       errorMessage.value = T.errorLoadTest.tr;
       state.value = ExerciseState.error;
     }
@@ -127,7 +123,9 @@ class ExerciseController extends GetxController {
       );
       state.value = ExerciseState.finished;
       Get.offNamed(AppRoutes.exerciseResult);
-    } catch (_) {
+    } catch (e) {
+      // Submit lỗi → vẫn sang màn kết quả (UI tự hiển thị trạng thái).
+      if (kDebugMode) debugPrint('[ExerciseController] _submitSession failed: $e');
       state.value = ExerciseState.finished;
       Get.offNamed(AppRoutes.exerciseResult);
     }

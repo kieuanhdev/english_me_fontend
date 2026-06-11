@@ -8,7 +8,7 @@ import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/widgets/word_card_parts.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
-import 'package:englishme/modules/study_session/views/study_session_back_screen.dart';
+import 'package:englishme/modules/study_session/views/study_session_card_back_screen.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class StudySessionFrontScreen extends GetView<StudySessionController> {
@@ -386,10 +386,7 @@ class _ProgressSection extends StatelessWidget {
 // ─── Flashcard Front ─────────────────────────────────────────────────────────
 
 class _FlashcardFront extends StatelessWidget {
-  const _FlashcardFront({
-    required this.card,
-    required this.onSpeak,
-  });
+  const _FlashcardFront({required this.card, required this.onSpeak});
   final VocabWord card;
   final VoidCallback onSpeak;
 

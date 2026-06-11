@@ -1,19 +1,27 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/repositories/pronunciation_repository.dart';
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:record/record.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class PronunciationController extends GetxController {
-  late final PronunciationRepository _repository;
+  final PronunciationRepository _repository;
+  PronunciationController(this._repository);
   final SpeechToText _speech = SpeechToText();
   bool _speechReady = false;
+
+  /// Ghi file audio để gửi Google Cloud STT (luồng chính). Đồng thời chạy
+  /// speech_to_text on-device để có transcript fallback khi Cloud lỗi/tắt.
+  final AudioRecorder _recorder = AudioRecorder();
+  String? _recordedPath;
 
   final exercises = <PronunciationExercise>[].obs;
   final isLoadingExercises = false.obs;
@@ -37,7 +45,6 @@ class PronunciationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repository = PronunciationRepository(DioClient.instance);
     fetchExercises();
   }
 
@@ -45,6 +52,7 @@ class PronunciationController extends GetxController {
   void onClose() {
     _searchDebounce?.cancel();
     _speech.cancel();
+    _recorder.dispose();
     super.onClose();
   }
 
@@ -109,6 +117,29 @@ class PronunciationController extends GetxController {
     canGoToResult.value = false;
     isRecording.value = true;
 
+    // Ghi file WAV PCM 16kHz mono cho Google Cloud STT (luồng chính).
+    _recordedPath = null;
+    try {
+      if (await _recorder.hasPermission()) {
+        final dir = await getTemporaryDirectory();
+        final path =
+            '${dir.path}/pron_${DateTime.now().millisecondsSinceEpoch}.wav';
+        await _recorder.start(
+          const RecordConfig(
+            encoder: AudioEncoder.pcm16bits,
+            sampleRate: 16000,
+            numChannels: 1,
+          ),
+          path: path,
+        );
+        _recordedPath = path;
+      }
+    } catch (_) {
+      // Ghi file lỗi -> bỏ qua, vẫn còn transcript on-device để fallback.
+      _recordedPath = null;
+    }
+
+    // Chạy STT on-device song song -> transcript fallback khi Cloud lỗi/tắt.
     await _speech.listen(
       onResult: (result) {
         liveTranscript.value = result.recognizedWords;
@@ -123,32 +154,75 @@ class PronunciationController extends GetxController {
   Future<void> stopRecording() async {
     if (!isRecording.value) return;
     await _speech.stop();
+    try {
+      if (await _recorder.isRecording()) {
+        await _recorder.stop();
+      }
+    } catch (_) {
+      _recordedPath = null;
+    }
     isRecording.value = false;
-    if (liveTranscript.value.trim().isNotEmpty) {
+    if (liveTranscript.value.trim().isNotEmpty || _recordedPath != null) {
       canGoToResult.value = true;
     }
   }
 
   void _onSpeechStatus(String status) {
-    // STT tự dừng khi user im lặng -> đồng bộ lại cờ recording.
+    // STT tự dừng khi user im lặng -> đồng bộ lại cờ recording + dừng ghi file.
     if (status == 'done' || status == 'notListening') {
       if (isRecording.value) {
+        unawaited(_stopRecorderIfActive());
         isRecording.value = false;
-        if (liveTranscript.value.trim().isNotEmpty) {
+        if (liveTranscript.value.trim().isNotEmpty || _recordedPath != null) {
           canGoToResult.value = true;
         }
       }
     }
   }
 
-  /// Gửi transcript lên backend chấm điểm thật (DeepSeek).
+  /// Dừng ghi âm nếu đang chạy. Lỗi recorder không quan trọng -> nuốt im lặng.
+  Future<void> _stopRecorderIfActive() async {
+    try {
+      if (await _recorder.isRecording()) {
+        await _recorder.stop();
+      }
+    } catch (_) {
+      // recorder lỗi khi dừng -> bỏ qua, không ảnh hưởng luồng chấm điểm.
+    }
+  }
+
+  /// Chấm phát âm: ưu tiên gửi FILE AUDIO lên Google Cloud STT (luồng chính,
+  /// đề cương MT4). STT chưa bật / lỗi (HTTP 422) hoặc không ghi được file ->
+  /// fallback gửi transcript on-device qua /assess-text.
   Future<void> assessRecording() async {
     final exercise = selectedExercise.value;
+    if (exercise == null) return;
     final spoken = liveTranscript.value.trim();
-    if (exercise == null || spoken.isEmpty) return;
+    final path = _recordedPath;
+    if (path == null && spoken.isEmpty) return;
 
     isAssessing.value = true;
     try {
+      // Luồng chính: upload audio -> Cloud STT chấm.
+      if (path != null && File(path).existsSync()) {
+        try {
+          feedback.value = await _repository.assessAudio(
+            audioPath: path,
+            referenceText: exercise.text,
+            exerciseId: exercise.id,
+          );
+          return;
+        } on DioException catch (e) {
+          // 422 = STT chưa bật / không nhận ra -> fallback transcript on-device.
+          if (e.response?.statusCode != 422) rethrow;
+        }
+      }
+
+      // Fallback: transcript on-device.
+      if (spoken.isEmpty) {
+        AppNotify.error(T.errorGeneric.tr, message: T.errorPronunciationGeneric.tr);
+        return;
+      }
       feedback.value = await _repository.assessTranscript(
         referenceText: exercise.text,
         spokenText: spoken,

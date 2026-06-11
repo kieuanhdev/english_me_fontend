@@ -19,7 +19,7 @@ void main() async {
   final localeController = AppLocaleController();
   await localeController.load();
   Get.put(localeController, permanent: true);
-  Get.put(TtsService());
-  Get.put(SoundService());
+  Get.put(TtsService(), permanent: true);
+  Get.put(SoundService(), permanent: true);
   runApp(const EnglishMeApp());
 }

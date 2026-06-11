@@ -2,7 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:englishme/modules/learn/models/curriculum_models.dart';
-import 'package:englishme/modules/learn/models/learning_models.dart' show XpBonus;
 import 'package:englishme/modules/learn/repositories/curriculum_repository.dart';
 
 /// Repository THẬT cho luồng giáo trình — gọi backend Spring Boot.

@@ -1,4 +1,4 @@
-import 'package:englishme/modules/learn/models/learning_models.dart' show XpBonus;
+import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus;
 
 enum TestTopic { grammar, vocabulary }
 

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,7 +26,10 @@ class TtsService extends GetxService {
     // Warm-up: speak empty string để engine khởi động sẵn
     try {
       await _tts.speak(' ');
-    } catch (_) {}
+    } catch (e) {
+      // Warm-up lỗi không quan trọng — lần speak thật sau vẫn chạy.
+      if (kDebugMode) debugPrint('[TtsService] warm-up failed: $e');
+    }
   }
 
   Future<void> _loadPrefs() async {
@@ -44,7 +50,10 @@ class TtsService extends GetxService {
         (lang) => (lang as String).toLowerCase().startsWith('en'),
       );
       if (hasEnglish) await _tts.setLanguage('en-US');
-    } catch (_) {}
+    } catch (e) {
+      // Lấy/đặt ngôn ngữ lỗi → dùng ngôn ngữ mặc định của engine.
+      if (kDebugMode) debugPrint('[TtsService] setLanguage failed: $e');
+    }
 
     await _tts.setSpeechRate(0.45);
     await _tts.setVolume(1.0);
@@ -81,7 +90,7 @@ class TtsService extends GetxService {
 
   @override
   void onClose() {
-    _tts.stop();
+    unawaited(_tts.stop());
     super.onClose();
   }
 }

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
 
 import 'package:englishme/core/network/api_exception.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/services/xp_grant_handler.dart';
 import 'package:englishme/core/values/app_strings.dart';
@@ -34,10 +34,13 @@ int _qualityFromRating(CardRating rating) {
 class StudySessionController extends GetxController {
   final String deskId;
   final String deskTitle;
+  final StudySessionRepository _repo;
 
-  StudySessionController({required this.deskId, required this.deskTitle});
-
-  late final StudySessionRepository _repo;
+  StudySessionController({
+    required this.deskId,
+    required this.deskTitle,
+    required StudySessionRepository repo,
+  }) : _repo = repo;
 
   final RxBool isLoading = true.obs;
   final RxString errorMessage = ''.obs;
@@ -73,7 +76,6 @@ class StudySessionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = StudySessionRepository(DioClient.instance);
     _startSession();
   }
 
@@ -211,8 +213,9 @@ class StudySessionController extends GetxController {
           bonuses: s.bonuses,
         );
       }
-    } catch (_) {
-      // ignore — UI dùng đếm cục bộ làm fallback.
+    } catch (e) {
+      // UI dùng đếm cục bộ làm fallback — không chặn flow, chỉ log để debug.
+      if (kDebugMode) debugPrint('[StudySession] _loadSummary failed: $e');
     }
   }
 

@@ -2,7 +2,7 @@ import 'package:englishme/core/services/sound_service.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:englishme/core/widgets/daily_goal_celebration.dart';
 import 'package:englishme/modules/home/controllers/home_controller.dart';
-import 'package:englishme/modules/learn/models/learning_models.dart' show XpBonus;
+import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus;
 import 'package:englishme/modules/profile/controllers/profile_controller.dart';
 import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:get/get.dart';

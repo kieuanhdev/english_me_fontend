@@ -1,7 +1,18 @@
 // Models cho luồng giáo trình mới (Unit → Lesson → Theory/Practice/Quiz).
-// Tách khỏi learning_models.dart để không đụng module cũ.
 
-import 'package:englishme/modules/learn/models/learning_models.dart' show XpBonus;
+class XpBonus {
+  final String type;
+  final String label;
+  final int amount;
+
+  const XpBonus({required this.type, required this.label, required this.amount});
+
+  factory XpBonus.fromJson(Map<String, dynamic> json) => XpBonus(
+        type: (json['type'] as String?) ?? '',
+        label: (json['label'] as String?) ?? '',
+        amount: (json['amount'] as num?)?.toInt() ?? 0,
+      );
+}
 
 class LevelUnits {
   LevelUnits({

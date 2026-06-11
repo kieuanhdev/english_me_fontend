@@ -15,11 +15,20 @@ class EnglishMeApp extends StatefulWidget {
   State<EnglishMeApp> createState() => _EnglishMeAppState();
 }
 
-class _EnglishMeAppState extends State<EnglishMeApp> with WidgetsBindingObserver {
+class _EnglishMeAppState extends State<EnglishMeApp>
+    with WidgetsBindingObserver {
+  late final ThemeController c;
+  late final AppLocaleController loc;
+  late final LocalizationService localizationService;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    c = Get.find<ThemeController>();
+    loc = Get.find<AppLocaleController>();
+    localizationService = LocalizationService();
   }
 
   @override
@@ -30,7 +39,6 @@ class _EnglishMeAppState extends State<EnglishMeApp> with WidgetsBindingObserver
 
   @override
   void didChangePlatformBrightness() {
-    final ThemeController c = Get.find<ThemeController>();
     if (c.themeModeRx.value == ThemeMode.system) {
       unawaited(c.refreshSystemTheme());
     }
@@ -38,13 +46,9 @@ class _EnglishMeAppState extends State<EnglishMeApp> with WidgetsBindingObserver
 
   @override
   Widget build(BuildContext context) {
-    final ThemeController c = Get.find<ThemeController>();
-    final AppLocaleController loc = Get.find<AppLocaleController>();
     return Obx(() {
-      c.themeModeRx.value;
-      loc.localeRx.value;
       return GetMaterialApp(
-        translations: LocalizationService(),
+        translations: localizationService,
         locale: loc.localeRx.value,
         fallbackLocale: const Locale('en', 'US'),
         theme: AppTheme.lightTheme,

@@ -8,10 +8,8 @@ import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/modules/home/models/home_dashboard_model.dart';
 import 'package:englishme/modules/home/repositories/home_repository.dart';
 import 'package:englishme/modules/home/views/widgets/save_word_deck_sheet.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/modules/learn/models/curriculum_models.dart';
 import 'package:englishme/modules/learn/repositories/curriculum_repository.dart';
-import 'package:englishme/modules/learn/repositories/api_curriculum_repository.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_deck_model.dart';
 import 'package:englishme/modules/vocab_hub/repositories/vocab_deck_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -22,7 +20,8 @@ enum WordOfDayState { idle, loading, loaded, empty, error }
 class HomeController extends GetxController {
   final HomeRepository _repo;
   final VocabDeckRepository _deckRepo;
-  HomeController(this._repo, this._deckRepo);
+  final CurriculumRepository _curriculumRepo;
+  HomeController(this._repo, this._deckRepo, this._curriculumRepo);
 
   final loadState = HomeLoadState.idle.obs;
   final Rxn<HomeDashboardResponse> dashboard = Rxn();
@@ -35,8 +34,6 @@ class HomeController extends GetxController {
 
   // ----- Giáo trình: Unit đang học (để hiện ở Home) -----
   // API thật (trước đây dùng MockCurriculumRepository → gây cảm giác "dữ liệu fake" ở Home).
-  final CurriculumRepository _curriculumRepo =
-      ApiCurriculumRepository(DioClient.instance);
   final Rxn<CurriculumUnit> currentUnit = Rxn<CurriculumUnit>();
   // Đang tải Unit đang học — để Home hiện khung chờ thay vì nhảy banner chung
   // (trạng thái sai) trước khi có dữ liệu thật.
@@ -318,13 +315,13 @@ class HomeController extends GetxController {
       case 'grammar':
         Get.toNamed(AppRoutes.grammarTheory);
       case 'exercise':
-        Get.toNamed(AppRoutes.learningSupport);
+        Get.toNamed(AppRoutes.exercise);
       case 'pronunciation':
         Get.toNamed(AppRoutes.pronunciation);
       case 'flashcard':
         Get.toNamed(AppRoutes.flashcards);
       case 'test':
-        Get.toNamed(AppRoutes.learningSupport);
+        Get.toNamed(AppRoutes.test);
     }
   }
 }

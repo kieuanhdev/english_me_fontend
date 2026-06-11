@@ -6,8 +6,8 @@ import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-class StudySessionBackScreen extends StatelessWidget {
-  const StudySessionBackScreen({super.key});
+class StudySessionCardBackScreen extends StatelessWidget {
+  const StudySessionCardBackScreen({super.key});
 
   StudySessionController get controller => Get.find<StudySessionController>();
 

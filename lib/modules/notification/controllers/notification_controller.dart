@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/modules/notification/models/notification_model.dart';
 import 'package:englishme/modules/notification/repositories/notification_repository.dart';
+import 'package:englishme/routes/app_routes.dart';
 
 enum NotificationLoadState { idle, loading, success, error }
 
@@ -85,13 +86,16 @@ class NotificationController extends GetxController {
     }
   }
 
-  /// Bấm 1 thông báo: đánh dấu đã đọc + điều hướng nếu có actionRoute.
+  /// Bấm 1 thông báo: đánh dấu đã đọc + điều hướng nếu có actionRoute hợp lệ.
+  /// Route do backend trả → validate qua [AppRoutes.isKnown] trước khi điều hướng;
+  /// route lạ → chỉ đóng sheet, không nhảy màn trắng.
   void onTapNotification(AppNotification n) {
     markRead(n);
     final route = n.actionRoute;
-    if (route != null && route.trim().isNotEmpty) {
-      Get.back(); // đóng bottom sheet
-      Get.toNamed(route);
+    if (route == null || route.trim().isEmpty) return;
+    Get.back(); // đóng bottom sheet
+    if (AppRoutes.isKnown(route)) {
+      Get.toNamed(route.trim());
     }
   }
 }

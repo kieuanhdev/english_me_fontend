@@ -1,8 +1,7 @@
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/modules/home/views/home_screen.dart';
-import 'package:englishme/modules/learn/views/learning_screen.dart';
-import 'package:englishme/modules/learn/views/learning_support_screen.dart';
+import 'package:englishme/modules/learn/views/unit_list_screen.dart';
 import 'package:englishme/modules/profile/views/profile_screen.dart';
 import 'package:englishme/modules/progress/views/progress_screen.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +12,7 @@ class MainShellScreen extends StatelessWidget {
 
   static final List<Widget> _tabs = [
     const HomeScreen(),
-    const LearningScreen(),
-    const LearningSupportScreen(),
+    const UnitListScreen(),
     const ProgressScreen(),
     const ProfileScreen(),
   ];

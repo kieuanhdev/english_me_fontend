@@ -1,8 +1,9 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
-import 'package:englishme/core/network/dio_client.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/auth/repositories/user_repository.dart';
@@ -12,9 +13,11 @@ import 'package:englishme/modules/study_session/repositories/study_session_repos
 import 'package:englishme/routes/app_routes.dart';
 
 class VocabDeckController extends GetxController {
-  late final VocabDeckRepository _repo;
-  late final StudySessionRepository _sessionRepo;
-  late final UserRepository _userRepo;
+  final VocabDeckRepository _repo;
+  final StudySessionRepository _sessionRepo;
+  final UserRepository _userRepo;
+
+  VocabDeckController(this._repo, this._sessionRepo, this._userRepo);
 
   /// Thứ tự CEFR tăng dần — dùng để so sánh cấp user với cấp bộ thẻ.
   static const cefrOrder = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
@@ -47,8 +50,11 @@ class VocabDeckController extends GetxController {
         .toList();
     // Gần cấp user nhất lên đầu (đồng bộ thứ tự nhóm trong VocabDeckList).
     if (maxIdx >= 0) {
-      levels.sort((a, b) =>
-          (maxIdx - cefrOrder.indexOf(a)).compareTo(maxIdx - cefrOrder.indexOf(b)));
+      levels.sort(
+        (a, b) => (maxIdx - cefrOrder.indexOf(a)).compareTo(
+          maxIdx - cefrOrder.indexOf(b),
+        ),
+      );
     }
     return levels;
   }
@@ -78,8 +84,7 @@ class VocabDeckController extends GetxController {
   }
 
   /// Bộ thẻ do người dùng tự tạo — tab "Bộ thẻ của tôi".
-  List<VocabDeck> get myDecks =>
-      decks.where((d) => !d.isSystem).toList();
+  List<VocabDeck> get myDecks => decks.where((d) => !d.isSystem).toList();
 
   /// Tổng số thẻ đến hạn ôn (SM-2) trên tất cả bộ thẻ — điểm nhấn riêng của tab "Bộ thẻ của tôi".
   final dueToday = 0.obs;
@@ -99,9 +104,6 @@ class VocabDeckController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _repo = VocabDeckRepository(DioClient.instance);
-    _sessionRepo = StudySessionRepository(DioClient.instance);
-    _userRepo = UserRepository(DioClient.instance);
     loadDecks();
   }
 
@@ -109,9 +111,9 @@ class VocabDeckController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      _loadUserLevel(); // phụ — không await, lọc danh sách cập nhật khi có kết quả
+      unawaited(_loadUserLevel()); // phụ — không await, lọc danh sách cập nhật khi có kết quả
       decks.value = await _repo.getDecks();
-      _loadDeckProgress(); // phụ — không await, không chặn UI danh sách
+      unawaited(_loadDeckProgress()); // phụ — không await, không chặn UI danh sách
     } on DioException catch (e) {
       errorMessage.value = e.message ?? T.errorConnection.tr;
     } finally {
@@ -124,8 +126,10 @@ class VocabDeckController extends GetxController {
   Future<void> _loadUserLevel() async {
     try {
       final me = await _userRepo.getMe();
+      if (isClosed) return; // controller dispose trong lúc chờ
       userLevel.value = me.cefrLevel ?? '';
     } catch (_) {
+      if (isClosed) return;
       userLevel.value = '';
     }
   }
@@ -165,23 +169,28 @@ class VocabDeckController extends GetxController {
         dueSum += p.due;
       }
     }
+    if (isClosed) return; // controller dispose trong lúc chờ Future.wait
     progressByDeck.value = map;
     dueToday.value = dueSum;
   }
 
-  void onStartStudy(VocabDeck deck) => Get.toNamed(AppRoutes.deckPrep, arguments: deck);
+  void onStartStudy(VocabDeck deck) =>
+      Get.toNamed(AppRoutes.deckPrep, arguments: deck);
 
   void onPracticeWordOfDay() {}
 
-  void onCreateDeck() => Get.toNamed(AppRoutes.createDesk);
+  void onCreateDeck() => Get.toNamed(AppRoutes.createDeck);
 
-  void onEditDeck(VocabDeck deck) => Get.toNamed(AppRoutes.createDesk, arguments: deck);
+  void onEditDeck(VocabDeck deck) =>
+      Get.toNamed(AppRoutes.createDeck, arguments: deck);
 
   Future<void> onDeleteDeck(VocabDeck deck) async {
     final confirmed = await Get.dialog<bool>(
       AlertDialog(
-        title: Text(T.errorDeleteDeskTitle.tr),
-        content: Text(T.errorDeleteDeskContentSimple.trParams({'title': deck.title})),
+        title: Text(T.errorDeleteDeckTitle.tr),
+        content: Text(
+          T.errorDeleteDeckContentSimple.trParams({'title': deck.title}),
+        ),
         actions: [
           AppButton(
             label: T.actionCancel,
@@ -206,8 +215,13 @@ class VocabDeckController extends GetxController {
       await loadDecks();
       AppNotify.success(T.deckDeleted.tr, message: deck.title);
     } on DioException catch (e) {
-      final msg = e.response?.data is Map ? (e.response!.data as Map)['message']?.toString() : null;
-      AppNotify.error(T.errorDeleteFailedTitle.tr, message: msg ?? e.message ?? T.errorNetwork.tr);
+      final msg = e.response?.data is Map
+          ? (e.response!.data as Map)['message']?.toString()
+          : null;
+      AppNotify.error(
+        T.errorDeleteFailedTitle.tr,
+        message: msg ?? e.message ?? T.errorNetwork.tr,
+      );
     }
   }
 

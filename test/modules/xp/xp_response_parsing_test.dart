@@ -1,61 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
-import 'package:englishme/modules/learn/models/learning_models.dart';
+import 'package:englishme/modules/learn/models/curriculum_models.dart'
+    show XpBonus;
 import 'package:englishme/modules/progress/models/xp_ledger.dart';
 import 'package:englishme/modules/study_session/models/review_response.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
 
-/// Spec §9.4 — verify 4 DTO mới parse đúng trường BE bổ sung
+/// Spec §9.4 — verify các DTO parse đúng trường BE bổ sung
 /// (totalXp / dailyEarnedXp / streakUpdated / bonuses) và endpoint
 /// `GET /xp/ledger` parse được trang cursor-based.
+///
+/// Lưu ý: response của `POST /lessons/{id}/complete` (LessonResult) được
+/// parse thủ công trong ApiCurriculumRepository.completeLesson — phần
+/// parse được test ở đây là XpBonus.fromJson dùng chung cho mọi DTO.
 void main() {
-  group('LearningCompleteResponse.fromJson — spec §9.4.1', () {
-    test('parses totalXp, dailyEarnedXp, bonuses[]', () {
-      final res = LearningCompleteResponse.fromJson({
-        'lessonId': 'a2-path-02-travel-act-02',
-        'completed': true,
-        'score': 100,
-        'xpEarned': 10,
-        'totalXp': 1280,
-        'dailyEarnedXp': 22,
-        'levelProgress': 0.42,
-        'skillProgress': 0.35,
-        'nextLessonId': 'a2-path-02-travel-act-03',
-        'streakUpdated': true,
-        'bonuses': [
-          {
-            'type': 'daily_goal_bonus',
-            'amount': 5,
-            'label': 'Đạt mục tiêu ngày (30 XP)',
-          },
-        ],
+  group('XpBonus.fromJson — spec §9.4.1', () {
+    test('parses type, amount, label', () {
+      final bonus = XpBonus.fromJson({
+        'type': 'daily_goal_bonus',
+        'amount': 5,
+        'label': 'Đạt mục tiêu ngày (30 XP)',
       });
 
-      expect(res.lessonId, 'a2-path-02-travel-act-02');
-      expect(res.xpEarned, 10);
-      expect(res.totalXp, 1280);
-      expect(res.dailyEarnedXp, 22);
-      expect(res.streakUpdated, isTrue);
-      expect(res.bonuses, hasLength(1));
-      expect(res.bonuses.first.type, 'daily_goal_bonus');
-      expect(res.bonuses.first.amount, 5);
-      expect(res.bonuses.first.label, 'Đạt mục tiêu ngày (30 XP)');
+      expect(bonus.type, 'daily_goal_bonus');
+      expect(bonus.amount, 5);
+      expect(bonus.label, 'Đạt mục tiêu ngày (30 XP)');
     });
 
-    test('treats missing optional fields as defaults (retry-safe)', () {
-      // Khi BE trả response không có bonuses/totalXp (vd: lỗi parse),
-      // FE phải fallback sang 0 / [] thay vì crash.
-      final res = LearningCompleteResponse.fromJson({
-        'lessonId': 'x',
-        'completed': false,
-        'score': 0,
-        'xpEarned': 0,
-      });
-      expect(res.totalXp, 0);
-      expect(res.dailyEarnedXp, 0);
-      expect(res.bonuses, isEmpty);
-      expect(res.streakUpdated, isFalse);
+    test('treats missing fields as defaults (retry-safe)', () {
+      // Khi BE trả bonus thiếu trường, FE fallback '' / 0 thay vì crash.
+      final bonus = XpBonus.fromJson(const {});
+      expect(bonus.type, '');
+      expect(bonus.label, '');
+      expect(bonus.amount, 0);
     });
   });
 

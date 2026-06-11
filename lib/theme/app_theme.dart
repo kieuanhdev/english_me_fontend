@@ -98,7 +98,7 @@ class AppPaletteColors {
   /// Nền thẻ gợi ý (home_recommendations) khi không dùng cam
   final Color recommendationMutedBg;
 
-  /// Highlight chọn trong form (vd. create_desk)
+  /// Highlight chọn trong form (vd. create_deck)
   final Color chipHighlightBg;
 
   /// Cờ quốc gia — dùng trong vocabulary_list để gắn nhãn ngôn ngữ

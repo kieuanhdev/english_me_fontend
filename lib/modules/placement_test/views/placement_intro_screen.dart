@@ -40,7 +40,7 @@ class PlacementIntroScreen extends StatelessWidget {
               ),
               AppGap.h8,
               Text(
-                'Một bài kiểm tra ngắn gồm 16 câu (ngữ pháp + từ vựng) để hệ thống xếp bạn vào lộ trình phù hợp theo chuẩn CEFR.',
+                'Một bài kiểm tra thích ứng (tối đa 15 câu ngữ pháp + từ vựng): độ khó tự điều chỉnh theo câu trả lời để xếp bạn vào lộ trình phù hợp theo chuẩn CEFR.',
                 style: AppTypography.bodyLarge.copyWith(fontSize: 14),
               ),
               AppGap.h18,
@@ -59,6 +59,14 @@ class PlacementIntroScreen extends StatelessWidget {
                       label: 'Từ vựng',
                       icon: Icons.library_books_rounded,
                       color: AppColors.skillVocabulary,
+                    ),
+                  ),
+                  AppGap.w10,
+                  Expanded(
+                    child: _SkillCard(
+                      label: 'Đọc hiểu',
+                      icon: Icons.chrome_reader_mode_rounded,
+                      color: AppColors.success,
                     ),
                   ),
                 ],
@@ -104,9 +112,9 @@ class _CapNotice extends StatelessWidget {
   const _CapNotice();
 
   static const String _fallback =
-      'Bài kiểm tra này chỉ xác định trình độ tối đa tới mức B2. Nếu trình độ '
-      'của bạn cao hơn, hãy làm các bài kiểm tra lên cấp trong lộ trình để xác '
-      'định chính xác. Câu bỏ trống được tính là sai.';
+      'Bài kiểm tra điều chỉnh độ khó theo từng câu trả lời của bạn (tối đa 15 câu) '
+      'và xác định trình độ theo chuẩn CEFR từ A1 đến C1. Câu càng về sau càng phản '
+      'ánh đúng năng lực thật, nên hãy cố gắng trả lời thật chính xác nhé!';
 
   @override
   Widget build(BuildContext context) {

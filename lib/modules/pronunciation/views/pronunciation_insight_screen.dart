@@ -7,6 +7,7 @@ import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
 import 'package:englishme/modules/pronunciation/repositories/pronunciation_repository.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 /// Màn "Điểm yếu phát âm" (P4) — tổng hợp lịch sử assess của user:
@@ -289,6 +290,38 @@ class _WeakWordTile extends StatelessWidget {
               ),
             ),
           ],
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: () => Get.toNamed(
+                AppRoutes.pronunciationPractice,
+                arguments: {'keyword': word.word},
+              ),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                decoration: BoxDecoration(
+                  color: _accent,
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.mic_rounded, size: 14, color: AppColors.onPrimaryFixed),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Luyện ngay',
+                      style: AppTypography.labelSmall.copyWith(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.onPrimaryFixed,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

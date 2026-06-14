@@ -52,11 +52,7 @@ class SessionSummaryScreen extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.settings_rounded, size: 22),
-                    color: AppColors.primary,
-                  ),
+                  const SizedBox(width: 48),
                 ],
               ),
             ),

@@ -59,6 +59,10 @@ class StudySessionController extends GetxController {
   // XP tích luỹ — backend trả qua ReviewResponse.sessionXp.
   final RxInt sessionXp = 0.obs;
 
+  // SM-2 interval của thẻ vừa đánh giá — hiển thị chip "Ôn lại sau X ngày".
+  final RxInt lastIntervalDays = 0.obs;
+  final Rxn<DateTime> lastNextReviewAt = Rxn<DateTime>();
+
   // Summary lấy từ backend khi hết session.
   final Rxn<StudySessionSummary> summary = Rxn();
 
@@ -155,6 +159,8 @@ class StudySessionController extends GetxController {
       // chỉ cập nhật `sessionXp` (pending) để hiển thị live; KHÔNG apply XP/streak
       // per-thẻ. Việc apply 1 lần (cộng total, streak, bonus, sound) nằm ở _loadSummary.
       sessionXp.value = res.sessionXp;
+      lastIntervalDays.value = res.intervalDays;
+      lastNextReviewAt.value = res.nextReviewAt;
 
       switch (rating) {
         case CardRating.mastered:

@@ -10,6 +10,8 @@ import 'package:englishme/modules/home/repositories/home_repository.dart';
 import 'package:englishme/modules/home/views/widgets/save_word_deck_sheet.dart';
 import 'package:englishme/modules/learn/models/curriculum_models.dart';
 import 'package:englishme/modules/learn/repositories/curriculum_repository.dart';
+import 'package:englishme/modules/progress/models/progress_model.dart';
+import 'package:englishme/modules/progress/repositories/progress_repository.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_deck_model.dart';
 import 'package:englishme/modules/vocab_hub/repositories/vocab_deck_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -21,7 +23,13 @@ class HomeController extends GetxController {
   final HomeRepository _repo;
   final VocabDeckRepository _deckRepo;
   final CurriculumRepository _curriculumRepo;
-  HomeController(this._repo, this._deckRepo, this._curriculumRepo);
+  final ProgressRepository _progressRepo;
+  HomeController(
+    this._repo,
+    this._deckRepo,
+    this._curriculumRepo,
+    this._progressRepo,
+  );
 
   final loadState = HomeLoadState.idle.obs;
   final Rxn<HomeDashboardResponse> dashboard = Rxn();
@@ -39,6 +47,10 @@ class HomeController extends GetxController {
   // (trạng thái sai) trước khi có dữ liệu thật.
   final currentUnitLoading = true.obs;
 
+  // ----- Per-skill breakdown (H3): vocab/grammar/pron lên Home -----
+  // Lấy từ /users/me/progress (tái dùng), highlight kỹ năng yếu nhất của user.
+  final Rxn<SkillBreakdown> skillBreakdown = Rxn<SkillBreakdown>();
+
   /// Fallback khi chưa có dashboard — khớp default backend (user_daily_goals.targetXp = 30).
   static const int dailyXpTargetFallback = 30;
 
@@ -50,13 +62,17 @@ class HomeController extends GetxController {
     _updateGreeting();
     loadDashboard();
     loadWordOfDay();
+    loadSkillBreakdown();
     // Shell dùng IndexedStack → Home không rebuild khi quay lại tab. Lắng nghe
     // tab: mỗi lần quay về Home (index 0) refresh ngầm dashboard (XP hôm nay,
     // streak, ngày học/tuần) + Unit đang học để phản ánh tiến độ vừa học ở tab
     // khác — không bật loading toàn màn để card không bị nháy.
     final shell = ShellController.ensureRegistered();
     _tabWorker = ever<int>(shell.currentTab, (index) {
-      if (index == 0) loadDashboard(silent: true);
+      if (index == 0) {
+        loadDashboard(silent: true);
+        loadSkillBreakdown();
+      }
     });
   }
 
@@ -118,7 +134,17 @@ class HomeController extends GetxController {
     await Future.wait([
       loadDashboard(),
       loadWordOfDay(forceRefresh: true),
+      loadSkillBreakdown(),
     ]);
+  }
+
+  /// Tải breakdown per-skill (H3). Lỗi -> giữ giá trị cũ, không vỡ Home.
+  Future<void> loadSkillBreakdown() async {
+    try {
+      skillBreakdown.value = await _progressRepo.getSkillBreakdown();
+    } catch (_) {
+      // im lặng — Home không phụ thuộc cứng vào breakdown.
+    }
   }
 
   Future<void> loadWordOfDay({bool forceRefresh = false}) async {
@@ -168,6 +194,73 @@ class HomeController extends GetxController {
 
   /// Mở study session để ôn thẻ tới hạn.
   void onReviewDueCards() => Get.toNamed(AppRoutes.flashcards);
+
+  // ----- Per-skill (H3) + kỹ năng yếu nhất (H1/H2 reason) -----
+  SkillBreakdown? get skills => skillBreakdown.value;
+
+  /// Tổng điểm các kỹ năng. 0 => user mới, chưa có dữ liệu.
+  double get _skillTotal {
+    final s = skillBreakdown.value;
+    if (s == null) return 0;
+    return s.vocabulary + s.grammar + s.reading + s.pronunciation;
+  }
+
+  bool get hasSkillData => _skillTotal > 0;
+
+  /// key kỹ năng yếu nhất ('vocabulary'|'grammar'|'reading'|'pronunciation'); null nếu chưa đủ dữ liệu.
+  String? get weakestSkillKey {
+    final s = skillBreakdown.value;
+    if (s == null || _skillTotal <= 0) return null;
+    final entries = <String, double>{
+      'vocabulary': s.vocabulary,
+      'grammar': s.grammar,
+      'reading': s.reading,
+      'pronunciation': s.pronunciation,
+    };
+    String key = 'vocabulary';
+    double min = double.infinity;
+    entries.forEach((k, v) {
+      if (v < min) {
+        min = v;
+        key = k;
+      }
+    });
+    return key;
+  }
+
+  String _skillLabel(String key) {
+    switch (key) {
+      case 'vocabulary':
+        return 'từ vựng';
+      case 'grammar':
+        return 'ngữ pháp';
+      case 'reading':
+        return 'đọc';
+      case 'pronunciation':
+        return 'phát âm';
+      default:
+        return key;
+    }
+  }
+
+  /// Nhãn kỹ năng yếu nhất để hiển thị (vd "từ vựng"); rỗng nếu chưa có dữ liệu.
+  String get weakestSkillLabel {
+    final k = weakestSkillKey;
+    return k == null ? '' : _skillLabel(k);
+  }
+
+  /// Câu lý do cá nhân hóa cho kỹ năng yếu nhất (H2).
+  String get weakestSkillReason {
+    final k = weakestSkillKey;
+    if (k == null) return '';
+    return 'Đây là kỹ năng bạn luyện ít nhất — tập trung vào nó sẽ tiến bộ nhanh hơn';
+  }
+
+  /// Mở màn "Kỹ năng cần cải thiện" (yếu gì + yếu ở đâu + luyện ngay với AI).
+  void onPracticeWeakestSkill() => Get.toNamed(AppRoutes.weakSkills);
+
+  /// Mở màn "Kỹ năng cần cải thiện" (dùng cho card "Kỹ năng của bạn").
+  void onOpenWeakSkills() => Get.toNamed(AppRoutes.weakSkills);
 
   // ----- Continue learning -----
   ContinueLearning? get continueLearning => dashboard.value?.continueLearning;

@@ -41,6 +41,44 @@ class ProgressRepository {
     return DailyGoal.fromJson(response.data as Map<String, dynamic>);
   }
 
+  /// Chỉ lấy breakdown per-skill (không gọi xp-history/streak-calendar) — dùng cho
+  /// Home để khỏi tốn 2 request thừa.
+  ///
+  /// Backend trả raw XP per-skill (vd vocab 250 / grammar 140 / pron 30), KHÔNG
+  /// kèm maxScore → không dùng `normalized` (chia 100, vocab/grammar đều clamp 1.0,
+  /// mất ý nghĩa so sánh). Thay vào đó chuẩn hóa theo SHARE = xp / max(xp) để bar
+  /// phản ánh đúng tương quan: skill cao nhất = 1.0, skill yếu nhất bar ngắn rõ rệt.
+  Future<SkillBreakdown> getSkillBreakdown() async {
+    final response = await _dio.get('/users/me/progress');
+    final progress = ProgressResponse.fromJson(
+      response.data as Map<String, dynamic>,
+    );
+    final raw = <String, int>{};
+    for (final s in progress.skills) {
+      raw[s.skill.toLowerCase()] = s.score;
+    }
+    final vocab = raw['vocabulary'] ?? 0;
+    final grammar = raw['grammar'] ?? 0;
+    final reading = raw['reading'] ?? 0;
+    final listening = raw['listening'] ?? 0;
+    final speaking = raw['speaking'] ?? 0;
+    final writing = raw['writing'] ?? 0;
+    final pron = raw['pronunciation'] ?? 0;
+    // Mốc chuẩn hóa = XP cao nhất trong tất cả skill (>0). Tất cả 0 -> giữ 0 (user mới).
+    final peak = [vocab, grammar, reading, listening, speaking, writing, pron]
+        .fold<int>(0, (a, b) => b > a ? b : a);
+    double share(int xp) => peak <= 0 ? 0 : (xp / peak).clamp(0.0, 1.0);
+    return SkillBreakdown(
+      vocabulary: share(vocab),
+      grammar: share(grammar),
+      reading: share(reading),
+      listening: share(listening),
+      speaking: share(speaking),
+      writing: share(writing),
+      pronunciation: share(pron),
+    );
+  }
+
   Future<ProgressData> getProgressData() async {
     final now = DateTime.now();
     final monthParam = '${now.year}-${now.month.toString().padLeft(2, '0')}';
@@ -105,9 +143,11 @@ class ProgressRepository {
       skillBreakdown: SkillBreakdown(
         vocabulary: skillMap['vocabulary'] ?? 0,
         grammar: skillMap['grammar'] ?? 0,
+        reading: skillMap['reading'] ?? 0,
+        listening: skillMap['listening'] ?? 0,
+        speaking: skillMap['speaking'] ?? 0,
+        writing: skillMap['writing'] ?? 0,
         pronunciation: skillMap['pronunciation'] ?? 0,
-        // Backend không có nguồn XP listening (mục 11.2) → luôn 0.
-        listening: 0,
       ),
       weeklySummary: WeeklySummary(
         totalXp: progress.weekSummary.totalXp,

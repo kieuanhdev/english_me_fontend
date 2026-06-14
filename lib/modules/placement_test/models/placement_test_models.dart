@@ -12,12 +12,16 @@ class QuestionModel {
   final String question;
   final Map<String, String> options;
 
+  /// Đoạn văn cho câu reading (rỗng với grammar/vocabulary).
+  final String passage;
+
   const QuestionModel({
     required this.id,
     required this.cefrLevel,
     required this.skillCategory,
     required this.question,
     required this.options,
+    this.passage = '',
   });
 
   factory QuestionModel.fromJson(Map<String, dynamic> json) => QuestionModel(
@@ -28,65 +32,75 @@ class QuestionModel {
     options: (json['options'] is Map)
         ? (json['options'] as Map).map((k, v) => MapEntry('$k', '$v'))
         : const <String, String>{},
+    passage: json['passage'] as String? ?? '',
   );
 
   List<QuestionOptionModel> get optionList =>
       options.entries.map((e) => QuestionOptionModel(id: e.key, text: e.value)).toList();
 }
 
+/// Phản hồi khi bắt đầu phiên CAT: chỉ có câu hỏi ĐẦU TIÊN (1 câu).
 class StartTestResponse {
   final String sessionId;
-  final int totalQuestions;
-  final List<QuestionModel> questions;
+  final int maxQuestions;
+  final QuestionModel? firstQuestion;
 
-  /// Thông báo giới hạn: bài đầu vào chỉ xác định trình độ tối đa tới B2.
+  /// Thông báo giới hạn: bài đầu vào xác định trình độ A1–C1.
   final String notice;
 
   const StartTestResponse({
     required this.sessionId,
-    required this.totalQuestions,
-    required this.questions,
+    required this.maxQuestions,
+    required this.firstQuestion,
     this.notice = '',
   });
 
   factory StartTestResponse.fromJson(Map<String, dynamic> json) => StartTestResponse(
     sessionId: json['sessionId'] as String? ?? '',
-    totalQuestions: json['totalQuestions'] as int? ?? 0,
-    questions: ((json['questions'] as List?) ?? const [])
-        .whereType<Map<String, dynamic>>()
-        .map(QuestionModel.fromJson)
-        .toList(),
+    maxQuestions: json['maxQuestions'] as int? ?? 15,
+    firstQuestion: json['firstQuestion'] is Map<String, dynamic>
+        ? QuestionModel.fromJson(json['firstQuestion'] as Map<String, dynamic>)
+        : null,
     notice: json['notice'] as String? ?? '',
   );
 }
 
-class AnswerResponseModel {
+/// Phản hồi sau mỗi câu trả lời trong CAT: feedback + câu kế tiếp (hoặc isDone).
+class CatAnswerResponseModel {
   final String questionId;
   final String selectedAnswer;
   final String correctAnswer;
   final bool isCorrect;
   final String explanation;
   final int answeredCount;
-  final int totalQuestions;
+  final int maxQuestions;
+  final bool isDone;
+  final QuestionModel? nextQuestion;
 
-  const AnswerResponseModel({
+  const CatAnswerResponseModel({
     required this.questionId,
     required this.selectedAnswer,
     required this.correctAnswer,
     required this.isCorrect,
     required this.explanation,
     required this.answeredCount,
-    required this.totalQuestions,
+    required this.maxQuestions,
+    required this.isDone,
+    required this.nextQuestion,
   });
 
-  factory AnswerResponseModel.fromJson(Map<String, dynamic> json) => AnswerResponseModel(
+  factory CatAnswerResponseModel.fromJson(Map<String, dynamic> json) => CatAnswerResponseModel(
     questionId: json['questionId'] as String? ?? '',
     selectedAnswer: json['selectedAnswer'] as String? ?? '',
     correctAnswer: json['correctAnswer'] as String? ?? '',
     isCorrect: (json['isCorrect'] ?? json['correct'] ?? false) as bool,
     explanation: json['explanation'] as String? ?? '',
     answeredCount: json['answeredCount'] as int? ?? 0,
-    totalQuestions: json['totalQuestions'] as int? ?? 0,
+    maxQuestions: json['maxQuestions'] as int? ?? 15,
+    isDone: (json['isDone'] ?? json['done'] ?? false) as bool,
+    nextQuestion: json['nextQuestion'] is Map<String, dynamic>
+        ? QuestionModel.fromJson(json['nextQuestion'] as Map<String, dynamic>)
+        : null,
   );
 }
 
@@ -97,6 +111,7 @@ class ReviewItemModel {
   final String correctAnswer;
   final bool isCorrect;
   final String explanation;
+  final String skillCategory;
 
   const ReviewItemModel({
     required this.questionId,
@@ -105,6 +120,7 @@ class ReviewItemModel {
     required this.correctAnswer,
     required this.isCorrect,
     required this.explanation,
+    this.skillCategory = '',
   });
 
   factory ReviewItemModel.fromJson(Map<String, dynamic> json) => ReviewItemModel(
@@ -114,6 +130,7 @@ class ReviewItemModel {
     correctAnswer: json['correctAnswer'] as String? ?? '',
     isCorrect: (json['isCorrect'] ?? json['correct'] ?? false) as bool,
     explanation: json['explanation'] as String? ?? '',
+    skillCategory: json['skillCategory'] as String? ?? '',
   );
 }
 
@@ -124,10 +141,13 @@ class TestResultModel {
   final int totalQuestions;
   final List<ReviewItemModel> review;
 
-  /// Học viên đã kịch trần B2 và có dấu hiệu giỏi hơn B2 (chỉ là tín hiệu UI).
-  final bool canGoHigherThanB2;
+  /// Ability estimate cuối của phiên CAT (IRT 1PL θ).
+  final double finalTheta;
 
-  /// Thông báo gợi ý làm bài kiểm tra lên cấp (rỗng nếu [canGoHigherThanB2] false).
+  /// Học viên đã kịch trần C1 và có dấu hiệu giỏi hơn (gợi ý C2) — tín hiệu UI.
+  final bool canGoHigherThanC1;
+
+  /// Thông báo gợi ý làm bài kiểm tra lên cấp (rỗng nếu [canGoHigherThanC1] false).
   final String aboveLevelMessage;
 
   const TestResultModel({
@@ -136,7 +156,8 @@ class TestResultModel {
     required this.score,
     required this.totalQuestions,
     required this.review,
-    this.canGoHigherThanB2 = false,
+    this.finalTheta = 0.0,
+    this.canGoHigherThanC1 = false,
     this.aboveLevelMessage = '',
   });
 
@@ -149,7 +170,8 @@ class TestResultModel {
         .whereType<Map<String, dynamic>>()
         .map(ReviewItemModel.fromJson)
         .toList(),
-    canGoHigherThanB2: (json['canGoHigherThanB2'] ?? false) as bool,
+    finalTheta: (json['finalTheta'] as num?)?.toDouble() ?? 0.0,
+    canGoHigherThanC1: (json['canGoHigherThanC1'] ?? false) as bool,
     aboveLevelMessage: json['aboveLevelMessage'] as String? ?? '',
   );
 }

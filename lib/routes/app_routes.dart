@@ -44,6 +44,9 @@ abstract class AppRoutes {
   // VocabHub (flashcard / deck)
   static const vocabHub = '/learn/vocab';
 
+  // Kỹ năng cần cải thiện (cá nhân hóa: yếu skill gì + yếu ở đâu + luyện ngay)
+  static const weakSkills = '/learn/weak-skills';
+
   /// Tập hợp mọi route hợp lệ — dùng để validate route do backend trả về
   /// (notification.actionRoute, learningPath.route) trước khi `Get.toNamed`.
   /// Backend trả route lạ → bỏ qua điều hướng thay vì văng màn trắng.
@@ -89,6 +92,7 @@ abstract class AppRoutes {
     progress,
     profile,
     vocabHub,
+    weakSkills,
   };
 
   /// `true` nếu [route] là một route đã đăng ký (so khớp chính xác, bỏ khoảng trắng).

@@ -72,6 +72,7 @@ class PronunciationResultScreen extends StatelessWidget {
                       _TranscriptionCard(
                         expected: exercise.text,
                         actual: feedback.transcription,
+                        errors: feedback.errors,
                       ),
                       if (feedback.errors.isNotEmpty) ...[
                         AppGap.h24,
@@ -242,14 +243,29 @@ class _ScoreBar extends StatelessWidget {
   }
 }
 
+/// Card so sánh phiên âm — highlight từng từ đúng (xanh) / sai (đỏ gạch chân).
+/// Dùng [errors] để xác định vị trí từ sai trong câu mẫu.
 class _TranscriptionCard extends StatelessWidget {
-  const _TranscriptionCard({required this.expected, required this.actual});
+  const _TranscriptionCard({
+    required this.expected,
+    required this.actual,
+    required this.errors,
+  });
 
   final String expected;
   final String actual;
+  final List<PronunciationError> errors;
+
+  Set<int> get _errorPositions => errors.map((e) => e.position).toSet();
 
   @override
   Widget build(BuildContext context) {
+    final errorPos = _errorPositions;
+    final expectedWords = expected.trim().split(RegExp(r'\s+'));
+    final actualWords = actual.trim().isEmpty
+        ? <String>[]
+        : actual.trim().split(RegExp(r'\s+'));
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -266,62 +282,111 @@ class _TranscriptionCard extends StatelessWidget {
             style: AppTypography.body.copyWith(fontWeight: FontWeight.w700),
           ),
           AppGap.h16,
-          _TranscriptionRow(
-            label: 'Mẫu',
-            text: expected,
-            color: AppColors.success,
+          // Câu mẫu — từ sai highlight đỏ, từ đúng highlight xanh
+          _LabelRow(label: 'Mẫu', color: AppColors.success),
+          AppGap.h6,
+          _HighlightedText(
+            words: expectedWords,
+            errorPositions: errorPos,
+            correctColor: AppColors.success,
+            errorColor: AppColors.danger,
           ),
-          AppGap.h12,
-          _TranscriptionRow(
+          AppGap.h14,
+          // Câu user đọc — plain text
+          _LabelRow(
             label: 'Bạn đọc',
-            text: actual.isEmpty ? 'Không nhận dạng được' : actual,
             color: actual.isEmpty ? AppColors.textSecondary : AppColors.tertiary,
           ),
+          AppGap.h6,
+          actual.isEmpty
+              ? Text(
+                  'Không nhận dạng được',
+                  style: AppTypography.body.copyWith(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                    fontStyle: FontStyle.italic,
+                  ),
+                )
+              : _HighlightedText(
+                  words: actualWords,
+                  errorPositions: errorPos,
+                  correctColor: AppColors.tertiary,
+                  errorColor: AppColors.danger,
+                ),
         ],
       ),
     );
   }
 }
 
-class _TranscriptionRow extends StatelessWidget {
-  const _TranscriptionRow({
-    required this.label,
-    required this.text,
-    required this.color,
-  });
-
+class _LabelRow extends StatelessWidget {
+  const _LabelRow({required this.label, required this.color});
   final String label;
-  final String text;
   final Color color;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Text(
+        label,
+        style: AppTypography.body.copyWith(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: color,
+        ),
+      ),
+    );
+  }
+}
+
+/// Hiển thị danh sách từ, tô màu theo vị trí lỗi.
+class _HighlightedText extends StatelessWidget {
+  const _HighlightedText({
+    required this.words,
+    required this.errorPositions,
+    required this.correctColor,
+    required this.errorColor,
+  });
+
+  final List<String> words;
+  final Set<int> errorPositions;
+  final Color correctColor;
+  final Color errorColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: List.generate(words.length, (i) {
+        final isError = errorPositions.contains(i);
+        final color = isError ? errorColor : correctColor;
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
+            color: color.withValues(alpha: 0.10),
             borderRadius: BorderRadius.circular(AppRadius.sm),
+            border: isError
+                ? Border(bottom: BorderSide(color: errorColor, width: 2))
+                : null,
           ),
           child: Text(
-            label,
+            words[i],
             style: AppTypography.body.copyWith(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              fontWeight: isError ? FontWeight.w700 : FontWeight.w500,
               color: color,
+              decoration: isError ? TextDecoration.underline : null,
+              decorationColor: errorColor,
             ),
           ),
-        ),
-        AppGap.w12,
-        Expanded(
-          child: Text(
-            text,
-            style: AppTypography.body,
-          ),
-        ),
-      ],
+        );
+      }),
     );
   }
 }

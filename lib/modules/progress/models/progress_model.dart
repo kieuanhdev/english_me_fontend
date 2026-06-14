@@ -8,14 +8,20 @@ class WeeklyXpEntry {
 class SkillBreakdown {
   final double vocabulary;
   final double grammar;
-  final double pronunciation;
+  final double reading;
   final double listening;
+  final double speaking;
+  final double writing;
+  final double pronunciation;
 
   const SkillBreakdown({
     required this.vocabulary,
     required this.grammar,
-    required this.pronunciation,
+    required this.reading,
     required this.listening,
+    required this.speaking,
+    required this.writing,
+    required this.pronunciation,
   });
 }
 

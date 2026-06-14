@@ -10,7 +10,7 @@ class PlacementTestRepository {
     return StartTestResponse.fromJson(_asMap(response.data));
   }
 
-  Future<AnswerResponseModel> answerQuestion(
+  Future<CatAnswerResponseModel> answerQuestion(
     String sessionId,
     String questionId,
     String selectedAnswer,
@@ -19,7 +19,7 @@ class PlacementTestRepository {
       '/placement-test/$sessionId/answer',
       data: {'questionId': questionId, 'selectedAnswer': selectedAnswer},
     );
-    return AnswerResponseModel.fromJson(_asMap(response.data));
+    return CatAnswerResponseModel.fromJson(_asMap(response.data));
   }
 
   Future<TestResultModel> completeTest(String sessionId) async {

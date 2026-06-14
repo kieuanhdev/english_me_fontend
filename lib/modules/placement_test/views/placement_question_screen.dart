@@ -21,7 +21,7 @@ class PlacementQuestionScreen extends GetView<PlacementTestController> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final question = controller.currentQuestion;
+          final question = controller.currentQuestion.value;
           if (question == null) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -33,8 +33,8 @@ class PlacementQuestionScreen extends GetView<PlacementTestController> {
               children: [
                 _QuestionTopBar(
                   progress: controller.progress,
-                  answeredCount: controller.currentIndex.value,
-                  totalQuestions: controller.questions.length,
+                  answeredCount: controller.answeredCount.value,
+                  totalQuestions: controller.maxQuestions.value,
                   onClose: () => Get.back(),
                 ),
                 AppGap.h12,
@@ -42,6 +42,10 @@ class PlacementQuestionScreen extends GetView<PlacementTestController> {
                 AppGap.h16,
                 _SkillChip(skill: question.skillCategory),
                 AppGap.h14,
+                if (question.passage.isNotEmpty) ...[
+                  _PassageCard(text: question.passage),
+                  AppGap.h16,
+                ],
                 Text(
                   'Chọn đáp án đúng:',
                   style: AppTypography.displayLarge.copyWith(fontSize: 24),
@@ -121,7 +125,7 @@ class _CapBanner extends StatelessWidget {
           AppGap.w8,
           Expanded(
             child: Text(
-              'Bài kiểm tra đầu vào • Xác định trình độ tối đa tới B2',
+              'Bài kiểm tra thích ứng • Độ khó điều chỉnh theo bạn (A1–C1)',
               style: AppTypography.labelMedium.copyWith(
                 fontSize: 12,
                 color: AppColors.primaryContainer,
@@ -192,6 +196,13 @@ class _SkillChip extends StatelessWidget {
 
   final String skill;
 
+  static const _label = {
+    'grammar': 'Ngữ pháp',
+    'vocabulary': 'Từ vựng',
+    'reading': 'Đọc hiểu',
+    'listening': 'Luyện nghe',
+  };
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -201,11 +212,60 @@ class _SkillChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       child: Text(
-        skill,
+        _label[skill.toLowerCase()] ?? skill,
         style: AppTypography.labelMedium.copyWith(
           color: AppColors.primaryContainer,
           fontWeight: FontWeight.w800,
         ),
+      ),
+    );
+  }
+}
+
+/// Đoạn văn cho câu reading — hiển thị trước câu hỏi.
+class _PassageCard extends StatelessWidget {
+  const _PassageCard({required this.text});
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.primarySoft,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.menu_book_rounded,
+                  size: 16, color: AppColors.primaryContainer),
+              AppGap.w8,
+              Text(
+                'Đọc đoạn văn',
+                style: AppTypography.labelMedium.copyWith(
+                  fontSize: 12,
+                  color: AppColors.primaryContainer,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ],
+          ),
+          AppGap.h8,
+          Text(
+            text,
+            style: AppTypography.bodyLarge.copyWith(
+              fontSize: 15,
+              height: 1.45,
+              color: AppColors.onSurface,
+            ),
+          ),
+        ],
       ),
     );
   }

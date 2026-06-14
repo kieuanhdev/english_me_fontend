@@ -19,12 +19,22 @@ class StudySessionCardBackScreen extends StatelessWidget {
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-          child: Obx(
-            () => StudySessionRatingGrid(
-              onRate: controller.rateCard,
-              isLoading: controller.isReviewing.value,
-            ),
-          ),
+          child: Obx(() {
+            final interval = controller.lastIntervalDays.value;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (interval > 0) ...[
+                  _Sm2IntervalChip(intervalDays: interval),
+                  AppGap.h8,
+                ],
+                StudySessionRatingGrid(
+                  onRate: controller.rateCard,
+                  isLoading: controller.isReviewing.value,
+                ),
+              ],
+            );
+          }),
         ),
       ),
       body: SafeArea(
@@ -54,11 +64,7 @@ class StudySessionCardBackScreen extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: const Icon(Icons.settings_rounded, size: 22),
-                    color: AppColors.primary,
-                  ),
+                  const SizedBox(width: 48),
                 ],
               ),
             ),
@@ -421,7 +427,7 @@ class _RatingBtn extends StatelessWidget {
                   score,
                   style: AppTypography.headlineMedium.copyWith(
                     fontSize: 13,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     color: fg,
                   ),
                 ),
@@ -429,6 +435,60 @@ class _RatingBtn extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ─── SM-2 Interval Chip ───────────────────────────────────────────────────────
+
+class _Sm2IntervalChip extends StatelessWidget {
+  const _Sm2IntervalChip({required this.intervalDays});
+
+  final int intervalDays;
+
+  Color get _color {
+    if (intervalDays <= 1) return AppColors.danger;
+    if (intervalDays <= 3) return AppColors.accentWarm;
+    return AppColors.primary;
+  }
+
+  IconData get _icon {
+    if (intervalDays <= 1) return Icons.replay_rounded;
+    if (intervalDays <= 3) return Icons.schedule_rounded;
+    return Icons.check_circle_outline_rounded;
+  }
+
+  String get _label {
+    if (intervalDays == 0) return 'Ôn lại ngay hôm nay';
+    if (intervalDays == 1) return 'Ôn lại sau 1 ngày';
+    return 'Ôn lại sau $intervalDays ngày';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      decoration: BoxDecoration(
+        color: _color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: _color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(_icon, color: _color, size: 14),
+          const SizedBox(width: 6),
+          Text(
+            _label,
+            style: AppTypography.labelSmall.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: _color,
+            ),
+          ),
+        ],
       ),
     );
   }

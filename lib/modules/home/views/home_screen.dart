@@ -10,6 +10,7 @@ import 'package:englishme/modules/home/views/widgets/home_quick_actions.dart';
 import 'package:englishme/modules/home/views/widgets/home_personalized_section.dart';
 import 'package:englishme/modules/home/views/widgets/home_quick_stats.dart';
 import 'package:englishme/modules/home/views/widgets/home_recommendations.dart';
+import 'package:englishme/modules/home/views/widgets/home_skill_progress.dart';
 import 'package:englishme/modules/home/views/widgets/home_word_of_day.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -58,6 +59,8 @@ class HomeScreen extends GetView<HomeController> {
                   const SliverToBoxAdapter(child: HomeQuickStats()),
                   const SliverToBoxAdapter(child: AppGap.h20),
                   const SliverToBoxAdapter(child: HomePersonalizedSection()),
+                  const SliverToBoxAdapter(child: AppGap.h20),
+                  const SliverToBoxAdapter(child: HomeSkillProgress()),
                   const SliverToBoxAdapter(child: AppGap.h28),
                   const SliverToBoxAdapter(child: HomeContinueLearning()),
                   const SliverToBoxAdapter(child: AppGap.h28),

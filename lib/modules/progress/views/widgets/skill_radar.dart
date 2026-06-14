@@ -38,8 +38,11 @@ class SkillRadarChart extends StatelessWidget {
                   values: [
                     skill.vocabulary,
                     skill.grammar,
-                    skill.pronunciation,
+                    skill.reading,
                     skill.listening,
+                    skill.speaking,
+                    skill.writing,
+                    skill.pronunciation,
                   ],
                   fillColor: AppColors.primary.withValues(alpha: 0.2),
                   strokeColor: AppColors.primary,
@@ -62,15 +65,33 @@ class SkillRadarChart extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _SkillBar(
-            label: 'Phát âm',
-            value: skill.pronunciation,
-            color: AppColors.primary,
+            label: 'Đọc',
+            value: skill.reading,
+            color: AppColors.success,
           ),
           const SizedBox(height: 10),
           _SkillBar(
             label: 'Nghe hiểu',
             value: skill.listening,
             color: AppColors.skillListening,
+          ),
+          const SizedBox(height: 10),
+          _SkillBar(
+            label: 'Nói',
+            value: skill.speaking,
+            color: AppColors.tertiary,
+          ),
+          const SizedBox(height: 10),
+          _SkillBar(
+            label: 'Viết',
+            value: skill.writing,
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 10),
+          _SkillBar(
+            label: 'Phát âm',
+            value: skill.pronunciation,
+            color: AppColors.primary,
           ),
         ],
       ),
@@ -239,7 +260,7 @@ class _RadarPainter extends CustomPainter {
     }
 
     // Labels
-    final labels = ['Từ vựng', 'Ngữ pháp', 'Phát âm', 'Nghe'];
+    final labels = ['Từ vựng', 'Ngữ pháp', 'Đọc', 'Nghe', 'Nói', 'Viết', 'Phát âm'];
     final textStyle = AppTypography.headlineMedium.copyWith(
       fontSize: 9,
       fontWeight: FontWeight.w700,

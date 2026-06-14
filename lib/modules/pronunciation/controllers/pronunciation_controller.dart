@@ -45,6 +45,11 @@ class PronunciationController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    // Nhận keyword từ InsightScreen khi user bấm "Luyện ngay" trên từ yếu.
+    final args = Get.arguments;
+    if (args is Map && args['keyword'] != null) {
+      searchKeyword.value = args['keyword'].toString();
+    }
     fetchExercises();
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/modules/learn/controllers/unit_detail_controller.dart';
@@ -38,7 +39,13 @@ class UnitDetailScreen extends GetView<UnitDetailController> {
                   children: [
                     Row(
                       children: [
-                        AppBackButton(onPressed: Get.back),
+                        AppBackButton(onPressed: () {
+                          if (Get.key.currentState?.canPop() ?? false) {
+                            Get.back();
+                          } else {
+                            ShellController.goToTab(1);
+                          }
+                        }),
                         AppGap.w12,
                         Expanded(
                           child: Column(

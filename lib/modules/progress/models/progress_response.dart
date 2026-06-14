@@ -53,7 +53,9 @@ class SkillScore {
   });
 
   factory SkillScore.fromJson(Map<String, dynamic> json) => SkillScore(
-    skill: (json['skill'] ?? '').toString(),
+    // Backend DTO dùng field 'name' (SkillScore record: name, score).
+    // Giữ fallback 'skill' phòng đổi tên sau.
+    skill: (json['name'] ?? json['skill'] ?? '').toString(),
     score: (json['score'] as num?)?.toInt() ?? 0,
     maxScore: (json['maxScore'] as num?)?.toInt(),
   );

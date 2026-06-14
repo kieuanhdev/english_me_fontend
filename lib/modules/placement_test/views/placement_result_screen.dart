@@ -3,6 +3,8 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
+import 'package:englishme/modules/placement_test/models/placement_test_models.dart';
+import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:get/get.dart';
 
@@ -40,13 +42,23 @@ class PlacementResultScreen extends GetView<PlacementTestController> {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                if (result.canGoHigherThanB2 &&
+                if (result.canGoHigherThanC1 &&
                     result.aboveLevelMessage.isNotEmpty) ...[
                   AppGap.h16,
-                  _AboveB2Card(message: result.aboveLevelMessage),
+                  _AboveLevelCard(message: result.aboveLevelMessage),
                 ],
                 AppGap.h24,
                 _ScoreCard(score: result.score, total: result.totalQuestions),
+                AppGap.h24,
+                _SkillBreakdown(
+                  review: result.review,
+                  // Map questionId → skillCategory từ các câu đã làm (CAT),
+                  // vì /complete response KHÔNG trả skillCategory trong review[].
+                  questionSkillMap: {
+                    for (final q in controller.answeredQuestions)
+                      q.id: q.skillCategory,
+                  },
+                ),
                 AppGap.h24,
                 _ReviewList(items: result.review),
                 AppGap.h28,
@@ -113,9 +125,9 @@ class _LevelBadge extends StatelessWidget {
   }
 }
 
-/// Card nổi bật khi học viên kịch trần B2 và có dấu hiệu giỏi hơn B2.
-class _AboveB2Card extends StatelessWidget {
-  const _AboveB2Card({required this.message});
+/// Card nổi bật khi học viên kịch trần C1 và có dấu hiệu giỏi hơn (gợi ý C2).
+class _AboveLevelCard extends StatelessWidget {
+  const _AboveLevelCard({required this.message});
 
   final String message;
 
@@ -129,19 +141,40 @@ class _AboveB2Card extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.success.withValues(alpha: 0.4), width: 1.5),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.rocket_launch_rounded, size: 22, color: AppColors.success),
-          AppGap.w12,
-          Expanded(
-            child: Text(
-              message,
-              style: AppTypography.bodyLarge.copyWith(
-                fontSize: 14,
-                height: 1.4,
-                color: AppColors.successDark,
-                fontWeight: FontWeight.w600,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.rocket_launch_rounded, size: 22, color: AppColors.success),
+              AppGap.w12,
+              Expanded(
+                child: Text(
+                  message,
+                  style: AppTypography.bodyLarge.copyWith(
+                    fontSize: 14,
+                    height: 1.4,
+                    color: AppColors.successDark,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          AppGap.h12,
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: () => Get.toNamed(AppRoutes.placementLevelPicker),
+              icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+              label: const Text('Tự chọn C2'),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.success,
+                textStyle: AppTypography.bodyLarge.copyWith(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
           ),
@@ -207,10 +240,139 @@ class _ScoreCard extends StatelessWidget {
   }
 }
 
+/// Phân tích kết quả theo kỹ năng (skillCategory) — chứng minh Adaptive CEFR.
+///
+/// [questionSkillMap]: Map questionId -> skillCategory xây từ controller.answeredQuestions.
+/// Cần thiết vì /complete response KHÔNG trả skillCategory trong review[].
+/// Backend trả PascalCase ("Grammar") → widget normalize toLower để khớp _skillLabel.
+class _SkillBreakdown extends StatelessWidget {
+  const _SkillBreakdown({
+    required this.review,
+    required this.questionSkillMap,
+  });
+
+  final List<ReviewItemModel> review;
+  final Map<String, String> questionSkillMap;
+
+  static const _skillLabel = {
+    'vocabulary': 'Từ vựng',
+    'grammar': 'Ngữ pháp',
+    'listening': 'Luyện nghe',
+    'reading': 'Đọc hiểu',
+    'writing': 'Viết',
+  };
+
+  static IconData _iconFor(String skill) => switch (skill) {
+        'vocabulary' => Icons.psychology_rounded,
+        'grammar' => Icons.menu_book_rounded,
+        'listening' => Icons.headphones_rounded,
+        'reading' => Icons.chrome_reader_mode_rounded,
+        'writing' => Icons.edit_rounded,
+        _ => Icons.quiz_rounded,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    // Ưu tiên lấy skillCategory từ questionSkillMap (từ /start response),
+    // fallback về item.skillCategory (nếu backend /complete có trả).
+    // Normalize toLower để khớp _skillLabel keys (backend dùng PascalCase).
+    final Map<String, List<ReviewItemModel>> grouped = {};
+    for (final item in review) {
+      final raw = (questionSkillMap[item.questionId] ?? item.skillCategory).trim();
+      if (raw.isEmpty) continue;
+      grouped.putIfAbsent(raw.toLowerCase(), () => []).add(item);
+    }
+    if (grouped.isEmpty) return const SizedBox.shrink();
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLowest,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(color: AppColors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Phân tích theo kỹ năng',
+            style: AppTypography.body.copyWith(fontWeight: FontWeight.w700),
+          ),
+          AppGap.h4,
+          Text(
+            'Dựa trên câu trả lời, hệ thống xác định kỹ năng yếu để gợi ý lộ trình.',
+            style: AppTypography.bodyLarge.copyWith(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          AppGap.h16,
+          ...grouped.entries.map((e) {
+            final skill = e.key;
+            final items = e.value;
+            final correct = items.where((i) => i.isCorrect).length;
+            final total = items.length;
+            final ratio = total > 0 ? correct / total : 0.0;
+            final label = _skillLabel[skill] ?? skill;
+            final color = ratio >= 0.7
+                ? AppColors.success
+                : ratio >= 0.4
+                    ? AppColors.accentWarm
+                    : AppColors.danger;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(_iconFor(skill), size: 16, color: color),
+                      AppGap.w8,
+                      Expanded(
+                        child: Text(
+                          label,
+                          style: AppTypography.body.copyWith(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '$correct/$total',
+                        style: AppTypography.body.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: color,
+                        ),
+                      ),
+                    ],
+                  ),
+                  AppGap.h6,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                    child: SizedBox(
+                      height: 7,
+                      child: LinearProgressIndicator(
+                        value: ratio,
+                        backgroundColor: AppColors.surfaceContainerHigh,
+                        valueColor: AlwaysStoppedAnimation<Color>(color),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+}
+
 class _ReviewList extends StatelessWidget {
   const _ReviewList({required this.items});
 
-  final List items;
+  final List<ReviewItemModel> items;
 
   @override
   Widget build(BuildContext context) {
@@ -239,18 +401,16 @@ class _ReviewTile extends StatelessWidget {
   const _ReviewTile({required this.index, required this.item});
 
   final int index;
-  final dynamic item;
+  final ReviewItemModel item;
 
   @override
   Widget build(BuildContext context) {
-    final bool correct = item.isCorrect as bool;
+    final bool correct = item.isCorrect;
     final Color borderColor = correct ? AppColors.success : AppColors.danger;
-    final Color bgColor = correct
-        ? AppColors.successSoft
-        : AppColors.dangerSoft;
-    final Color textColor = correct
-        ? AppColors.successDark
-        : AppColors.dangerDark;
+    final Color bgColor =
+        correct ? AppColors.successSoft : AppColors.dangerSoft;
+    final Color textColor =
+        correct ? AppColors.successDark : AppColors.dangerDark;
 
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
@@ -300,10 +460,10 @@ class _ReviewTile extends StatelessWidget {
                     color: textColor,
                   ),
                 ),
-                if ((item.explanation as String).isNotEmpty) ...[
+                if (item.explanation.isNotEmpty) ...[
                   AppGap.h6,
                   Text(
-                    item.explanation as String,
+                    item.explanation,
                     style: AppTypography.bodyLarge.copyWith(
                       fontSize: 12,
                       color: AppColors.textSecondary,

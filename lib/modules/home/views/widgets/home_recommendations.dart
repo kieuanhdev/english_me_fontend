@@ -144,34 +144,49 @@ class _RecommendCard extends StatelessWidget {
                 ),
               ),
             ],
-            // Lý do cá nhân hóa (P2) — chip nhỏ nổi bật khi gợi ý nhắm kỹ năng yếu.
+            // Lý do cá nhân hóa (H2) — chip nổi bật khi gợi ý nhắm kỹ năng yếu của user.
             if (item.reason != null && item.reason!.trim().isNotEmpty) ...[
-              const SizedBox(height: 10),
+              const SizedBox(height: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.tertiary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  color: AppColors.tertiary.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: AppColors.tertiary.withValues(alpha: 0.45),
+                  ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(
-                      Icons.insights_rounded,
-                      size: 13,
-                      color: AppColors.tertiary,
-                    ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Text(
-                        item.reason!,
-                        style: AppTypography.labelSmall.copyWith(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.insights_rounded,
+                          size: 13,
                           color: AppColors.tertiary,
-                          height: 1.25,
                         ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Gợi ý riêng cho bạn',
+                          style: AppTypography.labelSmall.copyWith(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.tertiary,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      item.reason!,
+                      style: AppTypography.labelSmall.copyWith(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.onSurface,
+                        height: 1.3,
                       ),
                     ),
                   ],

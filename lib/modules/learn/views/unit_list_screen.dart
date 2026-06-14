@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
-import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/modules/learn/controllers/unit_list_controller.dart';
 import 'package:englishme/modules/learn/models/curriculum_models.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -16,6 +15,14 @@ class UnitListScreen extends GetView<UnitListController> {
     if (controller.loading.value) return ApiState.loading;
     if (controller.error.value.isNotEmpty) return ApiState.error;
     return controller.data.value == null ? ApiState.empty : ApiState.success;
+  }
+
+  Future<void> _openCheckpoint(String level) async {
+    await Get.toNamed(
+      AppRoutes.curriculumCheckpoint,
+      arguments: {'level': level},
+    );
+    controller.load(); // refresh (có thể đã lên cấp)
   }
 
   @override
@@ -38,8 +45,6 @@ class UnitListScreen extends GetView<UnitListController> {
                   children: [
                     Row(
                       children: [
-                        AppBackButton(onPressed: Get.back),
-                        AppGap.w12,
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,13 +71,7 @@ class UnitListScreen extends GetView<UnitListController> {
                     AppGap.h16,
                     _LevelOverview(
                       data: d,
-                      onCheckpoint: () async {
-                        await Get.toNamed(
-                          AppRoutes.curriculumCheckpoint,
-                          arguments: {'level': d.level},
-                        );
-                        controller.load(); // refresh (có thể đã lên cấp)
-                      },
+                      onCheckpoint: () => _openCheckpoint(d.level),
                     ),
                     AppGap.h16,
                     Expanded(
@@ -86,6 +85,9 @@ class UnitListScreen extends GetView<UnitListController> {
                         ),
                       ),
                     ),
+                    AppGap.h12,
+                    // Thi luôn — bỏ qua học, làm bài kiểm tra cuối cấp để thử lên cấp.
+                    _SkipToTestButton(onTap: () => _openCheckpoint(d.level)),
                   ],
                 );
               },
@@ -298,6 +300,59 @@ class _UnitCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkipToTestButton extends StatelessWidget {
+  const _SkipToTestButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.fast_forward_rounded,
+                  color: AppColors.primary, size: 22),
+              AppGap.w12,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Thi lên cấp luôn',
+                      style: AppTypography.bodyRegular.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    AppGap.h2,
+                    Text(
+                      'Bỏ qua học, làm bài kiểm tra cuối cấp để thử lên cấp.',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: AppColors.primary),
             ],
           ),
         ),

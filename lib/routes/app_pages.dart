@@ -11,6 +11,7 @@ import 'package:englishme/routes/pages/progress_pages.dart';
 import 'package:englishme/routes/pages/pronunciation_pages.dart';
 import 'package:englishme/routes/pages/study_session_pages.dart';
 import 'package:englishme/routes/pages/test_pages.dart';
+import 'package:englishme/routes/pages/weak_skills_pages.dart';
 
 class AppPages {
   static const initial = AppRoutes.splash;
@@ -28,5 +29,6 @@ class AppPages {
     ...TestPages.pages,
     ...ProgressPages.pages,
     ...ProfilePages.pages,
+    ...WeakSkillsPages.pages,
   ];
 }

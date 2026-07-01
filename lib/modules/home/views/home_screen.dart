@@ -7,6 +7,7 @@ import 'package:englishme/modules/home/controllers/home_controller.dart';
 import 'package:englishme/modules/home/views/widgets/home_continue_learning.dart';
 import 'package:englishme/modules/home/views/widgets/home_hero_section.dart';
 import 'package:englishme/modules/home/views/widgets/home_quick_actions.dart';
+import 'package:englishme/modules/home/views/widgets/home_supplementary_actions.dart';
 import 'package:englishme/modules/home/views/widgets/home_personalized_section.dart';
 import 'package:englishme/modules/home/views/widgets/home_quick_stats.dart';
 import 'package:englishme/modules/home/views/widgets/home_recommendations.dart';
@@ -65,6 +66,8 @@ class HomeScreen extends GetView<HomeController> {
                   const SliverToBoxAdapter(child: HomeContinueLearning()),
                   const SliverToBoxAdapter(child: AppGap.h28),
                   const SliverToBoxAdapter(child: HomeQuickActions()),
+                  const SliverToBoxAdapter(child: AppGap.h28),
+                  const SliverToBoxAdapter(child: HomeSupplementaryActions()),
                   const SliverToBoxAdapter(child: AppGap.h28),
                   const SliverToBoxAdapter(child: HomeWordOfDay()),
                   const SliverToBoxAdapter(child: AppGap.h28),

@@ -15,14 +15,24 @@ class AuthController extends GetxController {
 
   AuthController(this._repository, this._authService);
 
+  /// Loading cho hành động email (login/register) — nút email tự xoay.
   final isLoading = false.obs;
+
+  /// Loading RIÊNG cho nút Google — tách khỏi [isLoading] để chỉ nút Google
+  /// xoay khi bấm Google, nút email không bị ảnh hưởng (và ngược lại).
+  final isGoogleLoading = false.obs;
+
   final Rxn<UserModel> user = Rxn<UserModel>();
+
+  /// Khi MỘT hành động đang chạy, các nút còn lại phải bị khoá (disable) nhưng
+  /// KHÔNG hiện spinner. Helper gom điều kiện "đang có việc gì đó chạy".
+  bool get isBusy => isLoading.value || isGoogleLoading.value;
 
   // ── Google ──────────────────────────────────────────────────────────────
 
   Future<void> signInWithGoogle() async {
     try {
-      isLoading.value = true;
+      isGoogleLoading.value = true;
       final idToken = await _authService.signInWithGoogle();
       if (idToken == null) return;
       await _navigateAfterSync(await _repository.syncUserWithBackend(idToken));
@@ -31,7 +41,7 @@ class AuthController extends GetxController {
     } on DioException catch (e) {
       _showApiError(e, fallback: T.authLoginFailed.tr);
     } finally {
-      isLoading.value = false;
+      isGoogleLoading.value = false;
     }
   }
 

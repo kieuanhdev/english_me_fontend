@@ -1,5 +1,6 @@
 import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
+import 'package:englishme/modules/learn/controllers/curriculum_progress_bus.dart';
 import 'package:englishme/modules/learn/models/curriculum_models.dart';
 import 'package:englishme/modules/learn/repositories/curriculum_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -21,15 +22,17 @@ class UnitListController extends GetxController {
     load();
   }
 
-  Future<void> load() async {
-    loading.value = true;
+  /// [silent] = true: refresh ngầm, giữ UI cũ, không bật loading spinner
+  /// (tránh flash trắng khi back từ unit detail về).
+  Future<void> load({bool silent = false}) async {
+    if (!silent) loading.value = true;
     error.value = '';
     try {
       data.value = await _repo.getLevelUnits(level);
     } catch (e) {
-      error.value = 'Không tải được danh sách Unit.';
+      if (data.value == null) error.value = 'Không tải được danh sách Unit.';
     } finally {
-      loading.value = false;
+      if (!silent) loading.value = false;
     }
   }
 
@@ -40,6 +43,8 @@ class UnitListController extends GetxController {
     }
     await Get.toNamed(AppRoutes.curriculumUnitDetail,
         arguments: {'unitId': unit.id});
-    load(); // refresh khi quay lại
+    // Chỉ refetch khi có tiến độ mới (đã làm bài trong unit). Mở unit xem rồi
+    // back ra → không đổi → bỏ qua, khỏi gọi API thừa.
+    if (CurriculumProgressBus.consume()) load(silent: true);
   }
 }

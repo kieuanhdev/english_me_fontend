@@ -60,7 +60,6 @@ class _PronunciationInsightScreenState
               AppMainAppBar(
                 title: 'Điểm yếu phát âm',
                 showBack: true,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: () => Get.back<void>(),
               ),

@@ -1,8 +1,6 @@
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/values/app_strings.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/grammar/controllers/grammar_theory_controller.dart';
 import 'package:englishme/modules/grammar/models/grammar_models.dart';
@@ -34,10 +32,6 @@ class GrammarTheoryScreen extends GetView<GrammarTheoryController> {
       initialIndex: controller.initialTabIndex.value,
       child: Scaffold(
         backgroundColor: AppColors.surface,
-        bottomNavigationBar: AppBottomNav(
-          initialIndex: 2,
-          onTap: (index, _) => ShellController.goToTab(index),
-        ),
         body: SafeArea(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +42,6 @@ class GrammarTheoryScreen extends GetView<GrammarTheoryController> {
                   title: T.titleGrammarTheory.tr,
                   showBack: true,
                   showSettings: false,
-                  showNotification: false,
                   horizontalPadding: 0,
                 ),
               ),
@@ -161,26 +154,33 @@ class _TopicCard extends GetView<GrammarTheoryController> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         border: Border.all(color: AppColors.outlineVariant),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Theme(
         // Strip the default ExpansionTile divider lines.
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
           childrenPadding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
           onExpansionChanged: (open) {
             if (open) controller.loadLessonsForTopic(topic.id);
           },
           leading: Container(
-            width: 44,
-            height: 44,
+            width: 46,
+            height: 46,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: colors.bg,
-              borderRadius: BorderRadius.circular(AppRadius.sm),
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Text(
               topic.level,
@@ -193,13 +193,51 @@ class _TopicCard extends GetView<GrammarTheoryController> {
           ),
           title: Text(
             topic.title,
-            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w700),
-          ),
-          subtitle: Text(
-            '${topic.category} • ${topic.lessonCount} ${T.labelLessons.tr.toLowerCase()}',
             style: AppTypography.bodyLarge.copyWith(
-              fontSize: 12,
-              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+            ),
+          ),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.folder_outlined,
+                  size: 13,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: 4),
+                Flexible(
+                  child: Text(
+                    topic.category,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySoft,
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                  child: Text(
+                    '${topic.lessonCount} ${T.labelLessons.tr.toLowerCase()}',
+                    style: AppTypography.bodyLarge.copyWith(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           children: [

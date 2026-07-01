@@ -1,6 +1,7 @@
 abstract class AppRoutes {
   static const splash = '/splash';
   static const shell = '/shell';
+  static const onboarding = '/onboarding';
   static const welcome = '/welcome';
   static const login = '/login';
   static const register = '/register';
@@ -47,12 +48,21 @@ abstract class AppRoutes {
   // Kỹ năng cần cải thiện (cá nhân hóa: yếu skill gì + yếu ở đâu + luyện ngay)
   static const weakSkills = '/learn/weak-skills';
 
+  // 4 kỹ năng ngôn ngữ ở "Luyện tập nhanh":
+  //   Nghe  → dictation (nghe chép chính tả)
+  //   Nói   → pronunciation (đã có)
+  //   Đọc   → exercise category=reading
+  //   Viết  → writing (chat gõ chữ với gia sư AI: sửa lỗi + gợi ý)
+  static const dictation = '/learn/dictation';
+  static const writing = '/learn/writing';
+
   /// Tập hợp mọi route hợp lệ — dùng để validate route do backend trả về
   /// (notification.actionRoute, learningPath.route) trước khi `Get.toNamed`.
   /// Backend trả route lạ → bỏ qua điều hướng thay vì văng màn trắng.
   static const Set<String> all = {
     splash,
     shell,
+    onboarding,
     welcome,
     login,
     register,
@@ -93,6 +103,8 @@ abstract class AppRoutes {
     profile,
     vocabHub,
     weakSkills,
+    dictation,
+    writing,
   };
 
   /// `true` nếu [route] là một route đã đăng ký (so khớp chính xác, bỏ khoảng trắng).

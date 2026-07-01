@@ -101,6 +101,7 @@ class ApiCurriculumRepository implements CurriculumRepository {
               .map(XpBonus.fromJson)
               .toList()
           : const [],
+      newBadges: BadgeAward.listFrom(data['newBadges']),
     );
   }
 

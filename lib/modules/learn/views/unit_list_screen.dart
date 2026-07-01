@@ -30,8 +30,9 @@ class UnitListScreen extends GetView<UnitListController> {
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
+        bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
           child: Obx(() {
             return ApiStateView(
               state: _stateOf(),
@@ -75,19 +76,25 @@ class UnitListScreen extends GetView<UnitListController> {
                     ),
                     AppGap.h16,
                     Expanded(
+                      // Nút "Thi lên cấp luôn" là item CUỐI danh sách (cuộn cùng
+                      // list), không cố định đáy màn. itemCount +1 cho nút.
                       child: ListView.separated(
-                        padding: EdgeInsets.zero,
-                        itemCount: d.units.length,
+                        padding: const EdgeInsets.only(bottom: 16),
+                        itemCount: d.units.length + 1,
                         separatorBuilder: (_, __) => AppGap.h10,
-                        itemBuilder: (_, index) => _UnitCard(
-                          unit: d.units[index],
-                          onTap: () => controller.openUnit(d.units[index]),
-                        ),
+                        itemBuilder: (_, index) {
+                          if (index == d.units.length) {
+                            return _SkipToTestButton(
+                              onTap: () => _openCheckpoint(d.level),
+                            );
+                          }
+                          return _UnitCard(
+                            unit: d.units[index],
+                            onTap: () => controller.openUnit(d.units[index]),
+                          );
+                        },
                       ),
                     ),
-                    AppGap.h12,
-                    // Thi luôn — bỏ qua học, làm bài kiểm tra cuối cấp để thử lên cấp.
-                    _SkipToTestButton(onTap: () => _openCheckpoint(d.level)),
                   ],
                 );
               },

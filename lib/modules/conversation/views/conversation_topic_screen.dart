@@ -64,6 +64,20 @@ class _ConversationTopicScreenState extends State<ConversationTopicScreen> {
   final _customCtrl = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Mở từ trong 1 bài giáo trình ("Luyện nói chủ đề bài này"): nhận topic gợi ý
+    // từ tiêu đề bài → bắt đầu luôn, không bắt user chọn lại (B xoay quanh A).
+    final args = Get.arguments;
+    if (args is Map && args['topic'] is String) {
+      final topic = (args['topic'] as String).trim();
+      if (topic.isNotEmpty) {
+        WidgetsBinding.instance.addPostFrameCallback((_) => _start(topic));
+      }
+    }
+  }
+
+  @override
   void dispose() {
     _customCtrl.dispose();
     super.dispose();
@@ -90,7 +104,6 @@ class _ConversationTopicScreenState extends State<ConversationTopicScreen> {
                 title: 'Hội thoại với AI',
                 showBack: true,
                 showSettings: false,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: Get.back,
               ),

@@ -24,7 +24,25 @@ class ExerciseController extends GetxController {
   final Rxn<ExerciseCompleteResponse> completion = Rxn();
 
   ExerciseCategory? _activeCategory;
+  String? _activeLevel;
   String? _sessionId;
+
+  @override
+  void onReady() {
+    super.onReady();
+    // Mở thẳng 1 category từ Home (vd Luyện tập nhanh → Đọc) qua arguments:
+    // {category: 'reading', level: 'B1'}. Hub vào không có args → bỏ qua, chờ user chọn.
+    final args = Get.arguments;
+    if (args is Map && args['category'] is String) {
+      final cat = ExerciseCategory.values.firstWhereOrNull(
+        (e) => e.name == args['category'],
+      );
+      if (cat != null) {
+        // Đã ở màn quiz (Home push trực tiếp) → chỉ nạp session, KHÔNG push lại.
+        _beginSession(cat, level: args['level'] as String?);
+      }
+    }
+  }
 
   ExerciseQuestion? get currentExercise =>
       questions.isNotEmpty && currentIndex.value < questions.length
@@ -36,16 +54,25 @@ class ExerciseController extends GetxController {
   int get totalAnswered => results.length;
   int get xpEarned => completion.value?.xpEarned ?? 0;
 
-  void startSession(ExerciseCategory category) {
-    _reset(category);
+  /// [level]: CEFR user — bắt buộc cho reading (cá nhân hóa); bỏ qua với vocab/grammar.
+  void startSession(ExerciseCategory category, {String? level}) {
     Get.toNamed(AppRoutes.exerciseQuiz);
-    _fetchQuestions(category);
+    _beginSession(category, level: level);
   }
 
-  Future<void> _fetchQuestions(ExerciseCategory category) async {
+  /// Nạp session (reset + fetch) KHÔNG điều hướng — dùng khi đã ở màn quiz
+  /// (vd Home push thẳng exerciseQuiz kèm arguments).
+  void _beginSession(ExerciseCategory category, {String? level}) {
+    _reset(category);
+    _activeLevel = level;
+    _fetchQuestions(category, level);
+  }
+
+  Future<void> _fetchQuestions(ExerciseCategory category, String? level) async {
     try {
       state.value = ExerciseState.loading;
-      final session = await _repo.getExerciseSession(category: category);
+      final session =
+          await _repo.getExerciseSession(category: category, level: level);
       _sessionId = session.sessionId;
       questions.assignAll(session.questions);
       state.value = ExerciseState.playing;
@@ -59,7 +86,7 @@ class ExerciseController extends GetxController {
   Future<void> retryLoad() async {
     if (_activeCategory == null) return;
     errorMessage.value = '';
-    await _fetchQuestions(_activeCategory!);
+    await _fetchQuestions(_activeCategory!, _activeLevel);
   }
 
   void selectAnswer(String answer) {
@@ -120,6 +147,7 @@ class ExerciseController extends GetxController {
         xpEarned: result.xpEarned,
         streakUpdated: result.streakUpdated,
         bonuses: result.bonuses,
+        newBadges: result.newBadges,
       );
       state.value = ExerciseState.finished;
       Get.offNamed(AppRoutes.exerciseResult);
@@ -132,9 +160,12 @@ class ExerciseController extends GetxController {
   }
 
   void retrySession() {
-    if (_activeCategory != null) {
-      _reset(_activeCategory!);
-      _fetchQuestions(_activeCategory!);
+    final cat = _activeCategory;
+    if (cat != null) {
+      final level = _activeLevel;
+      _reset(cat);
+      _activeLevel = level;
+      _fetchQuestions(cat, level);
     }
   }
 

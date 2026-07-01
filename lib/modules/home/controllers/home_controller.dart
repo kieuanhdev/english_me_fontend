@@ -198,26 +198,19 @@ class HomeController extends GetxController {
   // ----- Per-skill (H3) + kỹ năng yếu nhất (H1/H2 reason) -----
   SkillBreakdown? get skills => skillBreakdown.value;
 
-  /// Tổng điểm các kỹ năng. 0 => user mới, chưa có dữ liệu.
-  double get _skillTotal {
+  /// Có ít nhất 1 kỹ năng có dữ liệu (có lesson ở level user). Không thì ẩn widget.
+  bool get hasSkillData {
     final s = skillBreakdown.value;
-    if (s == null) return 0;
-    return s.vocabulary + s.grammar + s.reading + s.pronunciation;
+    return s != null && s.withData.isNotEmpty;
   }
 
-  bool get hasSkillData => _skillTotal > 0;
-
-  /// key kỹ năng yếu nhất ('vocabulary'|'grammar'|'reading'|'pronunciation'); null nếu chưa đủ dữ liệu.
+  /// key kỹ năng yếu nhất (tiến độ thấp nhất) trong các kỹ năng CÓ dữ liệu; null nếu chưa có.
   String? get weakestSkillKey {
     final s = skillBreakdown.value;
-    if (s == null || _skillTotal <= 0) return null;
-    final entries = <String, double>{
-      'vocabulary': s.vocabulary,
-      'grammar': s.grammar,
-      'reading': s.reading,
-      'pronunciation': s.pronunciation,
-    };
-    String key = 'vocabulary';
+    if (s == null) return null;
+    final entries = s.withData;
+    if (entries.isEmpty) return null;
+    String? key;
     double min = double.infinity;
     entries.forEach((k, v) {
       if (v < min) {
@@ -236,6 +229,12 @@ class HomeController extends GetxController {
         return 'ngữ pháp';
       case 'reading':
         return 'đọc';
+      case 'listening':
+        return 'nghe';
+      case 'speaking':
+        return 'nói';
+      case 'writing':
+        return 'viết';
       case 'pronunciation':
         return 'phát âm';
       default:
@@ -366,7 +365,9 @@ class HomeController extends GetxController {
   // "Xem lộ trình" → chuyển sang tab Học (index 1) trong shell, giữ bottom navbar.
   void onSeeAllLessons() => ShellController.goToTab(1);
 
-  void onStartPlacementTest() => Get.toNamed(AppRoutes.placementTest);
+  // canGoBack: vào từ Home là push trên shell → cho phép nút Quay lại.
+  void onStartPlacementTest() =>
+      Get.toNamed(AppRoutes.placementTest, arguments: {'canGoBack': true});
 
   void onContinueLearning() {
     Get.toNamed(
@@ -385,8 +386,28 @@ class HomeController extends GetxController {
     loadCurrentUnit();
   }
 
-  /// Điều hướng nhanh từ dải nút truy cập nhanh ở Home.
+  /// Điều hướng nhanh từ dải 4 kỹ năng (Nghe/Nói/Đọc/Viết) ở Home.
+  ///   Nghe → dictation (nghe chép chính tả), Nói → phát âm,
+  ///   Đọc → exercise category=reading, Viết → màn "Sắp ra mắt".
+  /// Nghe/Đọc cá nhân hóa theo CEFR user ([homeLevel]).
   void openQuickAction(String key) {
+    switch (key) {
+      case 'speaking':
+        Get.toNamed(AppRoutes.pronunciation);
+      case 'listening':
+        Get.toNamed(AppRoutes.dictation, arguments: {'level': homeLevel});
+      case 'reading':
+        Get.toNamed(
+          AppRoutes.exerciseQuiz,
+          arguments: {'category': 'reading', 'level': homeLevel},
+        );
+      case 'writing':
+        Get.toNamed(AppRoutes.writing, arguments: {'level': homeLevel});
+    }
+  }
+
+  /// Điều hướng từ dải "Học phần bổ trợ" (Từ vựng/Ngữ pháp/Flashcard/Kiểm tra).
+  void openSupplementaryAction(String key) {
     switch (key) {
       case 'vocabulary':
         Get.toNamed(AppRoutes.vocabHub);
@@ -394,8 +415,6 @@ class HomeController extends GetxController {
         Get.toNamed(AppRoutes.grammarTheory);
       case 'flashcard':
         Get.toNamed(AppRoutes.flashcards);
-      case 'pronunciation':
-        Get.toNamed(AppRoutes.pronunciation);
       case 'test':
         Get.toNamed(AppRoutes.test);
     }

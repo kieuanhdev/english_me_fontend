@@ -2,7 +2,6 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/services/tts_service.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/pronunciation/models/pronunciation_models.dart';
@@ -28,10 +27,6 @@ class PronunciationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: AppBottomNav(
-        initialIndex: 2,
-        onTap: (index, _) => ShellController.goToTab(index),
-      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -41,7 +36,6 @@ class PronunciationScreen extends StatelessWidget {
               AppMainAppBar(
                 title: T.pronunTitle.tr,
                 showBack: true,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: _onBack,
               ),

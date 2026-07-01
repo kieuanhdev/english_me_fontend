@@ -44,38 +44,30 @@ class ProgressRepository {
   /// Chỉ lấy breakdown per-skill (không gọi xp-history/streak-calendar) — dùng cho
   /// Home để khỏi tốn 2 request thừa.
   ///
-  /// Backend trả raw XP per-skill (vd vocab 250 / grammar 140 / pron 30), KHÔNG
-  /// kèm maxScore → không dùng `normalized` (chia 100, vocab/grammar đều clamp 1.0,
-  /// mất ý nghĩa so sánh). Thay vào đó chuẩn hóa theo SHARE = xp / max(xp) để bar
-  /// phản ánh đúng tương quan: skill cao nhất = 1.0, skill yếu nhất bar ngắn rõ rệt.
+  /// Backend trả score = số lesson ĐÃ HOÀN THÀNH, maxScore = TỔNG lesson của skill
+  /// ở level user. % = score / maxScore (SkillScore.normalized) — tiến độ học thật,
+  /// không skill nào tự nhảy 100% khi mới học. Skill không gắn lesson (maxScore=0)
+  /// → ratio = -1 (sentinel "không có dữ liệu") để widget ẩn bar.
   Future<SkillBreakdown> getSkillBreakdown() async {
     final response = await _dio.get('/users/me/progress');
     final progress = ProgressResponse.fromJson(
       response.data as Map<String, dynamic>,
     );
-    final raw = <String, int>{};
+    final ratio = <String, double>{};
     for (final s in progress.skills) {
-      raw[s.skill.toLowerCase()] = s.score;
+      // maxScore<=0 (skill không có lesson) -> -1: client coi như chưa có dữ liệu.
+      final max = s.maxScore ?? 0;
+      ratio[s.skill.toLowerCase()] = max <= 0 ? -1 : s.normalized;
     }
-    final vocab = raw['vocabulary'] ?? 0;
-    final grammar = raw['grammar'] ?? 0;
-    final reading = raw['reading'] ?? 0;
-    final listening = raw['listening'] ?? 0;
-    final speaking = raw['speaking'] ?? 0;
-    final writing = raw['writing'] ?? 0;
-    final pron = raw['pronunciation'] ?? 0;
-    // Mốc chuẩn hóa = XP cao nhất trong tất cả skill (>0). Tất cả 0 -> giữ 0 (user mới).
-    final peak = [vocab, grammar, reading, listening, speaking, writing, pron]
-        .fold<int>(0, (a, b) => b > a ? b : a);
-    double share(int xp) => peak <= 0 ? 0 : (xp / peak).clamp(0.0, 1.0);
+    double r(String k) => ratio[k] ?? -1;
     return SkillBreakdown(
-      vocabulary: share(vocab),
-      grammar: share(grammar),
-      reading: share(reading),
-      listening: share(listening),
-      speaking: share(speaking),
-      writing: share(writing),
-      pronunciation: share(pron),
+      vocabulary: r('vocabulary'),
+      grammar: r('grammar'),
+      reading: r('reading'),
+      listening: r('listening'),
+      speaking: r('speaking'),
+      writing: r('writing'),
+      pronunciation: r('pronunciation'),
     );
   }
 

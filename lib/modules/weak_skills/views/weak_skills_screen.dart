@@ -32,7 +32,6 @@ class WeakSkillsScreen extends GetView<WeakSkillsController> {
               title: 'Kỹ năng cần cải thiện',
               showBack: true,
               showSettings: false,
-              showNotification: false,
               onBack: Get.back,
             ),
             Expanded(
@@ -112,15 +111,22 @@ class _SkillCard extends StatelessWidget {
         'vocabulary' => Icons.menu_book_rounded,
         'grammar' => Icons.rule_rounded,
         'reading' => Icons.article_rounded,
+        'listening' => Icons.headphones_rounded,
+        'speaking' => Icons.record_voice_over_rounded,
+        'writing' => Icons.edit_note_rounded,
         'pronunciation' => Icons.record_voice_over_rounded,
         _ => Icons.school_rounded,
       };
 
-  /// Nhãn nút "luyện ngay" theo skill — phát âm nhấn mạnh AI.
+  /// Nhãn nút "luyện ngay" theo skill — khớp với điều hướng trong controller.
   String get _practiceLabel => switch (item.key) {
-        'pronunciation' => 'Luyện nói với AI',
+        'pronunciation' || 'speaking' => 'Luyện nói với AI',
+        'listening' => 'Luyện nghe',
+        'reading' => 'Luyện đọc',
+        'writing' => 'Luyện viết',
         'grammar' => 'Học ngữ pháp',
-        _ => 'Ôn từ vựng',
+        'vocabulary' => 'Ôn từ vựng',
+        _ => 'Luyện ngay',
       };
 
   @override

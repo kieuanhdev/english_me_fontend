@@ -4,6 +4,7 @@ import 'package:englishme/modules/auth/bindings/auth_binding.dart';
 import 'package:englishme/modules/home/bindings/home_binding.dart';
 import 'package:englishme/modules/learn/bindings/curriculum_binding.dart';
 import 'package:englishme/modules/vocab_hub/bindings/vocab_hub_binding.dart';
+import 'package:englishme/onboarding/onboarding_screen.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/splash/splash_screen.dart';
 import 'package:englishme/welcome/welcome_screen.dart';
@@ -25,6 +26,10 @@ abstract class CorePages {
         VocabHubBinding(),
         CurriculumBinding(),
       ],
+    ),
+    GetPage(
+      name: AppRoutes.onboarding,
+      page: () => const OnboardingScreen(),
     ),
     GetPage(name: AppRoutes.welcome, page: () => const WelcomeScreen()),
   ];

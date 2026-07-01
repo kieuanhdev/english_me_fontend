@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/modules/exercise/controllers/exercise_controller.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -57,11 +58,8 @@ class ExerciseResultScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: controller.closeExercise,
-                    icon: const Icon(Icons.close_rounded, size: 22),
-                    color: AppColors.primary,
-                  ),
+                  AppCloseButton(onPressed: controller.closeExercise),
+                  AppGap.w8,
                   Text(
                     'Kết quả',
                     style: AppTypography.displayLarge.copyWith(

@@ -56,7 +56,6 @@ class PronunciationResultScreen extends StatelessWidget {
                 title: 'Kết quả phát âm',
                 showBack: true,
                 showSettings: false,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: Get.back,
               ),

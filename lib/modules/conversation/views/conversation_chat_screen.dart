@@ -30,7 +30,6 @@ class ConversationChatScreen extends StatelessWidget {
                       : ctrl.topic.value,
                   showBack: true,
                   showSettings: false,
-                  showNotification: false,
                   horizontalPadding: 0,
                   onBack: Get.back,
                 ),

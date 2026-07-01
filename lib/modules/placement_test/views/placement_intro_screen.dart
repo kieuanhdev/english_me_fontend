@@ -13,6 +13,13 @@ class PlacementIntroScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Chỉ hiện nút Quay lại khi vào từ luồng có thể pop (vd. làm lại test từ
+    // Profile/Home — push bình thường). Luồng tạo acc mới dùng offAllNamed nên
+    // stack rỗng → KHÔNG cho back (tránh ra màn trắng) → bắt buộc làm test.
+    final canGoBack = (Get.arguments is Map &&
+            (Get.arguments as Map)['canGoBack'] == true) &&
+        Navigator.of(context).canPop();
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -25,8 +32,7 @@ class PlacementIntroScreen extends StatelessWidget {
               AppMainAppBar(
                 title: 'Kiểm tra trình độ',
                 horizontalPadding: 0,
-                showBack: true,
-                showNotification: false,
+                showBack: canGoBack,
                 showSettings: false,
                 onBack: () => Navigator.of(context).pop(),
               ),

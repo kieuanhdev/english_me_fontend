@@ -8,6 +8,17 @@ import 'package:englishme/theme/app_theme.dart';
 /// H3 — đưa per-skill XP (vocab/grammar/phát âm) lên Home dưới dạng mini-bar.
 /// Highlight kỹ năng yếu nhất của user bằng màu cảnh báo + nhãn "Cần luyện thêm",
 /// để cá nhân hóa "lộ" ra ngay trang chủ thay vì giấu trong tab Tiến độ.
+/// Nhãn + icon mỗi kỹ năng. (label, icon).
+const Map<String, (String, IconData)> _skillMeta = {
+  'listening': ('Nghe', Icons.headphones_rounded),
+  'speaking': ('Nói', Icons.record_voice_over_rounded),
+  'reading': ('Đọc', Icons.article_rounded),
+  'writing': ('Viết', Icons.edit_rounded),
+  'vocabulary': ('Từ vựng', Icons.menu_book_rounded),
+  'grammar': ('Ngữ pháp', Icons.rule_rounded),
+  'pronunciation': ('Phát âm', Icons.mic_rounded),
+};
+
 class HomeSkillProgress extends GetView<HomeController> {
   const HomeSkillProgress({super.key});
 
@@ -20,35 +31,29 @@ class HomeSkillProgress extends GetView<HomeController> {
 
       final weakest = controller.weakestSkillKey;
 
-      final bars = <Widget>[
-        _SkillBar(
-          label: 'Từ vựng',
-          icon: Icons.menu_book_rounded,
-          value: s.vocabulary,
-          isWeak: weakest == 'vocabulary',
-        ),
-        AppGap.h12,
-        _SkillBar(
-          label: 'Ngữ pháp',
-          icon: Icons.rule_rounded,
-          value: s.grammar,
-          isWeak: weakest == 'grammar',
-        ),
-        AppGap.h12,
-        _SkillBar(
-          label: 'Đọc',
-          icon: Icons.article_rounded,
-          value: s.reading,
-          isWeak: weakest == 'reading',
-        ),
-        AppGap.h12,
-        _SkillBar(
-          label: 'Phát âm',
-          icon: Icons.record_voice_over_rounded,
-          value: s.pronunciation,
-          isWeak: weakest == 'pronunciation',
-        ),
+      // Chỉ hiện kỹ năng CÓ dữ liệu (có lesson ở level user). value < 0 = ẩn.
+      // Giữ thứ tự cố định Nghe→Nói→Đọc→Viết→… cho ổn định thị giác.
+      const order = [
+        'listening',
+        'speaking',
+        'reading',
+        'writing',
+        'vocabulary',
+        'grammar',
+        'pronunciation',
       ];
+      final data = s.withData;
+      final bars = <Widget>[];
+      for (final key in order) {
+        if (!data.containsKey(key)) continue;
+        if (bars.isNotEmpty) bars.add(AppGap.h12);
+        bars.add(_SkillBar(
+          label: _skillMeta[key]!.$1,
+          icon: _skillMeta[key]!.$2,
+          value: data[key]!,
+          isWeak: weakest == key,
+        ));
+      }
 
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -75,7 +80,7 @@ class HomeSkillProgress extends GetView<HomeController> {
                       AppGap.w8,
                       Expanded(
                         child: Text(
-                          'Kỹ năng của bạn',
+                          'Cần cải thiện',
                           style: AppTypography.bodyLarge.copyWith(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,

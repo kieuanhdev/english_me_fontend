@@ -5,16 +5,16 @@ import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/modules/home/controllers/home_controller.dart';
 import 'package:englishme/theme/app_theme.dart';
 
-/// Dải nút truy cập nhanh tới các học phần bổ trợ.
+/// Dải nút truy cập nhanh 4 kỹ năng ngôn ngữ: Nghe / Nói / Đọc / Viết.
+/// Nói = Phát âm (đã có); Nghe/Đọc/Viết → màn "Sắp ra mắt".
 class HomeQuickActions extends GetView<HomeController> {
   const HomeQuickActions({super.key});
 
   static const _actions = <_QuickAction>[
-    _QuickAction('vocabulary', 'Từ vựng', Icons.style_rounded),
-    _QuickAction('grammar', 'Ngữ pháp', Icons.menu_book_rounded),
-    _QuickAction('flashcard', 'Flashcard', Icons.layers_rounded),
-    _QuickAction('pronunciation', 'Phát âm', Icons.record_voice_over_rounded),
-    _QuickAction('test', 'Kiểm tra', Icons.fact_check_rounded),
+    _QuickAction('listening', 'Nghe', Icons.headphones_rounded),
+    _QuickAction('speaking', 'Nói', Icons.record_voice_over_rounded),
+    _QuickAction('reading', 'Đọc', Icons.menu_book_rounded),
+    _QuickAction('writing', 'Viết', Icons.edit_note_rounded),
   ];
 
   @override
@@ -111,11 +111,10 @@ class _QuickActionTile extends StatelessWidget {
   }
 
   Color _colorFor(String key) => switch (key) {
-        'vocabulary' => AppColors.skillVocabulary,
-        'grammar' => AppColors.skillGrammar,
-        'flashcard' => AppColors.tertiary,
-        'pronunciation' => AppColors.skillListening,
-        'test' => AppColors.success,
+        'listening' => AppColors.skillListening,
+        'speaking' => AppColors.primary,
+        'reading' => AppColors.tertiary,
+        'writing' => AppColors.success,
         _ => AppColors.primary,
       };
 }

@@ -14,6 +14,31 @@ class XpBonus {
       );
 }
 
+/// Badge vừa mở khoá trong 1 lần kiếm XP (mọi luồng: lesson/test/exercise/...).
+/// FE dùng để hiện popup ăn mừng ngay, thay vì chờ user vào hồ sơ mới thấy.
+class BadgeAward {
+  final String name;
+  final String description;
+  final String? iconUrl;
+
+  const BadgeAward({required this.name, required this.description, this.iconUrl});
+
+  factory BadgeAward.fromJson(Map<String, dynamic> json) => BadgeAward(
+        name: (json['name'] as String?) ?? '',
+        description: (json['description'] as String?) ?? '',
+        iconUrl: json['iconUrl'] as String?,
+      );
+
+  /// Parse list `newBadges` từ JSON response (an toàn null/non-list).
+  static List<BadgeAward> listFrom(dynamic raw) {
+    if (raw is! List) return const [];
+    return raw
+        .whereType<Map<String, dynamic>>()
+        .map(BadgeAward.fromJson)
+        .toList();
+  }
+}
+
 class LevelUnits {
   LevelUnits({
     required this.level,
@@ -172,6 +197,11 @@ class CurriculumLessonDetail {
     required this.theoryViewed,
     required this.practiceCompleted,
     required this.status,
+    required this.bestScore,
+    required this.lastScore,
+    required this.unitProgress,
+    required this.unitCompleted,
+    required this.nextLessonId,
     required this.theory,
     required this.exercises,
     required this.quiz,
@@ -188,6 +218,11 @@ class CurriculumLessonDetail {
   final bool theoryViewed;
   final bool practiceCompleted; // đã xong luyện tập → vào thẳng quiz
   final String status;          // locked | available | in_progress | completed
+  final int bestScore;          // điểm cao nhất đã đạt (0 nếu chưa nộp)
+  final int lastScore;          // điểm lần nộp gần nhất
+  final double unitProgress;    // tiến độ unit (0..1) — dựng lại màn Kết quả
+  final bool unitCompleted;     // unit đã hoàn thành toàn bộ chưa
+  final String? nextLessonId;   // bài kế trong unit (null nếu bài cuối)
   final LessonTheory theory;
   final List<CurriculumActivity> exercises; // phase=practice
   final List<CurriculumActivity> quiz;       // phase=quiz
@@ -209,6 +244,11 @@ class CurriculumLessonDetail {
         theoryViewed: json['theoryViewed'] == true,
         practiceCompleted: json['practiceCompleted'] == true,
         status: (json['status'] ?? 'available').toString(),
+        bestScore: _i(json['bestScore']),
+        lastScore: _i(json['lastScore']),
+        unitProgress: _d(json['unitProgress']),
+        unitCompleted: json['unitCompleted'] == true,
+        nextLessonId: json['nextLessonId']?.toString(),
         theory: LessonTheory.fromJson(
             (json['theory'] as Map<String, dynamic>?) ?? const {}),
         exercises: _list(json['exercises'], CurriculumActivity.fromJson),
@@ -395,6 +435,7 @@ class LessonResult {
     this.dailyEarnedXp = 0,
     this.streakUpdated = false,
     this.bonuses = const [],
+    this.newBadges = const [],
   });
   final bool passed;
   final int score;
@@ -408,6 +449,7 @@ class LessonResult {
   final int dailyEarnedXp;
   final bool streakUpdated;
   final List<XpBonus> bonuses;
+  final List<BadgeAward> newBadges; // badge vừa mở khoá → popup ăn mừng
 }
 
 // ── Level Checkpoint Test (lên cấp CEFR) ──

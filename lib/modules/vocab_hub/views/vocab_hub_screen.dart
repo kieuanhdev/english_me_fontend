@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/values/app_strings.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/vocab_hub/controllers/vocab_deck_controller.dart';
 import 'package:englishme/modules/vocab_hub/views/widgets/vocab_deck_list.dart';
@@ -34,10 +32,6 @@ class VocabHubScreen extends StatelessWidget {
         backgroundColor: AppColors.surface,
         // FAB tạo bộ thẻ — chỉ hiện ở tab "Bộ thẻ của tôi" (index 1).
         floatingActionButton: const _CreateDeckFab(),
-        bottomNavigationBar: AppBottomNav(
-          initialIndex: 2,
-          onTap: (index, _) => ShellController.goToTab(index),
-        ),
         body: SafeArea(
           child: Column(
             children: [
@@ -46,6 +40,7 @@ class VocabHubScreen extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: AppMainAppBar(
                   title: 'Từ vựng',
+                  showBack: true,
                   showSearch: true,
                   horizontalPadding: 0,
                 ),

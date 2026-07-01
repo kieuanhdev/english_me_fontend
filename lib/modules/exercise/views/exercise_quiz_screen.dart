@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/modules/exercise/controllers/exercise_controller.dart';
 import 'package:englishme/modules/exercise/models/exercise_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -95,11 +96,8 @@ class _QuizAppBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          IconButton(
-            onPressed: onClose,
-            icon: const Icon(Icons.close_rounded, size: 22),
-            color: AppColors.primary,
-          ),
+          AppCloseButton(onPressed: onClose),
+          AppGap.w8,
           Text(
             'Luyện tập',
             style: AppTypography.displayLarge.copyWith(
@@ -228,6 +226,11 @@ class _QuizBody extends StatelessWidget {
           ],
         ),
         AppGap.h18,
+        // Passage (reading) — đoạn văn đọc hiểu phía trên câu hỏi.
+        if (question.passage != null && question.passage!.trim().isNotEmpty) ...[
+          _PassageCard(passage: question.passage!.trim()),
+          AppGap.h16,
+        ],
         // Question card
         Container(
           width: double.infinity,
@@ -385,6 +388,51 @@ class _OptionTile extends StatelessWidget {
   }
 }
 
+// ─── Passage Card (reading) ───────────────────────────────────────────────────
+
+class _PassageCard extends StatelessWidget {
+  const _PassageCard({required this.passage});
+  final String passage;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        border: Border.all(color: AppColors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.menu_book_rounded,
+                  size: 14, color: AppColors.tertiary),
+              const SizedBox(width: 6),
+              Text(
+                'Đoạn văn',
+                style: AppTypography.labelSmall.copyWith(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.tertiary,
+                ),
+              ),
+            ],
+          ),
+          AppGap.h8,
+          Text(
+            passage,
+            style: AppTypography.bodyLarge.copyWith(fontSize: 14, height: 1.6),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Category & Difficulty Chips ──────────────────────────────────────────────
 
 class _CategoryChip extends StatelessWidget {
@@ -393,10 +441,23 @@ class _CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isVocab = category == ExerciseCategory.vocabulary;
-    final color = isVocab ? AppColors.skillVocabulary : AppColors.skillGrammar;
-    final label = isVocab ? 'Từ vựng' : 'Ngữ pháp';
-    final icon = isVocab ? Icons.style_rounded : Icons.menu_book_rounded;
+    final (label, color, icon) = switch (category) {
+      ExerciseCategory.vocabulary => (
+          'Từ vựng',
+          AppColors.skillVocabulary,
+          Icons.style_rounded
+        ),
+      ExerciseCategory.grammar => (
+          'Ngữ pháp',
+          AppColors.skillGrammar,
+          Icons.menu_book_rounded
+        ),
+      ExerciseCategory.reading => (
+          'Đọc hiểu',
+          AppColors.tertiary,
+          Icons.chrome_reader_mode_rounded
+        ),
+    };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(

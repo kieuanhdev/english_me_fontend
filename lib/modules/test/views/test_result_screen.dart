@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/modules/test/controllers/test_controller.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -64,11 +65,8 @@ class TestResultScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: controller.closeTest,
-                    icon: const Icon(Icons.close_rounded, size: 22),
-                    color: AppColors.primary,
-                  ),
+                  AppCloseButton(onPressed: controller.closeTest),
+                  AppGap.w8,
                   Text(
                     'Kết quả kiểm tra',
                     style: AppTypography.displayLarge.copyWith(

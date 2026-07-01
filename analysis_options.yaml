@@ -1,1 +1,36 @@
 include: package:flutter_lints/flutter.yaml
+
+# ─────────────────────────────────────────────────────────────────────────
+# Lint guard cho UI consistency.
+#
+# `analyzer` mặc định KHÔNG có rule "forbid pattern" cho `Colors.white`,
+# `Color(0x…)`, `fontFamily:`… nên ta dùng script:
+#
+#     dart run tool/check_ui_consistency.dart
+#
+# Chạy như một bước trong CI (hoặc pre-commit) để chặn regression.
+# Lần đầu chạy: `dart run tool/check_ui_consistency.dart --baseline` để
+# snapshot số vi phạm hiện tại; sau đó script chỉ fail khi số vi phạm
+# vượt baseline → cho phép giảm dần mà không phải fix sạch ngay.
+#
+# Quy ước token: xem docs/UI_CONSISTENCY_AUDIT.md.
+# ─────────────────────────────────────────────────────────────────────────
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/gen/**"
+  # NOTE: strict-casts / strict-raw-types tạm tắt — bật sau khi dọn `dynamic`
+  # ở lib/data/models/*. Đợt 1 chỉ thêm token, không động vào view.
+
+linter:
+  rules:
+    # Khuyến nghị bám theme tokens
+    avoid_redundant_argument_values: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    prefer_const_declarations: true
+    sized_box_for_whitespace: true
+    use_colored_box: true
+    use_decorated_box: true

@@ -1,10 +1,10 @@
-import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus;
+import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus, BadgeAward;
 
 enum ExerciseType { multipleChoice, fillBlank }
 
 enum ExerciseDifficulty { easy, medium, hard }
 
-enum ExerciseCategory { vocabulary, grammar }
+enum ExerciseCategory { vocabulary, grammar, reading }
 
 /// Câu hỏi exercise / user test.
 /// Backend trả `options` dạng `{A: ..., B: ..., C: ..., D: ...}`.
@@ -21,6 +21,8 @@ class ExerciseQuestion {
   final String correctAnswer;
   final String? explanation;
   final String? hint;
+  final String? passage;
+  final String? audioUrl;
 
   const ExerciseQuestion({
     required this.id,
@@ -33,6 +35,8 @@ class ExerciseQuestion {
     required this.correctAnswer,
     this.explanation,
     this.hint,
+    this.passage,
+    this.audioUrl,
   });
 
   factory ExerciseQuestion.fromJson(Map<String, dynamic> json) {
@@ -74,6 +78,8 @@ class ExerciseQuestion {
       correctAnswer: (json['correctAnswer'] ?? '').toString(),
       explanation: json['explanation'] as String?,
       hint: json['hint'] as String?,
+      passage: json['passage'] as String?,
+      audioUrl: json['audioUrl'] as String?,
     );
   }
 
@@ -137,6 +143,7 @@ class ExerciseCompleteResponse {
   final int dailyEarnedXp;
   final bool streakUpdated;
   final List<XpBonus> bonuses;
+  final List<BadgeAward> newBadges;
 
   const ExerciseCompleteResponse({
     required this.totalQuestions,
@@ -148,6 +155,7 @@ class ExerciseCompleteResponse {
     required this.dailyEarnedXp,
     required this.streakUpdated,
     this.bonuses = const [],
+    this.newBadges = const [],
   });
 
   factory ExerciseCompleteResponse.fromJson(Map<String, dynamic> json) {
@@ -167,6 +175,7 @@ class ExerciseCompleteResponse {
               .map(XpBonus.fromJson)
               .toList()
           : const [],
+      newBadges: BadgeAward.listFrom(json['newBadges']),
     );
   }
 }

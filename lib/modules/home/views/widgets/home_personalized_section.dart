@@ -26,9 +26,7 @@ class HomePersonalizedSection extends GetView<HomeController> {
       final weakLabel = controller.weakestSkillLabel;
       final showWeak = weakLabel.isNotEmpty;
 
-      if (due <= 0 && !showContinue && !showWeak) {
-        return const SizedBox.shrink();
-      }
+      final isEmpty = due <= 0 && !showContinue && !showWeak;
 
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -37,6 +35,10 @@ class HomePersonalizedSection extends GetView<HomeController> {
           children: [
             const _SectionHeader(),
             AppGap.h12,
+            // User mới chưa có tín hiệu cá nhân hóa nào → KHÔNG ẩn section, hiện
+            // empty state mời học để tạo dữ liệu (thay vì để trống khó hiểu).
+            if (isEmpty)
+              _EmptyPersonalCard(onTap: controller.onContinueLearning),
             if (due > 0) ...[
               _PersonalCard(
                 icon: Icons.refresh_rounded,
@@ -177,6 +179,72 @@ class _PersonalCard extends StatelessWidget {
                 ),
               ),
               Icon(Icons.chevron_right_rounded, color: accent),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Empty state khi user CHƯA có tín hiệu cá nhân hóa (mới, chưa học gì). Mời học
+/// để app có dữ liệu gợi ý — thay vì ẩn section gây cảm giác trống/lỗi.
+class _EmptyPersonalCard extends StatelessWidget {
+  const _EmptyPersonalCard({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceContainerLowest,
+      borderRadius: BorderRadius.circular(AppRadius.lg),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+            border: Border.all(color: AppColors.outlineVariant),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: Icon(Icons.school_rounded,
+                    color: AppColors.primary, size: 24),
+              ),
+              AppGap.w12,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Chưa có dữ liệu cá nhân',
+                      style: AppTypography.bodyLarge.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Bắt đầu học để app gợi ý bài luyện, thẻ ôn và kỹ năng '
+                      'cần cải thiện dành riêng cho bạn',
+                      style: AppTypography.labelSmall.copyWith(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right_rounded, color: AppColors.primary),
             ],
           ),
         ),

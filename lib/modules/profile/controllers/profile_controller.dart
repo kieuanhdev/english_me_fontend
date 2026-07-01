@@ -142,7 +142,8 @@ class ProfileController extends GetxController {
   }
 
   void goToPlacementTest() {
-    Get.toNamed(AppRoutes.placementTest);
+    // canGoBack: vào từ Profile là push bình thường → cho phép nút Quay lại.
+    Get.toNamed(AppRoutes.placementTest, arguments: {'canGoBack': true});
   }
 
   /// Cập nhật `totalXp` (và streak nếu vừa được tăng) từ response của 4 endpoint

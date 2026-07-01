@@ -57,7 +57,6 @@ class ConversationSummaryScreen extends StatelessWidget {
                 title: 'Tổng kết hội thoại',
                 showBack: true,
                 showSettings: false,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: Get.back,
               ),

@@ -1,4 +1,4 @@
-import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus;
+import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus, BadgeAward;
 
 /// Response từ `GET /api/study-sessions/{id}/summary`.
 class StudySessionSummary {
@@ -15,6 +15,7 @@ class StudySessionSummary {
   final int? totalXp;
   final bool streakUpdated;
   final List<XpBonus> bonuses;
+  final List<BadgeAward> newBadges;
 
   const StudySessionSummary({
     required this.masteredCards,
@@ -27,6 +28,7 @@ class StudySessionSummary {
     this.totalXp,
     this.streakUpdated = false,
     this.bonuses = const [],
+    this.newBadges = const [],
   });
 
   factory StudySessionSummary.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,7 @@ class StudySessionSummary {
               .map(XpBonus.fromJson)
               .toList()
           : const [],
+      newBadges: BadgeAward.listFrom(json['newBadges']),
     );
   }
 }

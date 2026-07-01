@@ -39,4 +39,28 @@ class GrammarRepository {
       (response.data as Map).cast<String, dynamic>(),
     );
   }
+
+  /// Sinh thêm câu luyện tập CÙNG DẠNG với câu user vừa làm sai (AI).
+  /// AI hỏng / chưa cấu hình -> backend trả list rỗng (FE báo thử lại).
+  Future<List<GrammarPracticeItem>> generateSimilar({
+    required String lessonId,
+    required String exerciseType,
+    required Map<String, dynamic> wrongContent,
+    int count = 3,
+  }) async {
+    final response = await _dio.post(
+      '/grammar/practice/similar',
+      data: {
+        'lessonId': lessonId,
+        'exerciseType': exerciseType,
+        'wrongContent': wrongContent,
+        'count': count,
+      },
+    );
+    final list = (response.data as List?) ?? const [];
+    return list
+        .whereType<Map>()
+        .map((e) => GrammarPracticeItem.fromJson(e.cast<String, dynamic>()))
+        .toList();
+  }
 }

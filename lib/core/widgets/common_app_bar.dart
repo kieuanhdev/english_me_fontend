@@ -10,6 +10,7 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CommonAppBar({
     super.key,
     required this.title,
+    this.titleWidget,
     this.actions,
     this.leading,
     this.onBackPressed,
@@ -19,6 +20,10 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   final String title;
+
+  /// Nếu set, dùng widget này làm title thay cho chuỗi [title]
+  /// (vd hàng logo + tên app ở màn auth).
+  final Widget? titleWidget;
   final List<Widget>? actions;
   final Widget? leading;
   final VoidCallback? onBackPressed;
@@ -49,14 +54,15 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ))
           : null,
-      title: AppText(
-        title,
-        style: AppTypography.displayLarge.copyWith(
-          fontSize: 20,
-          color: AppColors.primary,
-        ),
-        isTranslate: isTranslate,
-      ),
+      title: titleWidget ??
+          AppText(
+            title,
+            style: AppTypography.displayLarge.copyWith(
+              fontSize: 20,
+              color: AppColors.primary,
+            ),
+            isTranslate: isTranslate,
+          ),
       actions: actions,
     );
   }

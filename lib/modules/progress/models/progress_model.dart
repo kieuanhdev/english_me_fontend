@@ -23,6 +23,22 @@ class SkillBreakdown {
     required this.writing,
     required this.pronunciation,
   });
+
+  /// Tất cả kỹ năng kèm value (0..1). value < 0 = không có dữ liệu (skill không
+  /// gắn lesson) → caller lọc ra trước khi hiển thị / so sánh.
+  Map<String, double> get all => {
+    'vocabulary': vocabulary,
+    'grammar': grammar,
+    'reading': reading,
+    'listening': listening,
+    'speaking': speaking,
+    'writing': writing,
+    'pronunciation': pronunciation,
+  };
+
+  /// Chỉ các kỹ năng CÓ dữ liệu (value >= 0) — dùng để vẽ bar và tìm kỹ năng yếu.
+  Map<String, double> get withData =>
+      Map.fromEntries(all.entries.where((e) => e.value >= 0));
 }
 
 /// Weekly summary đã đổi shape theo backend (mục 11.4):

@@ -217,6 +217,7 @@ class StudySessionController extends GetxController {
           xpEarned: s.xpEarned,
           streakUpdated: s.streakUpdated,
           bonuses: s.bonuses,
+          newBadges: s.newBadges,
         );
       }
     } catch (e) {

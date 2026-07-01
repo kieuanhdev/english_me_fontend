@@ -1,4 +1,4 @@
-import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus;
+import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus, BadgeAward;
 
 enum TestTopic { grammar, vocabulary }
 
@@ -170,6 +170,7 @@ class TestSubmitResponse {
   final String? cefrSuggestion;
   final int timeTakenSeconds;
   final List<XpBonus> bonuses;
+  final List<BadgeAward> newBadges;
 
   const TestSubmitResponse({
     required this.sessionId,
@@ -184,6 +185,7 @@ class TestSubmitResponse {
     this.cefrSuggestion,
     required this.timeTakenSeconds,
     this.bonuses = const [],
+    this.newBadges = const [],
   });
 
   factory TestSubmitResponse.fromJson(Map<String, dynamic> json) {
@@ -206,6 +208,7 @@ class TestSubmitResponse {
               .map(XpBonus.fromJson)
               .toList()
           : const [],
+      newBadges: BadgeAward.listFrom(json['newBadges']),
     );
   }
 }

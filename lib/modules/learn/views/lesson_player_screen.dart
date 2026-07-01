@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,7 +30,6 @@ class LessonPlayerScreen extends GetView<LessonPlayerController> {
                 title: controller.detail.value?.title ?? 'Bài học',
                 showBack: true,
                 showSettings: false,
-                showNotification: false,
                 onBack: Get.back,
               ),
               AppGap.h16,
@@ -619,9 +620,63 @@ class _QuizView extends StatelessWidget {
 }
 
 // ══════════ KẾT QUẢ ══════════
-class _SummaryView extends StatelessWidget {
+class _SummaryView extends StatefulWidget {
   const _SummaryView({required this.c});
   final LessonPlayerController c;
+
+  @override
+  State<_SummaryView> createState() => _SummaryViewState();
+}
+
+class _SummaryViewState extends State<_SummaryView>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _anim;
+
+  @override
+  void initState() {
+    super.initState();
+    // 1 controller drive toàn màn: ring quét + số đếm + các phần trượt vào tuần
+    // tự (staggered qua Interval). Tổng 1.3s, không lặp.
+    _anim = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1300),
+    );
+    // Chỉ chạy animation khi có kết quả MỚI (vừa nộp). Ôn tập (r==null) bỏ qua.
+    if (widget.c.result.value != null) {
+      _anim.forward();
+    } else {
+      _anim.value = 1; // hiện đủ ngay, không animate.
+    }
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
+  /// Bọc 1 phần nội dung bằng fade + trượt lên, bắt đầu tại [start] (0..1) của
+  /// timeline → các phần vào tuần tự tạo cảm giác "dựng" mượt.
+  Widget _staggered(double start, Widget child) {
+    final curve = CurvedAnimation(
+      parent: _anim,
+      curve: Interval(start, (start + 0.45).clamp(0.0, 1.0),
+          curve: Curves.easeOutCubic),
+    );
+    return AnimatedBuilder(
+      animation: curve,
+      builder: (_, __) => Opacity(
+        opacity: curve.value,
+        child: Transform.translate(
+          offset: Offset(0, (1 - curve.value) * 18),
+          child: __,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  LessonPlayerController get c => widget.c;
 
   @override
   Widget build(BuildContext context) {
@@ -671,38 +726,31 @@ class _SummaryView extends StatelessWidget {
       child: Column(
         children: [
           const Spacer(flex: 2),
-          // Vòng tròn điểm — viền dày theo trạng thái, điểm nổi bật ở giữa.
-          Container(
-            width: 132,
-            height: 132,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.10),
-              shape: BoxShape.circle,
-              border: Border.all(color: color, width: 4),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('${r.score}',
-                    style: AppTypography.displayLarge
-                        .copyWith(color: color, fontSize: 40, height: 1)),
-                Text('ĐIỂM',
-                    style: AppTypography.labelXSmall.copyWith(
-                        color: color, fontWeight: FontWeight.w900)),
-              ],
-            ),
+          // Vòng tròn điểm — ring quét tròn theo điểm + số đếm 0→score.
+          _AnimatedScoreRing(
+            anim: _anim,
+            score: r.score,
+            color: color,
+            passed: r.passed,
           ),
           AppGap.h20,
-          Text(title,
-              style: AppTypography.headlineMedium.copyWith(color: color)),
+          _staggered(
+            0.45,
+            Text(title,
+                style: AppTypography.headlineMedium.copyWith(color: color)),
+          ),
           AppGap.h6,
-          Text(subtitle,
-              textAlign: TextAlign.center,
-              style: AppTypography.bodySmall),
+          _staggered(
+            0.50,
+            Text(subtitle,
+                textAlign: TextAlign.center, style: AppTypography.bodySmall),
+          ),
           AppGap.h20,
 
           // Hàng chip thông tin: XP + ngưỡng đạt.
-          Wrap(
+          _staggered(
+            0.58,
+            Wrap(
             alignment: WrapAlignment.center,
             spacing: 10,
             runSpacing: 10,
@@ -721,19 +769,25 @@ class _SummaryView extends StatelessWidget {
                 color: color,
               ),
             ],
+            ),
           ),
           AppGap.h24,
 
           // Tiến độ unit sau bài học này.
-          _UnitProgressBar(
-            progress: r.unitProgress.clamp(0, 1).toDouble(),
-            completed: r.unitCompleted,
+          _staggered(
+            0.66,
+            _UnitProgressBar(
+              progress: r.unitProgress.clamp(0, 1).toDouble(),
+              completed: r.unitCompleted,
+            ),
           ),
 
           const Spacer(flex: 3),
 
           // Nút hành động đúng ngữ cảnh.
-          Row(
+          _staggered(
+            0.74,
+            Row(
             children: [
               Expanded(
                 child: AppButton(
@@ -764,7 +818,33 @@ class _SummaryView extends StatelessWidget {
                 ),
               ),
             ],
+            ),
           ),
+          // Luyện sâu kỹ năng của bài bằng engine chuyên biệt (Nghe chép/Nói AI/
+          // Đọc hiểu/Viết AI) — đúng nội dung vừa học (4 kỹ năng B xoay quanh A).
+          if (c.hasSkillEngine) ...[
+            AppGap.h12,
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: c.openSkillEngine,
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  side: BorderSide(color: AppColors.tertiary),
+                  foregroundColor: AppColors.tertiary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.fitness_center_rounded, size: 18),
+                label: Text(
+                  c.skillEngineLabel,
+                  style: AppTypography.bodyRegular
+                      .copyWith(fontWeight: FontWeight.w800),
+                ),
+              ),
+            ),
+          ],
           AppGap.h12,
           // Luyện tập thêm với AI — sinh câu hỏi mới từ lý thuyết bài học.
           Obx(
@@ -802,6 +882,110 @@ class _SummaryView extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Vòng tròn điểm ở màn Kết quả — ring quét tròn từ 0 đến tỉ lệ điểm + số đếm
+/// 0→score đồng thời. Khi đạt: ring pulse nhẹ sau khi quét xong (overshoot).
+class _AnimatedScoreRing extends StatelessWidget {
+  const _AnimatedScoreRing({
+    required this.anim,
+    required this.score,
+    required this.color,
+    required this.passed,
+  });
+  final Animation<double> anim;
+  final int score;
+  final Color color;
+  final bool passed;
+
+  @override
+  Widget build(BuildContext context) {
+    // Ring + số chạy trong 0..0.55 timeline; phần sau dành cho staggered text.
+    final fill = CurvedAnimation(
+      parent: anim,
+      curve: const Interval(0.0, 0.55, curve: Curves.easeOutCubic),
+    );
+    // Pulse nhẹ khi đạt: phình to chút rồi về 1 ở cuối timeline.
+    final pulse = passed
+        ? TweenSequence<double>([
+            TweenSequenceItem(tween: Tween(begin: 1, end: 1.08), weight: 50),
+            TweenSequenceItem(
+                tween: Tween(begin: 1.08, end: 1.0), weight: 50),
+          ]).animate(CurvedAnimation(
+            parent: anim,
+            curve: const Interval(0.55, 0.8, curve: Curves.easeOut),
+          ))
+        : const AlwaysStoppedAnimation<double>(1.0);
+
+    return AnimatedBuilder(
+      animation: anim,
+      builder: (_, __) {
+        final fraction = (score / 100).clamp(0.0, 1.0) * fill.value;
+        final shown = (score * fill.value).round();
+        return Transform.scale(
+          scale: pulse.value,
+          child: SizedBox(
+            width: 132,
+            height: 132,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                CustomPaint(
+                  size: const Size(132, 132),
+                  painter: _ScoreRingPainter(fraction: fraction, color: color),
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('$shown',
+                        style: AppTypography.displayLarge
+                            .copyWith(color: color, fontSize: 40, height: 1)),
+                    Text('ĐIỂM',
+                        style: AppTypography.labelXSmall.copyWith(
+                            color: color, fontWeight: FontWeight.w900)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ScoreRingPainter extends CustomPainter {
+  const _ScoreRingPainter({required this.fraction, required this.color});
+  final double fraction;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const stroke = 9.0;
+    final rect = Rect.fromLTWH(
+      stroke / 2,
+      stroke / 2,
+      size.width - stroke,
+      size.height - stroke,
+    );
+    final track = Paint()
+      ..color = color.withValues(alpha: 0.12)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke;
+    canvas.drawArc(rect, 0, math.pi * 2, false, track);
+
+    if (fraction <= 0) return;
+    final fg = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round;
+    canvas.drawArc(rect, -math.pi / 2, fraction * math.pi * 2, false, fg);
+  }
+
+  @override
+  bool shouldRepaint(_ScoreRingPainter old) =>
+      old.fraction != fraction || old.color != color;
 }
 
 /// Chip thông tin nhỏ ở màn Kết quả (XP, ngưỡng đạt…).

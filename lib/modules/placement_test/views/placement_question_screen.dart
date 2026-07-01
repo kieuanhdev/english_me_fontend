@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/modules/placement_test/models/placement_test_models.dart';
 import 'package:englishme/modules/placement_test/controllers/placement_test_controller.dart';
@@ -156,12 +157,7 @@ class _QuestionTopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        IconButton(
-          onPressed: onClose,
-          icon: Icon(Icons.close, color: AppColors.iconMuted, size: 30),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 26, minHeight: 26),
-        ),
+        AppCloseButton(onPressed: onClose, size: 36),
         AppGap.w10,
         Expanded(
           child: ClipRRect(

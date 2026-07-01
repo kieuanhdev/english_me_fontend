@@ -2,6 +2,7 @@ import 'package:englishme/core/utils/app_notify.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/services/sound_service.dart';
 import 'package:englishme/core/services/xp_grant_handler.dart';
+import 'package:englishme/modules/learn/controllers/curriculum_progress_bus.dart';
 import 'package:englishme/modules/learn/models/curriculum_models.dart';
 import 'package:englishme/modules/learn/repositories/curriculum_repository.dart';
 import 'package:englishme/routes/app_routes.dart';
@@ -73,9 +74,20 @@ class LessonPlayerController extends GetxController {
       detail.value = d;
       // Tiến độ lấy từ SERVER (bền, đồng bộ đa thiết bị) — không lưu ở client.
       if (d.isCompleted) {
-        // Đã hoàn thành (đã nộp ≥1 lần) → chế độ ÔN TẬP: mở ở Lý thuyết, đi tự do.
+        // Đã hoàn thành (đã nộp ≥1 lần) → vào THẲNG màn Kết quả với điểm cũ
+        // (server trả bestScore + unitProgress). Vẫn ở reviewMode để bấm stepper
+        // lùi xem lại lý thuyết/bài tập tự do. result==null trước đây → fallback
+        // "đã hoàn thành" trống; giờ dựng lại LessonResult từ điểm đã lưu.
         reviewMode.value = true;
-        phase.value = LessonPhase.theory;
+        result.value = LessonResult(
+          passed: d.bestScore >= d.requiredScoreToPass,
+          score: d.bestScore,
+          xpEarned: 0, // XP đã cộng lần nộp gốc — không cộng lại khi xem.
+          unitProgress: d.unitProgress,
+          unitCompleted: d.unitCompleted,
+          nextLessonId: d.nextLessonId, // còn bài kế → nút "Bài tiếp theo".
+        );
+        phase.value = LessonPhase.summary;
       } else if (d.practiceCompleted) {
         // Đã xong luyện tập nhưng chưa nộp quiz → vào thẳng Kiểm tra.
         phase.value = LessonPhase.quiz;
@@ -148,6 +160,7 @@ class LessonPlayerController extends GetxController {
       return;
     }
     await _repo.completeTheory(lessonId);
+    CurriculumProgressBus.markDirty();
     phase.value = LessonPhase.practice;
   }
 
@@ -303,6 +316,7 @@ class LessonPlayerController extends GetxController {
           lessonId,
           _practiceAnswers.values.toList(),
         );
+        CurriculumProgressBus.markDirty();
       }
     }
   }
@@ -402,6 +416,7 @@ class LessonPlayerController extends GetxController {
       // Lần sau getLessonDetail trả status='completed' → tự vào chế độ ôn tập.
       final res = await _repo.completeLesson(lessonId, _quizAnswers);
       result.value = res;
+      CurriculumProgressBus.markDirty();
       // Đồng bộ XP (Profile/Home/Progress) + ăn mừng bonus đạt mục tiêu ngày.
       // Trước đây luồng giáo trình KHÔNG gọi handler → Home phải load tay.
       XpGrantHandler.apply(
@@ -409,6 +424,7 @@ class LessonPlayerController extends GetxController {
         xpEarned: res.xpEarned,
         streakUpdated: res.streakUpdated,
         bonuses: res.bonuses,
+        newBadges: res.newBadges,
       );
       phase.value = LessonPhase.summary;
     }
@@ -528,6 +544,55 @@ class LessonPlayerController extends GetxController {
       extraIndex.value++;
     } else {
       extraFinished.value = true; // hết câu → hiện điểm
+    }
+  }
+
+  // ── Luyện thêm bằng 4 ENGINE KỸ NĂNG (B xoay quanh A) ────────────────────
+  /// Kỹ năng của bài → có engine luyện chuyên sâu tương ứng không.
+  /// (grammar/vocabulary luyện ngay trong lesson, không có engine riêng.)
+  bool get hasSkillEngine {
+    final skill = detail.value?.skill ?? '';
+    return skill == 'listening' ||
+        skill == 'speaking' ||
+        skill == 'reading' ||
+        skill == 'writing';
+  }
+
+  /// Nhãn nút "Luyện thêm" theo kỹ năng của bài.
+  String get skillEngineLabel {
+    switch (detail.value?.skill) {
+      case 'listening':
+        return 'Luyện nghe chép câu trong bài';
+      case 'speaking':
+        return 'Luyện nói chủ đề bài này';
+      case 'reading':
+        return 'Luyện đọc hiểu cùng cấp';
+      case 'writing':
+        return 'Viết theo chủ đề bài này';
+      default:
+        return 'Luyện thêm kỹ năng';
+    }
+  }
+
+  /// Mở engine kỹ năng tương ứng, truyền lessonId + level để luyện ĐÚNG nội dung
+  /// vừa học. Dictation/Writing nhận lessonId (câu/đề bám bài); Conversation nhận
+  /// topic = tiêu đề bài; Reading theo level (kho reading không gắn theo lesson).
+  void openSkillEngine() {
+    final d = detail.value;
+    if (d == null) return;
+    final level = d.level;
+    switch (d.skill) {
+      case 'listening':
+        Get.toNamed(AppRoutes.dictation,
+            arguments: {'level': level, 'lessonId': d.id});
+      case 'speaking':
+        Get.toNamed(AppRoutes.conversation, arguments: {'topic': d.title});
+      case 'reading':
+        Get.toNamed(AppRoutes.exerciseQuiz,
+            arguments: {'category': 'reading', 'level': level});
+      case 'writing':
+        Get.toNamed(AppRoutes.writing,
+            arguments: {'level': level, 'lessonId': d.id});
     }
   }
 

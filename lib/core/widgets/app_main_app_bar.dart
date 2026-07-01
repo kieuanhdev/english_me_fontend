@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 
 import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/app_settings_icon_button.dart';
-import 'package:englishme/modules/notification/controllers/notification_controller.dart';
-import 'package:englishme/modules/notification/views/widgets/notification_sheet.dart';
 import 'package:englishme/theme/app_theme.dart';
 
 class AppMainAppBar extends StatelessWidget {
@@ -15,10 +12,8 @@ class AppMainAppBar extends StatelessWidget {
     this.showSearch = false,
     this.showBack = false,
     this.showSettings = true,
-    this.showNotification = true,
     this.onBack,
     this.onSearch,
-    this.onNotification,
     this.onSettings,
     this.horizontalPadding = 20,
   });
@@ -28,10 +23,8 @@ class AppMainAppBar extends StatelessWidget {
   final bool showSearch;
   final bool showBack;
   final bool showSettings;
-  final bool showNotification;
   final VoidCallback? onBack;
   final VoidCallback? onSearch;
-  final VoidCallback? onNotification;
   final VoidCallback? onSettings;
   final double horizontalPadding;
 
@@ -43,10 +36,8 @@ class AppMainAppBar extends StatelessWidget {
       showBack: showBack,
       showSearch: showSearch,
       showSettings: showSettings,
-      showNotification: showNotification,
       onBack: onBack,
       onSearch: onSearch,
-      onNotification: onNotification,
       onSettings: onSettings,
       horizontalPadding: horizontalPadding,
     );
@@ -60,11 +51,9 @@ class AppPageHeader extends StatelessWidget {
     this.subtitle,
     this.showBack = false,
     this.showSearch = false,
-    this.showNotification = false,
     this.showSettings = false,
     this.onBack,
     this.onSearch,
-    this.onNotification,
     this.onSettings,
     this.horizontalPadding = 20,
   });
@@ -73,11 +62,9 @@ class AppPageHeader extends StatelessWidget {
   final String? subtitle;
   final bool showBack;
   final bool showSearch;
-  final bool showNotification;
   final bool showSettings;
   final VoidCallback? onBack;
   final VoidCallback? onSearch;
-  final VoidCallback? onNotification;
   final VoidCallback? onSettings;
   final double horizontalPadding;
 
@@ -107,10 +94,6 @@ class AppPageHeader extends StatelessWidget {
               onTap: onSearch,
             ),
           ],
-          if (showNotification) ...[
-            const SizedBox(width: 8),
-            _BellWithBadge(onTap: onNotification ?? _showNotifications),
-          ],
           if (showSettings) ...[
             const SizedBox(width: 8),
             if (onSettings == null)
@@ -124,69 +107,6 @@ class AppPageHeader extends StatelessWidget {
           ],
         ],
       ),
-    );
-  }
-
-  void _showNotifications() {
-    final controller = NotificationController.ensureRegistered();
-    controller.loadAll();
-    Get.bottomSheet<void>(
-      const NotificationSheet(),
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-    );
-  }
-}
-
-/// Chuông + badge số chưa đọc. Đọc [NotificationController] permanent qua Obx
-/// nên badge nhất quán ở mọi màn dùng [AppMainAppBar] mà không cần sửa per-screen.
-class _BellWithBadge extends StatelessWidget {
-  const _BellWithBadge({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final controller = NotificationController.ensureRegistered();
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        _HeaderIconButton(
-          icon: Icons.notifications_outlined,
-          color: AppColors.primary,
-          onTap: onTap,
-        ),
-        Positioned(
-          right: -2,
-          top: -2,
-          child: Obx(() {
-            final count = controller.unreadCount.value;
-            if (count == 0) return const SizedBox.shrink();
-            return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
-              decoration: BoxDecoration(
-                color: AppColors.danger,
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.surfaceContainerLowest,
-                  width: 1.5,
-                ),
-              ),
-              alignment: Alignment.center,
-              child: Text(
-                count > 9 ? '9+' : '$count',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  height: 1.1,
-                ),
-              ),
-            );
-          }),
-        ),
-      ],
     );
   }
 }

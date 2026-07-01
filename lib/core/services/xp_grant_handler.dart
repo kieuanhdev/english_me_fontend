@@ -1,8 +1,10 @@
 import 'package:englishme/core/services/sound_service.dart';
 import 'package:englishme/core/utils/app_notify.dart';
+import 'package:englishme/core/widgets/badge_unlock_celebration.dart';
 import 'package:englishme/core/widgets/daily_goal_celebration.dart';
 import 'package:englishme/modules/home/controllers/home_controller.dart';
-import 'package:englishme/modules/learn/models/curriculum_models.dart' show XpBonus;
+import 'package:englishme/modules/learn/models/curriculum_models.dart'
+    show XpBonus, BadgeAward;
 import 'package:englishme/modules/profile/controllers/profile_controller.dart';
 import 'package:englishme/modules/progress/controllers/progress_controller.dart';
 import 'package:get/get.dart';
@@ -35,6 +37,7 @@ class XpGrantHandler {
     bool streakUpdated = false,
     bool leveledUp = false,
     List<XpBonus> bonuses = const [],
+    List<BadgeAward> newBadges = const [],
     bool refreshScreens = true,
     bool playCompletionSound = true,
   }) {
@@ -73,6 +76,10 @@ class XpGrantHandler {
         _showBonusToast(bonus);
       }
     }
+
+    // Mở khoá badge → popup ăn mừng (hiện tuần tự nếu nhiều). showQueue tự
+    // nhường nếu đang có dialog khác (vd daily goal) để không chồng.
+    BadgeUnlockCelebration.showQueue(newBadges);
   }
 
   /// Refresh ngầm các màn hiển thị XP (Home dashboard + Progress) nếu chúng đang

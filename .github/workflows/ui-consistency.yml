@@ -1,0 +1,54 @@
+name: UI Consistency
+
+# Chặn regression token theme (Colors.white/black, Color(0x…) literal,
+# fontFamily raw). Logic: tool/check_ui_consistency.dart so với baseline
+# trong tool/ui_consistency_baseline.json — fail khi số vi phạm vượt baseline.
+#
+# Khi cố ý cải tổ giảm vi phạm, chạy local:
+#     dart run tool/check_ui_consistency.dart --baseline
+# rồi commit lại baseline.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/**'
+      - 'tool/check_ui_consistency.dart'
+      - 'tool/ui_consistency_baseline.json'
+      - '.github/workflows/ui-consistency.yml'
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'tool/check_ui_consistency.dart'
+      - 'tool/ui_consistency_baseline.json'
+      - '.github/workflows/ui-consistency.yml'
+
+jobs:
+  ui-consistency:
+    name: Theme token guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Show Dart version
+        run: dart --version
+
+      - name: Run UI consistency check
+        run: dart run tool/check_ui_consistency.dart
+
+      - name: Hint on failure
+        if: failure()
+        run: |
+          echo "::error::Có vi phạm theme tokens MỚI so với baseline."
+          echo "Fix lại hoặc — nếu là cải tổ cố ý — chạy local:"
+          echo "  dart run tool/check_ui_consistency.dart --baseline"
+          echo "rồi commit lại tool/ui_consistency_baseline.json."

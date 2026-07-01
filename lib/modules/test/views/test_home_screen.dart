@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
-import 'package:englishme/core/shell/shell_controller.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/modules/test/controllers/test_controller.dart';
@@ -16,10 +14,6 @@ class TestHomeScreen extends GetView<TestController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: AppBottomNav(
-        initialIndex: 2,
-        onTap: (index, _) => ShellController.goToTab(index),
-      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -32,6 +26,7 @@ class TestHomeScreen extends GetView<TestController> {
                   children: [
                     const AppMainAppBar(
                       title: 'Kiểm tra',
+                      showBack: true,
                       horizontalPadding: 0,
                     ),
                     AppGap.h6,

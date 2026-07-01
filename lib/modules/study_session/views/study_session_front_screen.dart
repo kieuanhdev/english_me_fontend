@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
 import 'package:englishme/core/services/tts_service.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/word_card_parts.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
@@ -285,11 +286,8 @@ class _SessionAppBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          IconButton(
-            onPressed: onClose,
-            icon: const Icon(Icons.close_rounded, size: 22),
-            color: AppColors.primary,
-          ),
+          AppCloseButton(onPressed: onClose),
+          AppGap.w8,
           Text(
             title.isNotEmpty ? title : 'Daily Session',
             style: AppTypography.displayLarge.copyWith(

@@ -37,6 +37,7 @@ class AppTextField extends StatelessWidget {
         ? hintText!.tr
         : hintText;
 
+    // Nhãn nằm TRÊN ĐỈNH ô (label-on-top), tách khỏi ô nhập cho rõ ràng.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -73,14 +74,16 @@ class AppTextField extends StatelessWidget {
               color: AppColors.textSecondary,
             ),
             filled: true,
-            fillColor: AppColors.surfaceContainerHigh,
+            // surfaceContainerLow: nhạt hơn High, hợp tông panel (trắng ở light mode)
+            // — tránh ô nhập xám đậm nổi cục trong form auth.
+            fillColor: AppColors.surfaceContainerLow,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 18,
               vertical: 16,
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: Color(0xFFCED8E2), width: 2),
+              borderSide: BorderSide(color: AppColors.outlineVariant, width: 2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
@@ -88,11 +91,11 @@ class AppTextField extends StatelessWidget {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+              borderSide: BorderSide(color: AppColors.danger, width: 2),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppRadius.md),
-              borderSide: const BorderSide(color: Colors.redAccent, width: 2),
+              borderSide: BorderSide(color: AppColors.danger, width: 2),
             ),
           ),
         ),

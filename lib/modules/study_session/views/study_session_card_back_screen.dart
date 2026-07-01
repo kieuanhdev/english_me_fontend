@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/core/widgets/word_card_parts.dart';
 import 'package:englishme/modules/vocab_hub/models/vocab_word_model.dart';
 import 'package:englishme/modules/study_session/controllers/study_session_controller.dart';
@@ -47,11 +48,8 @@ class StudySessionCardBackScreen extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Row(
                 children: [
-                  IconButton(
-                    onPressed: controller.closeSession,
-                    icon: const Icon(Icons.close_rounded, size: 22),
-                    color: AppColors.primary,
-                  ),
+                  AppCloseButton(onPressed: controller.closeSession),
+                  AppGap.w8,
                   Expanded(
                     child: Text(
                       controller.deskTitle.isNotEmpty

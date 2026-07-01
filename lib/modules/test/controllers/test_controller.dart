@@ -170,6 +170,7 @@ class TestController extends GetxController {
         xpEarned: result.xpEarned,
         streakUpdated: result.streakUpdated,
         bonuses: result.bonuses,
+        newBadges: result.newBadges,
       );
       state.value = TestState.finished;
       Get.offNamed(AppRoutes.testResult);

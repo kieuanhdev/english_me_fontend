@@ -61,38 +61,49 @@ class AppBottomNav extends StatelessWidget {
   }
 
   Widget _buildBar(int activeIndex, ShellController? shell) {
-    return Container(
-      height: 76,
-      decoration: BoxDecoration(
-        color: AppColors.surfaceContainerLowest.withValues(alpha: 0.92),
-        border: Border(top: BorderSide(color: AppColors.outlineVariant)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.onSurface.withValues(alpha: 0.04),
-            offset: const Offset(0, -4),
-            blurRadius: 24,
+    void handleTap(int i, String route) {
+      if (onTap != null) {
+        onTap!(i, route);
+      } else if (shell != null) {
+        ShellController.goToTab(i);
+      } else {
+        Get.offAllNamed(route);
+      }
+    }
+
+    // Floating pill bar — cách mép màn, bo tròn lớn, nổi khối với shadow mềm.
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: Container(
+          height: 66,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(AppRadius.pill),
+            border: Border.all(color: AppColors.outlineVariant),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.neutralShadow.withValues(alpha: 0.55),
+                offset: const Offset(0, 8),
+                blurRadius: 24,
+                spreadRadius: -4,
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Row(
-        children: List.generate(_items.length, (i) {
-          final item = _items[i];
-          return Expanded(
-            child: _NavItem(
-              data: item,
-              active: i == activeIndex,
-              onTap: () {
-                if (onTap != null) {
-                  onTap!(i, item.route);
-                } else if (shell != null) {
-                  ShellController.goToTab(i);
-                } else {
-                  Get.offAllNamed(item.route);
-                }
-              },
-            ),
-          );
-        }),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(_items.length, (i) {
+              final item = _items[i];
+              return _NavItem(
+                data: item,
+                active: i == activeIndex,
+                onTap: () => handleTap(i, item.route),
+              );
+            }),
+          ),
+        ),
       ),
     );
   }
@@ -125,44 +136,60 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = active
-        ? AppColors.primary
-        : AppColors.textSecondary.withValues(alpha: 0.7);
+    // Active: pill primary, icon + label nằm ngang. Inactive: chỉ icon, mờ.
+    final Color iconColor = active
+        ? AppColors.onPrimaryFixed
+        : AppColors.textSecondary.withValues(alpha: 0.75);
 
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        duration: const Duration(milliseconds: 240),
+        curve: Curves.easeOutCubic,
+        padding: active
+            ? const EdgeInsets.symmetric(horizontal: 16, vertical: 9)
+            : const EdgeInsets.all(9),
+        decoration: BoxDecoration(
+          color: active ? AppColors.primary : Colors.transparent,
+          borderRadius: BorderRadius.circular(AppRadius.pill),
+          boxShadow: active
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    offset: const Offset(0, 4),
+                    blurRadius: 12,
+                    spreadRadius: -2,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding: active
-                  ? const EdgeInsets.symmetric(horizontal: 14, vertical: 4)
-                  : EdgeInsets.zero,
-              decoration: BoxDecoration(
-                color: active ? AppColors.primarySoft : Colors.transparent,
-                borderRadius: BorderRadius.circular(AppRadius.xl),
-              ),
-              child: Icon(
-                active ? data.icon : data.inactiveIcon,
-                color: color,
-                size: 22,
-              ),
+            Icon(
+              active ? data.icon : data.inactiveIcon,
+              color: iconColor,
+              size: 24,
             ),
-            const SizedBox(height: 3),
-            Text(
-              data.label,
-              style: AppTypography.bodyLarge.copyWith(
-                fontSize: 9,
-                fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                color: color,
-                letterSpacing: 0.2,
-              ),
+            // Label chỉ hiện khi active — animated mở rộng theo pill.
+            AnimatedSize(
+              duration: const Duration(milliseconds: 240),
+              curve: Curves.easeOutCubic,
+              child: active
+                  ? Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Text(
+                        data.label,
+                        style: AppTypography.bodyLarge.copyWith(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.onPrimaryFixed,
+                          letterSpacing: 0.2,
+                        ),
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         ),

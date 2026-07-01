@@ -68,43 +68,37 @@ class WeakSkillsController extends GetxController {
     }
   }
 
-  /// Danh sách kỹ năng, SẮP XẾP yếu nhất lên đầu (share thấp -> trước).
+  /// Nhãn tiếng Việt mỗi kỹ năng.
+  static const Map<String, String> _labels = {
+    'listening': 'Nghe',
+    'speaking': 'Nói',
+    'reading': 'Đọc',
+    'writing': 'Viết',
+    'vocabulary': 'Từ vựng',
+    'grammar': 'Ngữ pháp',
+    'pronunciation': 'Phát âm',
+  };
+
+  /// Danh sách kỹ năng CÓ dữ liệu, SẮP XẾP yếu nhất lên đầu (share thấp -> trước).
+  /// share = tiến độ học (lesson hoàn thành / tổng lesson). Skill không có lesson bị bỏ.
   List<WeakSkillItem> get skills {
     final b = breakdown.value;
     if (b == null) return const [];
-    final items = <WeakSkillItem>[
-      WeakSkillItem(
-        key: 'vocabulary',
-        label: 'Từ vựng',
-        share: b.vocabulary,
-        reason: _reasonFor('vocabulary', b.vocabulary),
-      ),
-      WeakSkillItem(
-        key: 'grammar',
-        label: 'Ngữ pháp',
-        share: b.grammar,
-        reason: _reasonFor('grammar', b.grammar),
-      ),
-      WeakSkillItem(
-        key: 'reading',
-        label: 'Đọc',
-        share: b.reading,
-        reason: _reasonFor('reading', b.reading),
-      ),
-      WeakSkillItem(
-        key: 'pronunciation',
-        label: 'Phát âm',
-        share: b.pronunciation,
-        reason: _reasonFor('pronunciation', b.pronunciation),
-      ),
-    ]..sort((a, c) => a.share.compareTo(c.share));
+    final items = b.withData.entries
+        .map((e) => WeakSkillItem(
+              key: e.key,
+              label: _labels[e.key] ?? e.key,
+              share: e.value,
+              reason: _reasonFor(e.key, e.value),
+            ))
+        .toList()
+      ..sort((a, c) => a.share.compareTo(c.share));
     return items;
   }
 
   bool get hasData {
     final b = breakdown.value;
-    if (b == null) return false;
-    return (b.vocabulary + b.grammar + b.reading + b.pronunciation) > 0;
+    return b != null && b.withData.isNotEmpty;
   }
 
   String _reasonFor(String key, double share) {
@@ -113,9 +107,12 @@ class WeakSkillsController extends GetxController {
       return 'Bạn chưa luyện kỹ năng này — bắt đầu ngay để không bị hổng';
     }
     final base = switch (key) {
+      'listening' => 'Luyện nghe giúp bạn bắt ý và phản xạ nhanh hơn khi giao tiếp',
+      'speaking' => 'Luyện nói giúp bạn diễn đạt tự nhiên và tự tin hơn',
+      'reading' => 'Luyện đọc giúp bạn hiểu văn bản nhanh và nắm ý chính tốt hơn',
+      'writing' => 'Luyện viết giúp bạn sắp xếp ý và dùng câu chính xác hơn',
       'vocabulary' => 'Mở rộng vốn từ giúp bạn hiểu và diễn đạt tốt hơn',
       'grammar' => 'Nắm chắc ngữ pháp giúp câu của bạn chính xác hơn',
-      'reading' => 'Luyện đọc giúp bạn hiểu văn bản nhanh và nắm ý chính tốt hơn',
       'pronunciation' =>
         'Luyện phát âm giúp người khác hiểu bạn dễ hơn khi nói',
       _ => '',
@@ -133,13 +130,20 @@ class WeakSkillsController extends GetxController {
   void practice(String key) {
     switch (key) {
       case 'pronunciation':
-        // Phát âm: ưu tiên luyện NÓI với AI hội thoại (chấm điểm + nhận xét).
+      case 'speaking':
+        // Nói/Phát âm: ưu tiên luyện NÓI với AI hội thoại (chấm điểm + nhận xét).
         Get.toNamed(AppRoutes.conversation);
+      case 'listening':
+        Get.toNamed(AppRoutes.dictation);
+      case 'writing':
+        Get.toNamed(AppRoutes.writing);
       case 'grammar':
         Get.toNamed(AppRoutes.grammarTheory);
       case 'reading':
-        // Đọc: nội dung nằm trong bài học giáo trình → mở danh sách Unit để học.
-        Get.toNamed(AppRoutes.curriculumUnits);
+        // Đọc: vào thẳng màn Đọc của "Luyện tập nhanh" (cùng đích với
+        // lesson skill-engine + quick-practice) — luyện đọc thuần, KHÔNG mở
+        // giáo trình A1 (lesson hỗn hợp vocab+grammar). level=null → backend lo.
+        Get.toNamed(AppRoutes.exerciseQuiz, arguments: {'category': 'reading'});
       case 'vocabulary':
       default:
         Get.toNamed(AppRoutes.flashcards);

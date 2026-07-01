@@ -1,7 +1,6 @@
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
 import 'package:englishme/core/services/tts_service.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -22,10 +21,6 @@ class IpaScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: AppBottomNav(
-        initialIndex: 1,
-        onTap: (index, _) => ShellController.goToTab(index),
-      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +31,6 @@ class IpaScreen extends StatelessWidget {
                 title: 'Bảng IPA',
                 showBack: true,
                 showSettings: false,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: _onBack,
               ),

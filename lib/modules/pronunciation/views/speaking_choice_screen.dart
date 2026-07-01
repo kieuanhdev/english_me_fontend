@@ -1,6 +1,5 @@
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/shell/shell_controller.dart';
-import 'package:englishme/core/widgets/app_bottom_nav.dart';
 import 'package:englishme/core/widgets/app_main_app_bar.dart';
 import 'package:englishme/routes/app_routes.dart';
 import 'package:englishme/theme/app_theme.dart';
@@ -22,10 +21,6 @@ class SpeakingChoiceScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      bottomNavigationBar: AppBottomNav(
-        initialIndex: 2,
-        onTap: (index, _) => ShellController.goToTab(index),
-      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
@@ -36,7 +31,6 @@ class SpeakingChoiceScreen extends StatelessWidget {
                 title: 'Luyện nói',
                 showBack: true,
                 showSettings: false,
-                showNotification: false,
                 horizontalPadding: 0,
                 onBack: _onBack,
               ),

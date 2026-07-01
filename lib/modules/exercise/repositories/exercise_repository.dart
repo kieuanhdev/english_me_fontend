@@ -9,10 +9,15 @@ class ExerciseRepository {
   Future<ExerciseSession> getExerciseSession({
     required ExerciseCategory category,
     int size = 10,
+    String? level,
   }) async {
     final response = await _dio.get(
       '/exercises/sessions',
-      queryParameters: {'category': category.name, 'size': size},
+      queryParameters: {
+        'category': category.name,
+        'size': size,
+        if (level != null && level.isNotEmpty) 'level': level,
+      },
     );
     return ExerciseSession.fromJson(response.data as Map<String, dynamic>);
   }

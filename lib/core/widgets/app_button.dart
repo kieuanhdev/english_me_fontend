@@ -161,12 +161,14 @@ class AppButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(r),
         gradient: useGradient ? AppColors.primaryGradient : null,
         // Chỉ nút nền đặc (primary/danger) mới có bóng; nút viền & nút phẳng để
-        // nhẹ, không đổ bóng.
+        // nhẹ, không đổ bóng. Bóng mềm (có blur) thay vì gờ đặc 4px ở dưới —
+        // tránh trông như viền đậm/3D thô.
         boxShadow: disabled || !_isFilled
             ? null
             : [
                 BoxShadow(
-                  color: AppColors.primaryContainer,
+                  color: AppColors.primaryContainer.withValues(alpha: 0.28),
+                  blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],

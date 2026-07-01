@@ -71,10 +71,21 @@ class TtsService extends GetxService {
     });
   }
 
-  Future<void> speak(String text) async {
+  static const double _defaultRate = 0.45;
+  static const double _slowRate = 0.32;
+
+  Future<void> speak(String text) async => _speakAt(text, _defaultRate);
+
+  /// Đọc chậm hơn cho luyện nghe-chép (dictation).
+  Future<void> speakSlow(String text) async => _speakAt(text, _slowRate);
+
+  /// speak với rate chỉ định. awaitSpeakCompletion=false nên KHÔNG reset rate
+  /// trong finally (sẽ đổi trước khi đọc xong) — mỗi lần speak tự set rate mong muốn.
+  Future<void> _speakAt(String text, double rate) async {
     if (text.trim().isEmpty) return;
     try {
       await _tts.stop();
+      await _tts.setSpeechRate(rate);
       speakingText.value = text;
       await _tts.speak(text);
     } catch (_) {

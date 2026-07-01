@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path . -Directory)",
+      "Bash(Select-Object Name)",
+      "Read(//d/WorkSpace/**)",
+      "Bash(flutter analyze *)",
+      "Bash(flutter pub *)",
+      "Bash(flutter clean *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\WorkSpace\\\\doantotnghiep\\\\fontend\\\\englishme\\\\lib\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "WebFetch(domain:pub.dev)",
+      "Bash(Select-Object -Last 30)",
+      "PowerShell(flutter analyze *)",
+      "Bash(dir D:WorkSpacedoantotnghiepfontendenglishmelibmodules *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\WorkSpace\\\\doantotnghiep\\\\fontend\\\\englishme\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "Bash(Format-Table -AutoSize)",
+      "Bash(Get-ChildItem -Path \"d:\\\\WorkSpace\\\\doantotnghiep\\\\fontend\\\\englishme\\\\lib\\\\modules\\\\grammar\" -Recurse -File)",
+      "Bash(grep -E \"\\\\.\\(dart\\)$\")",
+      "Bash(Get-ChildItem -Path \"d:\\\\WorkSpace\\\\doantotnghiep\\\\fontend\\\\englishme\\\\lib\\\\modules\" -Directory)",
+      "Bash(Format-Table -HideTableHeaders)",
+      "Bash(mkdir -p \"d:\\\\WorkSpace\\\\doantotnghiep\\\\fontend\\\\englishme\\\\lib\\\\modules\\\\grammar\\\\views\")",
+      "Bash(Remove-Item -Recurse -Force \"d:\\\\WorkSpace\\\\doantotnghiep\\\\fontend\\\\englishme\\\\lib\\\\grammar\")",
+      "Read(//c/Users/bidan/Downloads/EnglishMe/docs/**)",
+      "Bash(findstr /n \"^## \" \"c:\\\\Users\\\\bidan\\\\Downloads\\\\EnglishMe\\\\docs\\\\PROJECT_DOCUMENTATION.md\")",
+      "Bash(rm -rf lib/dashboard lib/exercise lib/test lib/profile lib/progress lib/pronunciation lib/vocab && echo \"OK\" && ls lib/)",
+      "PowerShell(flutter test --no-pub 2>&1)",
+      "Bash(dart run *)"
+    ],
+    "additionalDirectories": [
+      "d:\\WorkSpace\\doantotnghiep\\fontend\\englishme\\lib",
+      "d:\\WorkSpace\\doantotnghiep\\fontend\\englishme\\lib\\modules\\grammar",
+      "D:\\WorkSpace\\doantotnghiep\\fontend\\englishme\\lib\\dashboard"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "figma-mcp-go"
+  ]
+}

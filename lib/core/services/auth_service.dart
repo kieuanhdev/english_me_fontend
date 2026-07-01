@@ -12,6 +12,10 @@ class AuthService {
         _googleSignIn = googleSignIn ?? GoogleSignIn();
 
   Future<String?> signInWithGoogle() async {
+    // Xóa phiên Google còn nhớ trước khi đăng nhập → LUÔN hiện màn chọn tài khoản,
+    // cho phép đổi nick Google khác (nếu không, Google tự nhảy vào nick cũ).
+    await _googleSignIn.signOut();
+
     final account = await _googleSignIn.signIn();
     if (account == null) return null;
 
@@ -42,6 +46,14 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    await Future.wait([_firebaseAuth.signOut(), _googleSignIn.signOut()]);
+    // disconnect() hủy hẳn liên kết (không chỉ signOut phiên) → lần đăng nhập sau
+    // Google bắt buộc hiện màn chọn tài khoản, đổi nick khác được.
+    // disconnect ném lỗi nếu chưa từng liên kết → nuốt lỗi, vẫn signOut Firebase.
+    try {
+      await _googleSignIn.disconnect();
+    } catch (_) {
+      await _googleSignIn.signOut();
+    }
+    await _firebaseAuth.signOut();
   }
 }

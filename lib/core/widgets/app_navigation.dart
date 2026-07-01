@@ -37,6 +37,44 @@ class AppBackButton extends StatelessWidget {
   }
 }
 
+/// Nút "thoát/hủy" cho luồng đang làm dở (phiên thi, học thẻ, luyện tập).
+/// Cùng kiểu dáng tròn border+shadow như [AppBackButton] để đồng bộ giao diện,
+/// nhưng icon X — phân biệt ngữ nghĩa "thoát phiên" với "quay lại" ([AppBackButton]).
+class AppCloseButton extends StatelessWidget {
+  const AppCloseButton({
+    required this.onPressed,
+    this.size = 40,
+    super.key,
+  });
+
+  final VoidCallback onPressed;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      child: Ink(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: AppColors.surfaceContainerLowest,
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.neutralShadow,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Icon(Icons.close_rounded, color: AppColors.primary, size: 22),
+      ),
+    );
+  }
+}
+
 class AppBackWithProgress extends StatelessWidget {
   const AppBackWithProgress({
     required this.onBack,

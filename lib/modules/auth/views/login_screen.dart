@@ -1,5 +1,6 @@
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/values/app_strings.dart';
+import 'package:englishme/core/widgets/app_brand_row.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/app_text_field.dart';
 import 'package:englishme/core/widgets/common_app_bar.dart';
@@ -36,6 +37,16 @@ class _LoginViewState extends State<_LoginView> {
 
   AuthController get _controller => Get.find<AuthController>();
 
+  /// Pop nếu còn route phía dưới; nếu không (vd vào login sau logout bằng
+  /// offAllNamed → stack rỗng) thì về Welcome thay vì ra màn trắng.
+  void _safeBack() {
+    if (Navigator.of(context).canPop()) {
+      Get.back();
+    } else {
+      Get.offAllNamed(AppRoutes.welcome);
+    }
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -47,32 +58,37 @@ class _LoginViewState extends State<_LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
-      appBar: const CommonAppBar(
-        title: T.authLogin,
-        actions: [LanguageToggleButton(), ThemeToggleButton(), SizedBox(width: 4)],
+      appBar: CommonAppBar(
+        title: '',
+        titleWidget: const AppBrandRow(),
+        isTranslate: false,
+        // Sau logout dùng offAllNamed → stack rỗng, Get.back() sẽ ra màn trắng.
+        // Guard: pop nếu được, không thì về Welcome.
+        onBackPressed: _safeBack,
+        actions: const [
+          LanguageToggleButton(),
+          ThemeToggleButton(),
+          SizedBox(width: 4),
+        ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              AppGap.h20,
-              Text(
-                T.loginWelcomeTitle.tr,
-                style: AppTypography.displayLarge.copyWith(
-                  fontSize: 26,
-                  color: AppColors.primary,
-                ),
-              ),
-              AppGap.h6,
-              Text(
-                T.loginWelcomeSubtitle.tr,
-                style: AppTypography.bodyRegular.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              AppGap.h20,
+      body: Stack(
+        children: [
+          const _AuthBackdrop(),
+          SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 32),
+                  child: IntrinsicHeight(
+                    child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AuthBrandHeader(
+                    title: T.loginWelcomeTitle.tr,
+                    subtitle: T.loginWelcomeSubtitle.tr,
+                  ),
+                  AppGap.h18,
               AuthFormPanel(
                 child: Column(
                   children: [
@@ -87,27 +103,35 @@ class _LoginViewState extends State<_LoginView> {
                       obscureText: true,
                       controller: _passwordController,
                     ),
-                    AppGap.h8,
+                    AppGap.h6,
                     Align(
                       alignment: Alignment.centerRight,
                       child: AppButton(
                         label: T.forgotPassword,
                         variant: AppButtonVariant.text,
                         expand: false,
+                        height: 36,
                         onPressed: () {},
+                        textStyle: AppTypography.bodyRegular.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                     AppGap.h10,
                     Obx(
                       () => AppButton(
                         label: T.loginNow,
-                        onPressed: _controller.isLoading.value
+                        gradient: true,
+                        radius: AppRadius.pill,
+                        onPressed: _controller.isBusy
                             ? null
                             : () => _controller.signInWithEmail(
                                 _emailController.text,
                                 _passwordController.text,
                               ),
                         isLoading: _controller.isLoading.value,
+                        textStyle: AuthText.button,
                       ),
                     ),
                     AppGap.h24,
@@ -116,25 +140,74 @@ class _LoginViewState extends State<_LoginView> {
                     Obx(
                       () => AppButton(
                         label: T.buttonContinueWithGoogle,
-                        onPressed: _controller.isLoading.value
+                        radius: AppRadius.pill,
+                        onPressed: _controller.isBusy
                             ? null
                             : _controller.signInWithGoogle,
                         variant: AppButtonVariant.secondary,
                         leading: const GoogleMark(),
-                        isLoading: _controller.isLoading.value,
+                        isLoading: _controller.isGoogleLoading.value,
+                        textStyle: AuthText.button,
                       ),
                     ),
                   ],
                 ),
               ),
-              AppGap.h20,
-              AuthNavigationText(
-                promptText: T.dontHaveAccount.tr,
-                buttonText: T.registerNow.tr,
-                onTap: () => Get.toNamed(AppRoutes.register),
+                  const Spacer(),
+                  AppGap.h20,
+                  AuthNavigationText(
+                    promptText: T.dontHaveAccount.tr,
+                    buttonText: T.registerNow.tr,
+                    onTap: () => Get.toNamed(AppRoutes.register),
+                  ),
+                ],
+                    ),
+                  ),
+                ),
               ),
-            ],
+            ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Nền trang trí cho màn auth: 2 khối tròn gradient mờ ở góc.
+class _AuthBackdrop extends StatelessWidget {
+  const _AuthBackdrop();
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        child: Stack(
+          children: [
+            Positioned(
+              top: -90,
+              right: -80,
+              child: Container(
+                width: 240,
+                height: 240,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -110,
+              left: -100,
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  color: AppColors.tertiary.withValues(alpha: 0.06),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

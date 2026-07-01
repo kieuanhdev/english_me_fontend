@@ -2,6 +2,10 @@ import 'package:englishme/modules/grammar/bindings/grammar_binding.dart';
 import 'package:englishme/modules/grammar/bindings/grammar_theory_binding.dart';
 import 'package:englishme/modules/grammar/views/grammar_lesson_detail_screen.dart';
 import 'package:englishme/modules/grammar/views/grammar_theory_screen.dart';
+import 'package:englishme/modules/dictation/bindings/dictation_binding.dart';
+import 'package:englishme/modules/dictation/views/dictation_screen.dart';
+import 'package:englishme/modules/writing/bindings/writing_binding.dart';
+import 'package:englishme/modules/writing/views/writing_screen.dart';
 import 'package:englishme/modules/learn/bindings/curriculum_binding.dart';
 import 'package:englishme/modules/learn/views/checkpoint_screen.dart';
 import 'package:englishme/modules/learn/views/lesson_player_screen.dart';
@@ -50,6 +54,17 @@ abstract class LearnPages {
         showExercises: AppRouteArgs.showExercises(Get.arguments),
       ),
       binding: GrammarBinding(),
+    ),
+    // 4 kỹ năng: Nghe→dictation, Đọc→exercise, Viết→writing (chat AI).
+    GetPage(
+      name: AppRoutes.dictation,
+      page: () => const DictationScreen(),
+      binding: DictationBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.writing,
+      page: () => const WritingScreen(),
+      binding: WritingBinding(),
     ),
   ];
 }

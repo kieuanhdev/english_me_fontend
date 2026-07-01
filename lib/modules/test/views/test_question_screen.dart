@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:englishme/core/layout/app_spacing.dart';
 import 'package:englishme/core/widgets/app_button.dart';
 import 'package:englishme/core/widgets/api_state_view.dart';
+import 'package:englishme/core/widgets/app_navigation.dart';
 import 'package:englishme/modules/test/controllers/test_controller.dart';
 import 'package:englishme/modules/test/models/test_model.dart';
 import 'package:englishme/core/values/app_strings.dart';
@@ -96,11 +97,10 @@ class _TestAppBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: Row(
         children: [
-          IconButton(
+          AppCloseButton(
             onPressed: () => _showExitDialog(context, controller),
-            icon: const Icon(Icons.close_rounded, size: 22),
-            color: AppColors.primary,
           ),
+          AppGap.w8,
           Expanded(
             child: Obx(
               () => Text(

@@ -147,6 +147,28 @@ class GrammarExercise {
   }
 }
 
+/// Câu luyện tập AI sinh ra (cùng dạng câu user vừa sai). Cùng shape với
+/// [GrammarExercise] để tái dùng renderer: id + exerciseType + content map.
+class GrammarPracticeItem {
+  const GrammarPracticeItem({
+    required this.id,
+    required this.exerciseType,
+    required this.content,
+  });
+
+  final String id;
+  final String exerciseType;
+  final Map<String, dynamic> content;
+
+  factory GrammarPracticeItem.fromJson(Map<String, dynamic> json) {
+    return GrammarPracticeItem(
+      id: json['id']?.toString() ?? '',
+      exerciseType: json['exerciseType']?.toString() ?? '',
+      content: (json['content'] as Map?)?.cast<String, dynamic>() ?? const {},
+    );
+  }
+}
+
 class GrammarLessonDetail {
   const GrammarLessonDetail({
     required this.id,
